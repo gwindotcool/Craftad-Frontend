@@ -14,7 +14,7 @@ export default function JobHistory({ token }) {
             .then((res) => {
                 const history = (res.jobs || []).filter(
                     (job) =>
-                        ["completed", "customer_confirmed"].includes(
+                        ["completed", "customer_confirmed", "paid"].includes(
                             job.status
                         )
                 );
@@ -29,13 +29,50 @@ export default function JobHistory({ token }) {
 
     if (loading) return <Spinner />;
 
-    const filtered = jobs.filter((j) => !search.trim() || (j.title + j.category + j.description).toLowerCase().includes(search.toLowerCase()));
+    const filtered = jobs.filter(
+        (j) =>
+            !search.trim() ||
+            `${j.title || ""} ${j.category || ""} ${j.description || ""}`
+                .toLowerCase()
+                .includes(search.toLowerCase())
+    );
 
     return (
         <div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: C.text, marginBottom: 14 }}>Job History</h2>
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Search history…" style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontSize: 14, outline: "none", marginBottom: 18, boxSizing: "border-box" }} />
-            {filtered.length === 0 ? <Empty msg="No jobs found" icon="📖" /> : filtered.map((job) => <JobCard key={job._id} job={job} />)}
+            <h2
+                style={{
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: C.text,
+                    marginBottom: 14
+                }}
+            >
+                Job History
+            </h2>
+
+            <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="🔍 Search history…"
+                style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: 8,
+                    border: `1.5px solid ${C.border}`,
+                    fontSize: 14,
+                    outline: "none",
+                    marginBottom: 18,
+                    boxSizing: "border-box"
+                }}
+            />
+
+            {filtered.length === 0 ? (
+                <Empty msg="No jobs found" icon="📖" />
+            ) : (
+                filtered.map((job) => (
+                    <JobCard key={job._id} job={job} />
+                ))
+            )}
         </div>
     );
 }

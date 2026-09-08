@@ -14,7 +14,7 @@ export default function ArtisanProfile({ token }) {
     const toggleSkill = (skill) => setF((p) => ({ ...p, skills: p.skills.includes(skill) ? p.skills.filter((s) => s !== skill) : [...p.skills, skill] }));
 
     useEffect(() => {
-        api.get("/api/artisan/me", token)
+        api.get("/api/artisans/me", token)
             .then((d) => {
                 const p = extract(d, "artisan", "profile", "data");
                 setProfile(p);
@@ -63,13 +63,13 @@ export default function ArtisanProfile({ token }) {
         try {
             if (profile) {
                 await api.patch(
-                    "/api/artisan/update",
+                    "/api/artisans/update",
                     payload,
                     token
                 );
             } else {
                 await api.post(
-                    "/api/artisan/create",
+                    "/api/artisans/create",
                     payload,
                     token
                 );

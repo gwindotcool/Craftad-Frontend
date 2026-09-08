@@ -18,12 +18,26 @@ export default function CustomerHome({ token, user }) {
     const toast$ = (msg, type = "success") => { setToast({ msg, type }); setTimeout(() => setToast(null), 3500); };
 
     // ✅ Fixed: use /api/jobs/history (not /api/jobs which is artisan/admin only)
-    useEffect(() => {
-        api.get("/api/job/my-jobs", token)
-            .then((d) => setJobs(arr(extract(d, "jobs", "data"))))
-            .catch((e) => console.error("Jobs:", e.message))
-            .finally(() => setLoading(false));
-    }, [token]);
+useEffect(() => {
+    const loadJobs = async () => {
+        try {
+            const d = await api.get("/api/job/my-jobs", token);
+            setJobs(arr(extract(d, "jobs", "data")));
+        } catch (e) {
+            console.error("Jobs:", e.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    loadJobs();
+
+    // Refresh jobs every 5 seconds
+    const interval = setInterval(loadJobs, 5000);
+
+    return () => clearInterval(interval);
+}, [token]);
+
 
     const loadApps = (jobId) => {
         setAppsL(true);
@@ -43,22 +57,70 @@ export default function CustomerHome({ token, user }) {
 
     const assign = async (applicationId) => {
         try {
-            await api.patch(
+            // 1. Accept the artisan's application
+            const response = await api.patch(
                 `/api/applications/accept/${applicationId}`,
                 {},
                 token
             );
 
-            toast$("Artisan assigned successfully!");
+            // 2. Get the job ID
+            const jobId = sel?._id;
+
+            if (!jobId) {
+                throw new Error("Job ID not found");
+            }
+
+            // 3. Fund the job's agreed price into escrow
+            await api.post(
+                `/api/payments/fund/${jobId}`,
+                {},
+                token
+            );
+
+            toast$("Artisan assigned and payment funded successfully!");
+
+            // 4. Close the modal
             setSel(null);
 
-            // Refresh jobs from backend
-            const response = await api.get(
+            // 5. Refresh jobs from backend
+            const jobsResponse = await api.get(
                 "/api/job/my-jobs",
                 token
             );
 
-            setJobs(response.jobs || []);
+            setJobs(jobsResponse.jobs || []);
+
+        } catch (e) {
+            toast$(e.message, "error");
+        }
+    };
+
+    const confirmJob = async (jobId) => {
+        try {
+            await api.patch(
+                `/api/job/${jobId}/confirm`,
+                {},
+                token
+            );
+
+            toast$("Job completion confirmed!");
+
+            setJobs((current) =>
+                current.map((job) =>
+                    job._id === jobId
+                        ? { ...job, status: "customer_confirmed" }
+                        : job
+                )
+            );
+
+            if (sel?._id === jobId) {
+                setSel((current) =>
+                    current
+                        ? { ...current, status: "customer_confirmed" }
+                        : current
+                );
+            }
 
         } catch (e) {
             toast$(e.message, "error");
@@ -89,7 +151,7 @@ export default function CustomerHome({ token, user }) {
         ["assigned", "in_progress"].includes(j.status)
     );
     const completed = jobs.filter((j) =>
-        ["completed", "customer_confirmed"].includes(j.status)
+        ["completed", "customer_confirmed","paid"].includes(j.status)
     );
     const filtered  = jobs.filter((j) => {
         if (!search.trim()) return true;
@@ -127,42 +189,96 @@ export default function CustomerHome({ token, user }) {
                 : filtered.map((job) => (
                     <JobCard key={job._id} job={job}
                         onClick={() => { setSel(job); loadApps(job._id); }}
-                        actions={[
-                            job.status === "customer_confirmed"                     && <Btn key="p" variant="success" size="sm" onClick={() => pay(job._id)}>💳 Release Payment</Btn>,
-                            job.status === "customer_confirmed"         && <Btn key="r" variant="purple"  size="sm" onClick={() => setReviewJob(job._id)}>⭐ Review</Btn>,
-                        ]}
+                             actions={[
+                                 job.status === "completed" &&
+                                 <Btn
+                                     key="confirm"
+                                     variant="success"
+                                     size="sm"
+                                     onClick={() => confirmJob(job._id)}
+                                 >
+                                     ✅ Confirm Completion
+                                 </Btn>,
+
+                                 job.status === "customer_confirmed" &&
+                                 <Btn
+                                     key="p"
+                                     variant="success"
+                                     size="sm"
+                                     onClick={() => pay(job._id)}
+                                 >
+                                     💳 Release Payment
+                                 </Btn>,
+
+                                 job.status === "paid" &&
+                                 <Btn
+                                     key="paid"
+                                     variant="success"
+                                     size="sm"
+                                     disabled
+                                 >
+                                     ✓ Paid
+                                 </Btn>,
+
+                                 ["customer_confirmed", "paid"].includes(job.status) &&
+                                 <Btn
+                                     key="r"
+                                     variant="purple"
+                                     size="sm"
+                                     onClick={() => setReviewJob(job._id)}
+                                 >
+                                     ⭐ Review
+                                 </Btn>,
+                             ]}
                     />
                 ))
             }
 
             {/* Job detail modal */}
             <Modal open={!!sel} onClose={() => setSel(null)} title={sel?.title || "Job Details"} maxWidth={600}>
-                {sel && (<>
-                    <Badge status={sel.status} />
-                    <p style={{ margin: "12px 0", color: C.muted, fontSize: 14, lineHeight: 1.6 }}>{sel.description}</p>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 16, fontSize: 13, color: C.muted, marginBottom: 18 }}>
-                        <span>🔧 {sel.category}</span>
-                        <span>💰 {fmtMoney(sel.budget)}</span>
-                        <span>📅 {fmtDate(sel.createdAt)}</span>
-                    </div>
-                    <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Applicants</h3>
-                    {appsL ? <Spinner /> : apps.length === 0 ? <Empty msg="No applicants yet" icon="👤" /> :
-                        apps.map((a) => (
-                            <div key={a._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, border: `1px solid ${C.border}`, marginBottom: 8 }}>
-                                <div>
-                                    <div style={{ fontWeight: 600, fontSize: 14 }}>{a.artisan?.fullName || "Artisan"}</div>
-                                    <div style={{ fontSize: 12, color: C.muted }}>{a.message || "No message"}</div>
+                {appsL ? (
+                    <Spinner />
+                ) : apps.length === 0 ? (
+                    <Empty msg="No applicants yet" icon="👤" />
+                ) : (
+                    apps.map((a) => (
+                        <div
+                            key={a._id}
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                padding: "12px 14px",
+                                borderRadius: 10,
+                                border: `1px solid ${C.border}`,
+                                marginBottom: 8
+                            }}
+                        >
+                            <div>
+                                <div style={{ fontWeight: 600, fontSize: 14 }}>
+                                    {a.artisan?.fullName || "Artisan"}
                                 </div>
-                                {sel.status === "open" && <Btn
+
+                                <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
+                                    {a.message || "No message"}
+                                </div>
+
+                                <div style={{ fontSize: 13, fontWeight: 700, marginTop: 6 }}>
+                                    Proposed Price: {fmtMoney(a.proposedPrice)}
+                                </div>
+                            </div>
+
+                            {sel.status === "open" && (
+                                <Btn
                                     size="sm"
                                     onClick={() => assign(a._id)}
                                 >
                                     Accept
-                                </Btn>}
-                            </div>
-                        ))
-                    }
-                </>)}
+                                </Btn>
+                            )}
+                        </div>
+                    ))
+                )}
             </Modal>
 
             {/* Review modal */}
