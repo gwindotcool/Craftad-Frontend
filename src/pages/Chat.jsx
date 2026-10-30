@@ -32,9 +32,7 @@ export function Chat() {
     <div className="mx-auto flex h-[calc(100vh-9rem)] max-w-2xl flex-col">
       <Link to={`/jobs/${jobId}`} className="text-sm text-muted no-underline">Back to the job</Link>
       <h1 className="font-display text-3xl">Job chat</h1>
-        <p className="mb-4 text-sm text-muted">
-            Send messages to the other person assigned to this job.
-        </p>
+      <p className="mb-4 text-sm text-muted">History for this job. The send box is ready for a future POST.</p>
       <div className="flex-1 space-y-3 overflow-y-auto rounded-card border border-line bg-cream p-4">
         {error && <p className="text-sm text-copper-deep">{error}</p>}
         {!error && messages.length === 0 && <p className="text-sm text-muted">No messages yet.</p>}
@@ -50,46 +48,17 @@ export function Chat() {
           );
         })}
       </div>
-
-        <form
-            className="mt-3 flex gap-2"
-            onSubmit={async (e) => {
-                e.preventDefault();
-
-                const text = draft.trim();
-
-                if (!text) return;
-
-                setError("");
-
-                try {
-                    await craftad.sendChatMessage(token, jobId, text);
-
-                    setDraft("");
-
-                    const data = await craftad.chat(token, jobId);
-                    setMessages(listOf(data, ["messages"]));
-                } catch (err) {
-                    setError(err.message);
-                }
-            }}
-        >
-            <input
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                placeholder="Write a message"
-                className="min-h-12 flex-1 rounded-full border border-line bg-cream px-4 outline-none"
-            />
-
-            <button
-                type="submit"
-                disabled={!draft.trim()}
-                className="min-h-12 rounded-full bg-copper px-5 text-sm font-medium text-cream disabled:opacity-50"
-            >
-                Send
-            </button>
-        </form>
-
+      <form
+        className="mt-3 flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!draft.trim()) return;
+          setError("The live API can show chat history, but it doesn’t accept new messages yet.");
+        }}
+      >
+        <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Write a message" className="min-h-12 flex-1 rounded-full border border-line bg-cream px-4 outline-none" />
+        <button className="min-h-12 rounded-full bg-copper px-5 text-sm font-medium text-cream">Send</button>
+      </form>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Search } from "lucide-react";
 import { craftad, listOf } from "../api";
+import { ShareBar } from "../components/ShareBar";
 import { useSession } from "../session";
 
 export function Jobs() {
@@ -88,8 +89,8 @@ export function Jobs() {
       ) : (
         <ul className="grid gap-3">
           {shown.map((job) => (
-            <li key={job._id}>
-              <Link to={`/jobs/${job._id}`} className="block rounded-card border border-line bg-cream p-5 no-underline">
+            <li key={job._id} className="rounded-card border border-line bg-cream p-5">
+              <Link to={`/jobs/${job._id}`} className="block no-underline">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h2 className="font-display text-2xl text-ink">{job.title}</h2>
                   <span className="rounded-full bg-paper px-3 py-1 text-xs capitalize">{job.status?.replaceAll("_", " ")}</span>
@@ -97,6 +98,9 @@ export function Jobs() {
                 <p className="mt-2 text-sm text-muted">{job.description}</p>
                 <p className="mt-3 text-sm">{job.category} · {job.location} · ₦{(job.budget || 0).toLocaleString()}</p>
               </Link>
+              <div className="mt-4 border-t border-line pt-4">
+                <ShareBar title="Share" text={`${job.title} in ${job.location} on Craftad`} url={`/jobs/${job._id}`} />
+              </div>
             </li>
           ))}
         </ul>
