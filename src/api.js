@@ -27,6 +27,12 @@ export const craftad = {
   rejectApplication: (token, id) => request(`/api/applications/${id}/reject`, { method: "PATCH" }, token),
   review: (token, jobId, body) => request(`/api/reviews/${jobId}`, { method: "POST", body: JSON.stringify(body) }, token),
   chat: (token, id) => request(`/api/chat/${id}`, {}, token),
+
+    sendMessage: (token, id, text) =>
+        request(`/api/chat/${id}`, {
+            method: "POST",
+            body: JSON.stringify({ text }),
+        }, token),
   wallet: (token) => request("/api/wallet/me", {}, token),
   transactions: (token) => request("/api/transactions/my", {}, token),
   myTransactions: (token) => request("/api/transactions/my", {}, token),
