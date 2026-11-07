@@ -1,4 +1,4 @@
-
+import { Toaster } from "react-hot-toast";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { RequireAuth } from "./components/RequireAuth";
@@ -26,6 +26,8 @@ export default function App() {
     return (
         <SessionProvider>
             <AdminSessionProvider>
+                <Toaster position="top-right" />
+
                 <Routes>
                     {/* Public pages */}
                     <Route path="/" element={<Home />} />
