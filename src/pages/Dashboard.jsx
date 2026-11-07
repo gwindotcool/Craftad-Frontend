@@ -1,48 +1,51 @@
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+// 1. Import useQuery from React Query
+import { useQuery } from "@tanstack/react-query";
 import { craftad, listOf } from "../api";
 import { useSession } from "../session";
-import { loadSocial, saveSocial } from "../components/ShareBar";
+import { SocialLinksForm } from "../components/SocialLinksForm";
 
 export function Dashboard() {
     const { token, user } = useSession();
 
-    const [jobs, setJobs] = useState([]);
-    const [balance, setBalance] = useState(null);
-    const [note, setNote] = useState("");
-
+    // Artisan Profile State
     const [skills, setSkills] = useState("");
     const [years, setYears] = useState("1");
     const [bio, setBio] = useState("");
     const [profileNote, setProfileNote] = useState("");
 
-    const [social, setSocial] = useState({});
-    const [socialNote, setSocialNote] = useState("");
+    // 2. Fetch Jobs with React Query (Auto-caching, auto-retries)
+    const {
+        data: jobs = [],
+        isLoading: loadingJobs,
+        error: jobsError
+    } = useQuery({
+        queryKey: ['jobs', user?.role],
+        queryFn: async () => {
+            const data = user?.role === "artisan"
+                ? await craftad.openJobs(token)
+                : await craftad.myJobs(token);
+            return listOf(data, ["jobs"]);
+        },
+        enabled: !!token && !!user // Only run if the user is logged in
+    });
 
-    useEffect(() => {
-        if (!token || !user) return;
-
-        const load =
-            user.role === "artisan"
-                ? craftad.openJobs(token)
-                : craftad.myJobs(token);
-
-        load
-            .then((data) => setJobs(listOf(data, ["jobs"])))
-            .catch((err) => setNote(err.message));
-
-        craftad
-            .wallet(token)
-            .then((data) => setBalance(data.wallet?.balance ?? null))
-            .catch(() => setBalance(null));
-
-        setSocial(loadSocial());
-    }, [token, user]);
+    // 3. Fetch Wallet Balance with React Query
+    const {
+        data: balance = null,
+        isLoading: loadingWallet
+    } = useQuery({
+        queryKey: ['wallet', 'balance'],
+        queryFn: async () => {
+            const data = await craftad.wallet(token);
+            return data.wallet?.balance ?? null;
+        },
+        enabled: !!token && !!user
+    });
 
     return (
         <div className="space-y-8">
-
             {/* Welcome panel and dashboard statistics */}
             <div className="space-y-6">
                 <div className="relative overflow-hidden rounded-[1.75rem] bg-ink p-7 text-cream shadow-sm sm:p-9">
@@ -73,16 +76,17 @@ export function Dashboard() {
                 <div className="grid gap-4 sm:grid-cols-3">
                     <Stat
                         label={user?.role === "artisan" ? "Open jobs" : "Your jobs"}
-                        value={String(jobs.length)}
+                        value={loadingJobs ? "..." : String(jobs.length)} // Show loading state
                         description="Available in your workspace"
                     />
 
                     <Stat
                         label="Wallet balance"
                         value={
-                            balance === null
-                                ? "—"
-                                : `₦${balance.toLocaleString()}`
+                            loadingWallet ? "..." : // Show loading state
+                                balance === null
+                                    ? "—"
+                                    : `₦${balance.toLocaleString()}`
                         }
                         description="Your current wallet balance"
                     />
@@ -99,9 +103,10 @@ export function Dashboard() {
                 </div>
             </div>
 
-            {note && (
+            {/* Display React Query Errors */}
+            {jobsError && (
                 <p className="rounded-2xl border border-line bg-cream px-4 py-3 text-sm text-copper-deep">
-                    {note}
+                    Failed to load jobs: {jobsError.message}
                 </p>
             )}
 
@@ -158,7 +163,6 @@ export function Dashboard() {
                             } catch {
                                 await craftad.createArtisan(token, body);
                             }
-
                             setProfileNote("Artisan profile saved.");
                         } catch (err) {
                             setProfileNote(
@@ -219,125 +223,23 @@ export function Dashboard() {
                 </form>
             )}
 
-            {/* Social links */}
-            <form
-                className="grid gap-4 rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm sm:grid-cols-2 sm:p-8"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    saveSocial(social);
-                    setSocialNote("Social links saved on this device.");
-                }}
-            >
+            {/* Social links - ISOLATED COMPONENT */}
+            <div className="grid gap-4 rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm sm:grid-cols-2 sm:p-8">
                 <div className="sm:col-span-2">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-copper">
                         STAY CONNECTED
                     </p>
-
                     <h2 className="mt-2 font-display text-2xl text-ink sm:text-3xl">
                         Social links
                     </h2>
-
                     <p className="mt-2 text-sm text-muted">
                         Add your social accounts so people can connect with you.
                     </p>
                 </div>
-
-                <input
-                    value={social.whatsapp || ""}
-                    onChange={(e) =>
-                        setSocial({ ...social, whatsapp: e.target.value })
-                    }
-                    placeholder="WhatsApp number"
-                    className="min-h-12 rounded-xl border border-line bg-paper px-4 outline-none transition focus:border-copper"
-                />
-
-                <input
-                    value={social.instagram || ""}
-                    onChange={(e) =>
-                        setSocial({ ...social, instagram: e.target.value })
-                    }
-                    placeholder="Instagram username"
-                    className="min-h-12 rounded-xl border border-line bg-paper px-4 outline-none transition focus:border-copper"
-                />
-
-                <input
-                    value={social.facebook || ""}
-                    onChange={(e) =>
-                        setSocial({ ...social, facebook: e.target.value })
-                    }
-                    placeholder="Facebook page or profile"
-                    className="min-h-12 rounded-xl border border-line bg-paper px-4 outline-none transition focus:border-copper"
-                />
-
-                <input
-                    value={social.x || ""}
-                    onChange={(e) =>
-                        setSocial({ ...social, x: e.target.value })
-                    }
-                    placeholder="X username"
-                    className="min-h-12 rounded-xl border border-line bg-paper px-4 outline-none transition focus:border-copper"
-                />
-
-                <div className="flex flex-wrap gap-4 sm:col-span-2">
-                    {social.whatsapp && (
-                        <a
-                            className="text-sm font-medium text-copper hover:underline"
-                            href={`https://wa.me/${social.whatsapp.replace(/\D/g, "")}`}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            WhatsApp
-                        </a>
-                    )}
-
-                    {social.instagram && (
-                        <a
-                            className="text-sm font-medium text-copper hover:underline"
-                            href={`https://instagram.com/${social.instagram.replace("@", "")}`}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            Instagram
-                        </a>
-                    )}
-
-                    {social.facebook && (
-                        <a
-                            className="text-sm font-medium text-copper hover:underline"
-                            href={
-                                social.facebook.startsWith("http")
-                                    ? social.facebook
-                                    : `https://facebook.com/${social.facebook}`
-                            }
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            Facebook
-                        </a>
-                    )}
-
-                    {social.x && (
-                        <a
-                            className="text-sm font-medium text-copper hover:underline"
-                            href={`https://x.com/${social.x.replace("@", "")}`}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            X
-                        </a>
-                    )}
+                <div className="sm:col-span-2">
+                    <SocialLinksForm />
                 </div>
-
-                <button className="min-h-11 w-fit rounded-full bg-ink px-6 text-sm font-semibold text-cream transition-colors hover:bg-copper sm:col-span-2">
-                    Save social links
-                </button>
-
-                {socialNote && (
-                    <p className="text-sm text-muted sm:col-span-2">
-                        {socialNote}
-                    </p>
-                )}
-            </form>
+            </div>
 
             {/* Recent jobs */}
             <section className="space-y-4">
@@ -356,7 +258,13 @@ export function Dashboard() {
                 </div>
 
                 <div className="grid gap-3">
-                    {jobs.slice(0, 4).map((job) => (
+                    {loadingJobs && (
+                        <div className="rounded-[1.25rem] border border-line bg-cream p-8 text-center text-muted">
+                            Loading your jobs...
+                        </div>
+                    )}
+
+                    {!loadingJobs && jobs.slice(0, 4).map((job) => (
                         <Link
                             key={job._id}
                             to={`/jobs/${job._id}`}
@@ -368,8 +276,8 @@ export function Dashboard() {
                                 </h3>
 
                                 <span className="rounded-full bg-paper px-3 py-1 text-xs capitalize text-muted">
-                  {job.status?.replaceAll("_", " ")}
-                </span>
+                                    {job.status?.replaceAll("_", " ")}
+                                </span>
                             </div>
 
                             <p className="mt-2 text-sm text-muted">
@@ -378,7 +286,7 @@ export function Dashboard() {
                         </Link>
                     ))}
 
-                    {jobs.length === 0 && (
+                    {!loadingJobs && jobs.length === 0 && (
                         <div className="rounded-[1.25rem] border border-dashed border-line bg-cream p-8 text-center">
                             <p className="font-display text-xl text-ink">
                                 Nothing here yet.

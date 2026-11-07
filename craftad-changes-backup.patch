@@ -1,0 +1,4423 @@
+diff --git a/README.md b/README.md
+index 03556e6..26baa85 100644
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,3 @@
+-<<<<<<< HEAD
+ # craftad-frontend
+ 
+ Standalone Vite + React + JavaScript + Tailwind frontend for the Craftad Lite API.
+@@ -10,21 +9,3 @@ npm run dev
+ ```
+ 
+ Talks to `https://craftad-lite-2.onrender.com`. Sign in with a Craftad account. Chat can read job history; sending messages waits on a backend POST.
+-=======
+-# React + Vite
+-
+-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+-
+-Currently, two official plugins are available:
+-
+-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+-
+-## React Compiler
+-
+-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-
+-## Expanding the ESLint configuration
+-
+-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+->>>>>>> 89413558c3ac50fe7a5b979ccbe772016af0d5c9
+diff --git a/index.html b/index.html
+index ac5b266..9b20d41 100644
+--- a/index.html
++++ b/index.html
+@@ -1,12 +1,15 @@
+ <!doctype html>
+ <html lang="en">
+-<head>
++  <head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>Craftad — Hire skilled artisans</title>
+-</head>
+-<body>
+-<div id="root"></div>
+-<script type="module" src="/src/main.jsx"></script>
+-</body>
+-</html>
+\ No newline at end of file
++    <link rel="preconnect" href="https://fonts.googleapis.com" />
++    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
++    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,520;9..144,640&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
++  </head>
++  <body>
++    <div id="root"></div>
++    <script type="module" src="/src/main.jsx"></script>
++  </body>
++</html>
+diff --git a/package.json b/package.json
+index 29abaa4..d3e45a0 100644
+--- a/package.json
++++ b/package.json
+@@ -4,29 +4,20 @@
+   "version": "1.0.0",
+   "type": "module",
+   "scripts": {
+-    "dev": "vite",
++    "dev": "vite --host 0.0.0.0 --port 5173",
+     "build": "vite build",
+-    "lint": "eslint .",
+-    "preview": "vite preview"
++    "preview": "vite preview --host 0.0.0.0 --port 5173"
+   },
+   "dependencies": {
+-    "axios": "^1.17.0",
+     "lucide-react": "^0.510.0",
+-    "react": "^19.2.6",
+-    "react-dom": "^19.2.6",
+-    "react-router-dom": "^7.17.0"
++    "react": "^19.2.0",
++    "react-dom": "^19.2.0",
++    "react-router-dom": "^7.1.1"
+   },
+   "devDependencies": {
+-    "@eslint/js": "^10.0.1",
+     "@tailwindcss/vite": "^4.3.0",
+-    "@types/react": "^19.2.14",
+-    "@types/react-dom": "^19.2.3",
+-    "@vitejs/plugin-react": "^6.0.1",
+-    "eslint": "^10.3.0",
+-    "eslint-plugin-react-hooks": "^7.1.1",
+-    "eslint-plugin-react-refresh": "^0.5.2",
+-    "globals": "^17.6.0",
++    "@vitejs/plugin-react": "^5.2.0",
+     "tailwindcss": "^4.3.0",
+-    "vite": "^8.0.12"
++    "vite": "^8.2.0"
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/public/favicon.svg b/public/favicon.svg
+deleted file mode 100644
+index 6893eb1..0000000
+--- a/public/favicon.svg
++++ /dev/null
+@@ -1 +0,0 @@
+-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="46" fill="none" viewBox="0 0 48 46"><path fill="#863bff" d="M25.946 44.938c-.664.845-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.287c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.497 0-3.578-1.842-3.578H1.237c-.92 0-1.456-1.04-.92-1.788L10.013.474c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.579 1.842 3.579h11.377c.943 0 1.473 1.088.89 1.83L25.947 44.94z" style="fill:#863bff;fill:color(display-p3 .5252 .23 1);fill-opacity:1"/><mask id="a" width="48" height="46" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M25.842 44.938c-.664.844-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.183c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.498 0-3.579-1.842-3.579H1.133c-.92 0-1.456-1.04-.92-1.787L9.91.473c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.578 1.842 3.578h11.377c.943 0 1.473 1.088.89 1.832L25.843 44.94z" style="fill:#000;fill-opacity:1"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#ede6ff" rx="5.508" ry="14.704" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -4.47 31.516)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#ede6ff" rx="10.399" ry="29.851" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -39.328 7.883)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#7e14ff" rx="5.508" ry="30.487" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.814 -25.913 -14.639)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#7e14ff" rx="5.508" ry="30.599" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.814 -32.644 -3.334)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#7e14ff" rx="5.508" ry="30.599" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -34.34 30.47)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#ede6ff" rx="14.072" ry="22.078" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="rotate(93.35 24.506 48.493)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#7e14ff" rx="3.47" ry="21.501" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.009 28.708 47.59)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#7e14ff" rx="3.47" ry="21.501" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.009 28.708 47.59)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx=".387" cy="8.972" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(39.51 .387 8.972)"/></g><g filter="url(#k)"><ellipse cx="47.523" cy="-6.092" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 47.523 -6.092)"/></g><g filter="url(#l)"><ellipse cx="41.412" cy="6.333" fill="#47bfff" rx="5.971" ry="9.665" style="fill:#47bfff;fill:color(display-p3 .2799 .748 1);fill-opacity:1" transform="rotate(37.892 41.412 6.333)"/></g><g filter="url(#m)"><ellipse cx="-1.879" cy="38.332" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 -1.88 38.332)"/></g><g filter="url(#n)"><ellipse cx="-1.879" cy="38.332" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 -1.88 38.332)"/></g><g filter="url(#o)"><ellipse cx="35.651" cy="29.907" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 35.651 29.907)"/></g><g filter="url(#p)"><ellipse cx="38.418" cy="32.4" fill="#47bfff" rx="5.971" ry="15.297" style="fill:#47bfff;fill:color(display-p3 .2799 .748 1);fill-opacity:1" transform="rotate(37.892 38.418 32.4)"/></g></g><defs><filter id="b" width="60.045" height="41.654" x="-19.77" y="16.149" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-54.613" y="-7.533" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-49.64" y="2.03" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-45.045" y="20.029" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-43.513" y="21.178" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="15.756" y="-17.901" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="23.548" y="2.284" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="23.548" y="2.284" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-27.636" y="-22.853" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="20.116" y="-38.415" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="24.641" y="-11.323" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-29.286" y="6.009" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-29.286" y="6.009" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="8.244" y="-2.416" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="18.713" y="10.588" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter></defs></svg>
+\ No newline at end of file
+diff --git a/public/icons.svg b/public/icons.svg
+deleted file mode 100644
+index e952219..0000000
+--- a/public/icons.svg
++++ /dev/null
+@@ -1,24 +0,0 @@
+-<svg xmlns="http://www.w3.org/2000/svg">
+-  <symbol id="bluesky-icon" viewBox="0 0 16 17">
+-    <g clip-path="url(#bluesky-clip)"><path fill="#08060d" d="M7.75 7.735c-.693-1.348-2.58-3.86-4.334-5.097-1.68-1.187-2.32-.981-2.74-.79C.188 2.065.1 2.812.1 3.251s.241 3.602.398 4.13c.52 1.744 2.367 2.333 4.07 2.145-2.495.37-4.71 1.278-1.805 4.512 3.196 3.309 4.38-.71 4.987-2.746.608 2.036 1.307 5.91 4.93 2.746 2.72-2.746.747-4.143-1.747-4.512 1.702.189 3.55-.4 4.07-2.145.156-.528.397-3.691.397-4.13s-.088-1.186-.575-1.406c-.42-.19-1.06-.395-2.741.79-1.755 1.24-3.64 3.752-4.334 5.099"/></g>
+-    <defs><clipPath id="bluesky-clip"><path fill="#fff" d="M.1.85h15.3v15.3H.1z"/></clipPath></defs>
+-  </symbol>
+-  <symbol id="discord-icon" viewBox="0 0 20 19">
+-    <path fill="#08060d" d="M16.224 3.768a14.5 14.5 0 0 0-3.67-1.153c-.158.286-.343.67-.47.976a13.5 13.5 0 0 0-4.067 0c-.128-.306-.317-.69-.476-.976A14.4 14.4 0 0 0 3.868 3.77C1.546 7.28.916 10.703 1.231 14.077a14.7 14.7 0 0 0 4.5 2.306q.545-.748.965-1.587a9.5 9.5 0 0 1-1.518-.74q.191-.14.372-.293c2.927 1.369 6.107 1.369 8.999 0q.183.152.372.294-.723.437-1.52.74.418.838.963 1.588a14.6 14.6 0 0 0 4.504-2.308c.37-3.911-.63-7.302-2.644-10.309m-9.13 8.234c-.878 0-1.599-.82-1.599-1.82 0-.998.705-1.82 1.6-1.82.894 0 1.614.82 1.599 1.82.001 1-.705 1.82-1.6 1.82m5.91 0c-.878 0-1.599-.82-1.599-1.82 0-.998.705-1.82 1.6-1.82.893 0 1.614.82 1.599 1.82 0 1-.706 1.82-1.6 1.82"/>
+-  </symbol>
+-  <symbol id="documentation-icon" viewBox="0 0 21 20">
+-    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="m15.5 13.333 1.533 1.322c.645.555.967.833.967 1.178s-.322.623-.967 1.179L15.5 18.333m-3.333-5-1.534 1.322c-.644.555-.966.833-.966 1.178s.322.623.966 1.179l1.534 1.321"/>
+-    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M17.167 10.836v-4.32c0-1.41 0-2.117-.224-2.68-.359-.906-1.118-1.621-2.08-1.96-.599-.21-1.349-.21-2.848-.21-2.623 0-3.935 0-4.983.369-1.684.591-3.013 1.842-3.641 3.428C3 6.449 3 7.684 3 10.154v2.122c0 2.558 0 3.838.706 4.726q.306.383.713.671c.76.536 1.79.64 3.581.66"/>
+-    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M3 10a2.78 2.78 0 0 1 2.778-2.778c.555 0 1.209.097 1.748-.047.48-.129.854-.503.982-.982.145-.54.048-1.194.048-1.749a2.78 2.78 0 0 1 2.777-2.777"/>
+-  </symbol>
+-  <symbol id="github-icon" viewBox="0 0 19 19">
+-    <path fill="#08060d" fill-rule="evenodd" d="M9.356 1.85C5.05 1.85 1.57 5.356 1.57 9.694a7.84 7.84 0 0 0 5.324 7.44c.387.079.528-.168.528-.376 0-.182-.013-.805-.013-1.454-2.165.467-2.616-.935-2.616-.935-.349-.91-.864-1.143-.864-1.143-.71-.48.051-.48.051-.48.787.051 1.2.805 1.2.805.695 1.194 1.817.857 2.268.649.064-.507.27-.857.49-1.052-1.728-.182-3.545-.857-3.545-3.87 0-.857.31-1.558.8-2.104-.078-.195-.349-1 .077-2.078 0 0 .657-.208 2.14.805a7.5 7.5 0 0 1 1.946-.26c.657 0 1.328.092 1.946.26 1.483-1.013 2.14-.805 2.14-.805.426 1.078.155 1.883.078 2.078.502.546.799 1.247.799 2.104 0 3.013-1.818 3.675-3.558 3.87.284.247.528.714.528 1.454 0 1.052-.012 1.896-.012 2.156 0 .208.142.455.528.377a7.84 7.84 0 0 0 5.324-7.441c.013-4.338-3.48-7.844-7.773-7.844" clip-rule="evenodd"/>
+-  </symbol>
+-  <symbol id="social-icon" viewBox="0 0 20 20">
+-    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M12.5 6.667a4.167 4.167 0 1 0-8.334 0 4.167 4.167 0 0 0 8.334 0"/>
+-    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M2.5 16.667a5.833 5.833 0 0 1 8.75-5.053m3.837.474.513 1.035c.07.144.257.282.414.309l.93.155c.596.1.736.536.307.965l-.723.73a.64.64 0 0 0-.152.531l.207.903c.164.715-.213.991-.84.618l-.872-.52a.63.63 0 0 0-.577 0l-.872.52c-.624.373-1.003.094-.84-.618l.207-.903a.64.64 0 0 0-.152-.532l-.723-.729c-.426-.43-.289-.864.306-.964l.93-.156a.64.64 0 0 0 .412-.31l.513-1.034c.28-.562.735-.562 1.012 0"/>
+-  </symbol>
+-  <symbol id="x-icon" viewBox="0 0 19 19">
+-    <path fill="#08060d" fill-rule="evenodd" d="M1.893 1.98c.052.072 1.245 1.769 2.653 3.77l2.892 4.114c.183.261.333.48.333.486s-.068.089-.152.183l-.522.593-.765.867-3.597 4.087c-.375.426-.734.834-.798.905a1 1 0 0 0-.118.148c0 .01.236.017.664.017h.663l.729-.83c.4-.457.796-.906.879-.999a692 692 0 0 0 1.794-2.038c.034-.037.301-.34.594-.675l.551-.624.345-.392a7 7 0 0 1 .34-.374c.006 0 .93 1.306 2.052 2.903l2.084 2.965.045.063h2.275c1.87 0 2.273-.003 2.266-.021-.008-.02-1.098-1.572-3.894-5.547-2.013-2.862-2.28-3.246-2.273-3.266.008-.019.282-.332 2.085-2.38l2-2.274 1.567-1.782c.022-.028-.016-.03-.65-.03h-.674l-.3.342a871 871 0 0 1-1.782 2.025c-.067.075-.405.458-.75.852a100 100 0 0 1-.803.91c-.148.172-.299.344-.99 1.127-.304.343-.32.358-.345.327-.015-.019-.904-1.282-1.976-2.808L6.365 1.85H1.8zm1.782.91 8.078 11.294c.772 1.08 1.413 1.973 1.425 1.984.016.017.241.02 1.05.017l1.03-.004-2.694-3.766L7.796 5.75 5.722 2.852l-1.039-.004-1.039-.004z" clip-rule="evenodd"/>
+-  </symbol>
+-</svg>
+diff --git a/public/images/hero-artisan.jpeg b/public/images/hero-artisan.jpeg
+deleted file mode 100644
+index a7ec5f8..0000000
+Binary files a/public/images/hero-artisan.jpeg and /dev/null differ
+diff --git a/src/App.jsx b/src/App.jsx
+index d74ea60..e636b1e 100644
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@ -1,111 +1,34 @@
+-import { useState } from "react";
+-import { globalStyle } from "./theme";
+-import LandingPage from "./pages/landing/LandingPage.jsx";
+-import AuthPage from "./components/auth/AuthPage.jsx";
+-import Sidebar from "./components/Sidebar";
+-import Notifs from "./components/Notifs";
+-
+-// customer
+-import CustomerHome from "./pages/customer/CustomerHome";
+-import PostJob from "./pages/customer/PostJob";
+-import CustomerWallet from "./pages/customer/CustomerWallet";
+-
+-// artisan
+-import ForYou from "./pages/artisan/ForYou";
+-import ActiveJobs from "./pages/artisan/ActiveJobs";
+-import JobHistory from "./pages/artisan/JobHistory";
+-import ArtisanProfile from "./pages/artisan/ArtisanProfile";
+-import ArtisanWallet from "./pages/artisan/ArtisanWallet";
+-
+-// admin
+-import AdminHome from "./pages/admin/AdminHome";
+-import AdminUsers from "./pages/admin/AdminUsers";
+-import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
+-import AdminEarnings from "./pages/admin/AdminEarnings";
+-
+-export default function App(){
+-    const [token,setToken] = useState(
+-        localStorage.getItem("token")
+-    );
+-
+-    const getStoredUser = () => {
+-        try {
+-            const storedUser = localStorage.getItem("user");
+-            if (!storedUser || storedUser === "undefined") {
+-                return null;
+-            }
+-            return JSON.parse(storedUser);
+-        } catch {
+-            localStorage.removeItem("user");
+-            return null;
+-        }
+-    };
+-
+-    const [user, setUser] = useState(getStoredUser());
+-    const [page,setPage] = useState("home");
+-    const [showAuth,setShowAuth] = useState(false);
+-
+-    const onAuth=(tok,usr)=>{
+-        localStorage.setItem("token", tok);
+-        localStorage.setItem("user", JSON.stringify(usr));
+-        setToken(tok);
+-        setUser(usr);
+-        setPage("home");
+-    };
+-
+-    const logout=()=>{
+-        localStorage.removeItem("token");
+-        localStorage.removeItem("user");
+-        setToken(null);
+-        setUser(null);
+-        setShowAuth(false);
+-    };
+-
+-    if(!token){
+-        return (
+-            <>
+-                <style>{globalStyle}</style>
+-                {showAuth ? <AuthPage onAuth={onAuth} /> : <LandingPage onLogin={()=>setShowAuth(true)} />}
+-            </>
+-        )
+-    }
+-
+-    const role=user?.role || "customer";
+-
+-    const PAGES={
+-        customer:{
+-            home: <CustomerHome token={token} user={user} />,
+-            post: <PostJob token={token} onPost={()=>setPage("home")} />,
+-            wallet: <CustomerWallet token={token} />,
+-            notifs: <Notifs token={token} />
+-        },
+-        artisan:{
+-            home: <ForYou token={token} />,
+-            active: <ActiveJobs token={token} />,
+-            history: <JobHistory token={token} />,
+-            profile: <ArtisanProfile token={token} />,
+-            wallet: <ArtisanWallet token={token} />,
+-            notifs: <Notifs token={token} />
+-        },
+-        admin:{
+-            home: <AdminHome token={token} />,
+-            users: <AdminUsers token={token} />,
+-            earnings: <AdminEarnings token={token} />,
+-            withdrawals: <AdminWithdrawals token={token} />
+-        }
+-    };
+-
+-    return (
+-        <>
+-            <style>{globalStyle}</style>
+-            <div style={{ display:"flex", minHeight:"100vh" }}>
+-                <Sidebar user={user} page={page} setPage={setPage} logout={logout} />
+-                <main style={{ flex:1, padding:"28px 32px", overflowY:"auto" }}>
+-                    <div style={{ maxWidth:860, margin:"0 auto" }}>
+-                        {PAGES[role]?.[page] || PAGES[role]?.home}
+-                    </div>
+-                </main>
+-            </div>
+-        </>
+-    )
++import { Navigate, Route, Routes } from "react-router-dom";
++import { RequireAuth } from "./components/RequireAuth";
++import { SessionProvider } from "./session";
++import { Auth } from "./pages/Auth";
++import { Chat } from "./pages/Chat";
++import { ChatInbox } from "./pages/ChatInbox";
++import { Dashboard } from "./pages/Dashboard";
++import { Home } from "./pages/Home";
++import { JobDetail } from "./pages/JobDetail";
++import { Jobs } from "./pages/Jobs";
++import { NewJob } from "./pages/NewJob";
++import { Notifications } from "./pages/Notifications";
++import { WalletPage } from "./pages/WalletPage";
++
++export default function App() {
++  return (
++    <SessionProvider>
++      <Routes>
++        <Route path="/" element={<Home />} />
++        <Route path="/login" element={<Auth mode="login" />} />
++        <Route path="/register" element={<Auth mode="register" />} />
++        <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
++        <Route path="/jobs" element={<RequireAuth><Jobs /></RequireAuth>} />
++        <Route path="/jobs/new" element={<RequireAuth><NewJob /></RequireAuth>} />
++        <Route path="/jobs/:jobId" element={<RequireAuth><JobDetail /></RequireAuth>} />
++        <Route path="/chat" element={<RequireAuth><ChatInbox /></RequireAuth>} />
++        <Route path="/chat/:jobId" element={<RequireAuth><Chat /></RequireAuth>} />
++        <Route path="/wallet" element={<RequireAuth><WalletPage /></RequireAuth>} />
++        <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
++        <Route path="*" element={<Navigate to="/" replace />} />
++      </Routes>
++    </SessionProvider>
++  );
+ }
+diff --git a/src/api.js b/src/api.js
+index 3b47e22..24dcfd7 100644
+--- a/src/api.js
++++ b/src/api.js
+@@ -1,16 +1,83 @@
+-import axios from "axios";
++const BASE = "https://craftad-lite-2.onrender.com";
+ 
+-export const api = axios.create({
+-    baseURL: import.meta.env.VITE_API_URL || "https://craftad-lite-2.onrender.com/api",
+-});
++async function request(path, init = {}, token) {
++  const headers = new Headers(init.headers);
++  if (init.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
++  if (token) headers.set("Authorization", `Bearer ${token}`);
++  const res = await fetch(`${BASE}${path}`, { ...init, headers });
++  const data = await res.json().catch(() => ({}));
++  if (!res.ok) throw new Error(data.message || data.error || "Something went wrong");
++  return data;
++}
+ 
+-api.interceptors.request.use(
+-    (config) => {
+-        const token = localStorage.getItem("token");
+-        if (token) {
+-            config.headers.Authorization = `Bearer ${token}`;
+-        }
+-        return config;
+-    },
+-    (error) => Promise.reject(error)
+-);
++export const craftad = {
++  register: (body) => request("/api/auth/register", { method: "POST", body: JSON.stringify(body) }),
++  login: (body) => request("/api/auth/login", { method: "POST", body: JSON.stringify(body) }),
++  profile: (token) => request("/api/auth/profile", {}, token),
++  myJobs: (token) => request("/api/job/my-jobs?limit=50", {}, token),
++  openJobs: (token) => request("/api/job/open-jobs?limit=50", {}, token),
++  createJob: (token, body) => request("/api/job/create-job", { method: "POST", body: JSON.stringify(body) }, token),
++  startJob: (token, id) => request(`/api/job/${id}/start`, { method: "PATCH" }, token),
++  rejectJob: (token, id) => request(`/api/job/${id}/reject`, { method: "PATCH" }, token),
++  completeJob: (token, id) => request(`/api/job/${id}/complete`, { method: "PATCH" }, token),
++  confirmJob: (token, id) => request(`/api/job/${id}/confirm`, { method: "PATCH" }, token),
++  apply: (token, id, body) => request(`/api/applications/apply/${id}`, { method: "POST", body: JSON.stringify(body) }, token),
++  applications: (token, id) => request(`/api/applications/job/${id}`, {}, token),
++  acceptApplication: (token, id) => request(`/api/applications/accept/${id}`, { method: "PATCH" }, token),
++  rejectApplication: (token, id) => request(`/api/applications/${id}/reject`, { method: "PATCH" }, token),
++  review: (token, jobId, body) => request(`/api/reviews/${jobId}`, { method: "POST", body: JSON.stringify(body) }, token),
++  chat: (token, id) => request(`/api/chat/${id}`, {}, token),
++  wallet: (token) => request("/api/wallet/me", {}, token),
++  transactions: (token) => request("/api/transactions/my", {}, token),
++  myTransactions: (token) => request("/api/transactions/my", {}, token),
++  fund: (token, amount) => request("/api/wallet/deposit", { method: "POST", body: JSON.stringify({ amount }) }, token),
++  withdraw: (token, amount) => request("/api/wallet/withdrawals", { method: "POST", body: JSON.stringify({ amount }) }, token),
++  resolveBank: (token, accountNumber, bankCode) =>
++    request(`/api/wallet/banks/resolve?accountNumber=${encodeURIComponent(accountNumber)}&bankCode=${encodeURIComponent(bankCode)}`, {}, token),
++  addBank: (token, body) => request("/api/wallet/banks", { method: "POST", body: JSON.stringify(body) }, token),
++  notifications: (token) => request("/api/notifications", {}, token),
++  markAllRead: (token) => request("/api/notifications/read-all", { method: "PATCH" }, token),
++  markRead: (token, id) => request(`/api/notifications/${id}/read`, { method: "PATCH" }, token),
++  saveFcmToken: (token, fcmToken) => request("/api/auth/fcm-token", { method: "POST", body: JSON.stringify({ token: fcmToken }) }, token),
++  removeFcmToken: (token, fcmToken) => request("/api/auth/fcm-token", { method: "DELETE", body: JSON.stringify({ token: fcmToken }) }, token),
++  artisanMe: (token) => request("/api/artisans/me", {}, token),
++  createArtisan: (token, body) => request("/api/artisans/create", { method: "POST", body: JSON.stringify(body) }, token),
++  updateArtisan: (token, body) => request("/api/artisans/update", { method: "PATCH", body: JSON.stringify(body) }, token),
++  releaseEscrow: (token, id) => request(`/api/escrow/${id}/release`, { method: "PATCH" }, token),
++  disputeEscrow: (token, id, reason) => request(`/api/escrow/${id}/dispute`, { method: "PATCH", body: JSON.stringify({ reason }) }, token),
++  resolveEscrow: (token, id, body) => request(`/api/escrow/${id}/resolve`, { method: "PATCH", body: JSON.stringify(body) }, token),
++};
++
++export function listOf(payload, keys) {
++  if (Array.isArray(payload)) return payload;
++  if (payload && typeof payload === "object") {
++    for (const key of keys) if (Array.isArray(payload[key])) return payload[key];
++    if (Array.isArray(payload.data)) return payload.data;
++  }
++  return [];
++}
++
++const TOKEN_KEY = "craftad_token";
++const USER_KEY = "craftad_user";
++
++export function loadSession() {
++  const token = localStorage.getItem(TOKEN_KEY);
++  let user = null;
++  try {
++    user = JSON.parse(localStorage.getItem(USER_KEY) || "null");
++  } catch {
++    user = null;
++  }
++  if (!token || token === "undefined" || token === "null") return { token: null, user: null };
++  return { token, user };
++}
++
++export function saveSession(token, user) {
++  localStorage.setItem(TOKEN_KEY, token);
++  localStorage.setItem(USER_KEY, JSON.stringify(user));
++}
++
++export function clearSession() {
++  localStorage.removeItem(TOKEN_KEY);
++  localStorage.removeItem(USER_KEY);
++}
+diff --git a/src/components/JobCard.jsx b/src/components/JobCard.jsx
+deleted file mode 100644
+index bed5933..0000000
+--- a/src/components/JobCard.jsx
++++ /dev/null
+@@ -1,133 +0,0 @@
+-import { C } from "../theme";
+-import { fmtMoney, fmtDate } from "../theme";
+-import { Badge } from "./ui";
+-
+-export default function JobCard({ job, onClick, actions }) {
+-    const displayPrice = job.agreedPrice ?? job.budget;
+-
+-    return (
+-        <div
+-            onClick={onClick}
+-            style={{
+-                background: "#fff",
+-                borderRadius: 12,
+-                padding: 18,
+-                marginBottom: 10,
+-                border: `1px solid ${C.border}`,
+-                cursor: onClick ? "pointer" : "default",
+-                transition: "box-shadow .15s"
+-            }}
+-            onMouseEnter={(e) =>
+-                onClick &&
+-                (e.currentTarget.style.boxShadow =
+-                    "0 4px 16px rgba(0,0,0,0.08)")
+-            }
+-            onMouseLeave={(e) =>
+-                (e.currentTarget.style.boxShadow = "none")
+-            }
+-        >
+-            <div
+-                style={{
+-                    display: "flex",
+-                    justifyContent: "space-between",
+-                    alignItems: "flex-start",
+-                    marginBottom: 6
+-                }}
+-            >
+-                <div>
+-                    <div
+-                        style={{
+-                            fontWeight: 700,
+-                            fontSize: 15,
+-                            color: C.text
+-                        }}
+-                    >
+-                        {job.title || job.category || "Untitled Job"}
+-                    </div>
+-
+-                    <div
+-                        style={{
+-                            fontSize: 12,
+-                            color: C.muted,
+-                            marginTop: 2
+-                        }}
+-                    >
+-                        🔧 {job.category} &nbsp;·&nbsp; 📍{" "}
+-                        {job.location?.address || job.location || "Location set"}
+-                    </div>
+-                </div>
+-
+-                <Badge status={job.status || "pending"} />
+-            </div>
+-
+-            <p
+-                style={{
+-                    fontSize: 13,
+-                    color: "#374151",
+-                    lineHeight: 1.5,
+-                    margin: "8px 0"
+-                }}
+-            >
+-                {(job.description || "").slice(0, 110)}
+-                {(job.description || "").length > 110 ? "…" : ""}
+-            </p>
+-
+-            <div
+-                style={{
+-                    display: "flex",
+-                    justifyContent: "space-between",
+-                    alignItems: "center",
+-                    marginTop: 10
+-                }}
+-            >
+-                <div>
+-                    <div
+-                        style={{
+-                            fontSize: 11,
+-                            color: C.muted,
+-                            marginBottom: 2
+-                        }}
+-                    >
+-                        {job.agreedPrice != null
+-                            ? "Agreed Price"
+-                            : "Budget"}
+-                    </div>
+-
+-                    <span
+-                        style={{
+-                            fontWeight: 800,
+-                            color: C.accent,
+-                            fontSize: 15
+-                        }}
+-                    >
+-                        {displayPrice != null
+-                            ? fmtMoney(displayPrice)
+-                            : "Budget TBD"}
+-                    </span>
+-                </div>
+-
+-                <span
+-                    style={{
+-                        fontSize: 12,
+-                        color: C.muted
+-                    }}
+-                >
+-                    {fmtDate(job.createdAt)}
+-                </span>
+-            </div>
+-
+-            {actions?.filter(Boolean).length > 0 && (
+-                <div
+-                    style={{
+-                        display: "flex",
+-                        gap: 8,
+-                        marginTop: 12
+-                    }}
+-                    onClick={(e) => e.stopPropagation()}
+-                >
+-                    {actions}
+-                </div>
+-            )}
+-        </div>
+-    );
+-}
+diff --git a/src/components/Notifs.jsx b/src/components/Notifs.jsx
+deleted file mode 100644
+index b90d9aa..0000000
+--- a/src/components/Notifs.jsx
++++ /dev/null
+@@ -1,33 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C, arr, extract, fmtDate } from "../theme";
+-import { api } from "../api";
+-import { Spinner, Empty } from "./ui";
+-
+-export default function Notifs({ token }) {
+-    const [notifs, setNotifs]   = useState([]);
+-    const [loading, setLoading] = useState(true);
+-
+-    useEffect(() => {
+-        api.get("/api/notifications", token)
+-            .then((d) => setNotifs(arr(extract(d, "notifications", "data"))))
+-            .catch((e) => console.error("Notifs:", e.message))
+-            .finally(() => setLoading(false));
+-    }, [token]);
+-
+-    if (loading) return <Spinner />;
+-    return (
+-        <div>
+-            <h2 style={{ fontSize: 22, fontWeight: 800, color: C.text, marginBottom: 22 }}>Notifications</h2>
+-            {notifs.length === 0 ? <Empty msg="You're all caught up!" icon="🎉" /> :
+-                notifs.map((n, i) => (
+-                    <div key={i} style={{ padding: "14px 18px", borderRadius: 10, background: n.isRead ? "#fff" : "#FFFBEB", border: `1px solid ${n.isRead ? C.border : "#FDE68A"}`, marginBottom: 8 }}>
+-                        {!n.isRead && <span style={{ fontSize: 10, fontWeight: 700, color: C.accent, textTransform: "uppercase", letterSpacing: 0.5 }}>New · </span>}
+-                        <span style={{ fontWeight: 600, fontSize: 14 }}>{n.title}</span>
+-                        <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>{n.message}</div>
+-                        <div style={{ fontSize: 12, color: C.muted, marginTop: 6 }}>{fmtDate(n.createdAt)}</div>
+-                    </div>
+-                ))
+-            }
+-        </div>
+-    );
+-}
+diff --git a/src/components/Sidebar.jsx b/src/components/Sidebar.jsx
+deleted file mode 100644
+index 61c0d26..0000000
+--- a/src/components/Sidebar.jsx
++++ /dev/null
+@@ -1,64 +0,0 @@
+-import { C } from "../theme";
+-
+-const NAV = {
+-    customer: [
+-        { k: "home",   l: "Dashboard",     i: "🏠" },
+-        { k: "post",   l: "Post a Job",    i: "➕" },
+-        { k: "wallet", l: "Wallet",        i: "💰" },
+-        { k: "notifs", l: "Notifications", i: "🔔" },
+-    ],
+-    artisan: [
+-        { k: "home",    l: "For You",       i: "✨" },
+-        { k: "active",  l: "Active Jobs",   i: "⚡" },
+-        { k: "history", l: "Job History",   i: "📖" },
+-        { k: "profile", l: "My Profile",    i: "👤" },
+-        { k: "wallet",  l: "Wallet",        i: "💰" },
+-        { k: "notifs",  l: "Notifications", i: "🔔" },
+-    ],
+-    admin: [
+-        { k: "home",        l: "Dashboard",   i: "📊" },
+-        { k: "users",       l: "Users",       i: "👥" },
+-        { k: "earnings",    l: "Earnings",    i: "💹" },
+-        { k: "withdrawals", l: "Withdrawals", i: "🏦" },
+-    ],
+-};
+-
+-export default function Sidebar({ user, page, setPage, logout }) {
+-    const role  = user?.role || "customer";
+-    const items = NAV[role]  || NAV.customer;
+-    return (
+-        <div style={{ width: 230, background: C.sidebar, color: "#fff", display: "flex", flexDirection: "column", height: "100vh", position: "sticky", top: 0, flexShrink: 0 }}>
+-            <div style={{ padding: "20px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+-                    <div style={{ width: 36, height: 36, background: C.accent, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🔧</div>
+-                    <div>
+-                        <div style={{ fontWeight: 800, fontSize: 14 }}>ArtisanConnect</div>
+-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", textTransform: "capitalize" }}>{role} account</div>
+-                    </div>
+-                </div>
+-            </div>
+-            <nav style={{ flex: 1, padding: "14px 10px", overflowY: "auto" }}>
+-                {items.map((item) => (
+-                    <button key={item.k} onClick={() => setPage(item.k)} style={{ display: "flex", alignItems: "center", gap: 9, width: "100%", padding: "9px 10px", borderRadius: 9, border: "none", cursor: "pointer", background: page === item.k ? "rgba(245,158,11,0.15)" : "transparent", color: page === item.k ? C.accent : "rgba(255,255,255,0.55)", fontWeight: page === item.k ? 700 : 400, fontSize: 13, marginBottom: 2, textAlign: "left", transition: "all .1s" }}>
+-                        <span style={{ fontSize: 15 }}>{item.i}</span>{item.l}
+-                        {page === item.k && <span style={{ marginLeft: "auto", width: 5, height: 5, borderRadius: "50%", background: C.accent }} />}
+-                    </button>
+-                ))}
+-            </nav>
+-            <div style={{ padding: "14px 10px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+-                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
+-                        {(user?.fullName || user?.email || "U")[0].toUpperCase()}
+-                    </div>
+-                    <div style={{ minWidth: 0 }}>
+-                        <div style={{ fontSize: 13, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.fullName || "User"}</div>
+-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</div>
+-                    </div>
+-                </div>
+-                <button onClick={logout} style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "8px 10px", borderRadius: 8, border: "none", cursor: "pointer", background: "rgba(239,68,68,0.1)", color: "#EF4444", fontSize: 13, fontWeight: 600 }}>
+-                    🚪 Sign Out
+-                </button>
+-            </div>
+-        </div>
+-    );
+-}
+diff --git a/src/components/auth/AuthCard.jsx b/src/components/auth/AuthCard.jsx
+deleted file mode 100644
+index 5bc0209..0000000
+--- a/src/components/auth/AuthCard.jsx
++++ /dev/null
+@@ -1,455 +0,0 @@
+-import { useState } from "react";
+-import { api } from "../../api";
+-
+-import { Btn, Inp, Sel, ErrBox, Card } from "../ui";
+-
+-
+-export default function AuthCard({onAuth}){
+-
+-
+-    const [mode,setMode] = useState("login");
+-
+-
+-    const [form,setForm]=useState({
+-
+-        fullName:"",
+-        phone:"",
+-        email:"",
+-        password:"",
+-        role:"customer"
+-
+-    });
+-
+-
+-    const [loading,setLoading]=useState(false);
+-
+-    const [error,setError]=useState("");
+-
+-
+-
+-    const update=(key)=>(e)=>{
+-
+-        setForm(prev=>({
+-
+-            ...prev,
+-
+-            [key]:e.target.value
+-
+-        }));
+-
+-    };
+-
+-
+-
+-
+-    const submit=async()=>{
+-
+-
+-        setError("");
+-
+-
+-
+-        if(!form.email || !form.password){
+-
+-            setError(
+-                "Email and password are required"
+-            );
+-
+-            return;
+-
+-        }
+-
+-
+-
+-        if(mode==="register" && (!form.fullName || !form.phone)){
+-
+-            setError(
+-                "Name and phone are required"
+-            );
+-
+-            return;
+-
+-        }
+-
+-
+-
+-        try{
+-
+-
+-            setLoading(true);
+-
+-
+-
+-            if(mode==="register"){
+-
+-
+-                await api.post(
+-                    "/api/auth/register",
+-                    form
+-                );
+-
+-
+-            }
+-
+-
+-
+-            const res = await api.post(
+-                "/api/auth/login",
+-                {
+-
+-                    email:form.email,
+-
+-                    password:form.password
+-
+-                }
+-
+-            );
+-
+-
+-
+-            const token = res.token;
+-            const user = res.user;
+-
+-
+-
+-            localStorage.setItem(
+-                "token",
+-                token
+-            );
+-
+-
+-
+-            onAuth(token,user);
+-
+-
+-
+-        }
+-
+-        catch (err) {
+-            setError(err.message || "Authentication failed");
+-        }
+-
+-        finally{
+-
+-            setLoading(false);
+-
+-        }
+-
+-
+-    };
+-
+-
+-
+-
+-    return (
+-
+-
+-        <Card>
+-
+-
+-            <div
+-
+-                style={{
+-                    width:380
+-                }}
+-
+-            >
+-
+-
+-
+-                <div
+-
+-                    style={{
+-                        textAlign:"center",
+-                        marginBottom:25
+-                    }}
+-
+-                >
+-
+-                    <h2>
+-
+-                        🔧 ArtisanConnect
+-
+-                    </h2>
+-
+-
+-                    <p
+-
+-                        style={{
+-                            color:"#64748b"
+-                        }}
+-
+-                    >
+-
+-                        Connect with trusted professionals
+-
+-                    </p>
+-
+-
+-                </div>
+-
+-
+-
+-
+-
+-                <div
+-
+-                    style={{
+-                        display:"flex",
+-                        background:"#f1f5f9",
+-                        borderRadius:12,
+-                        padding:5,
+-                        marginBottom:20
+-                    }}
+-
+-                >
+-
+-
+-                    <button
+-
+-                        onClick={()=>{
+-
+-                            setMode("login");
+-
+-                            setError("");
+-
+-                        }}
+-
+-                        style={{
+-
+-                            flex:1,
+-
+-                            padding:10,
+-
+-                            border:0,
+-
+-                            borderRadius:8,
+-
+-                            background:
+-
+-                                mode==="login"
+-
+-                                    ?
+-
+-                                    "white"
+-
+-                                    :
+-
+-                                    "transparent"
+-
+-                        }}
+-
+-                    >
+-
+-                        Login
+-
+-                    </button>
+-
+-
+-
+-                    <button
+-
+-                        onClick={()=>{
+-
+-                            setMode("register");
+-
+-                            setError("");
+-
+-                        }}
+-
+-                        style={{
+-
+-                            flex:1,
+-
+-                            padding:10,
+-
+-                            border:0,
+-
+-                            borderRadius:8,
+-
+-                            background:
+-
+-                                mode==="register"
+-
+-                                    ?
+-
+-                                    "white"
+-
+-                                    :
+-
+-                                    "transparent"
+-
+-                        }}
+-
+-                    >
+-
+-                        Register
+-
+-                    </button>
+-
+-
+-
+-                </div>
+-
+-
+-
+-
+-
+-                {
+-
+-                    mode==="register" &&
+-
+-                    <>
+-
+-
+-                        <Inp
+-
+-                            label="Full Name"
+-
+-                            placeholder="John Doe"
+-
+-                            value={form.fullName}
+-
+-                            onChange={update("fullName")}
+-
+-                        />
+-
+-
+-
+-                        <Inp
+-
+-                            label="Phone"
+-
+-                            placeholder="08012345678"
+-
+-                            value={form.phone}
+-
+-                            onChange={update("phone")}
+-
+-                        />
+-
+-
+-
+-                        <Sel
+-
+-                            label="Account Type"
+-
+-                            value={form.role}
+-
+-                            onChange={update("role")}
+-
+-                        >
+-
+-
+-                            <option value="customer">
+-
+-                                I need a service
+-
+-                            </option>
+-
+-
+-                            <option value="artisan">
+-
+-                                I provide services
+-
+-                            </option>
+-
+-
+-                        </Sel>
+-
+-
+-
+-                    </>
+-
+-                }
+-
+-
+-
+-
+-                <Inp
+-
+-                    label="Email"
+-
+-                    type="email"
+-
+-                    placeholder="example@gmail.com"
+-
+-                    value={form.email}
+-
+-                    onChange={update("email")}
+-
+-                />
+-
+-
+-
+-
+-                <Inp
+-
+-                    label="Password"
+-
+-                    type="password"
+-
+-                    placeholder="********"
+-
+-                    value={form.password}
+-
+-                    onChange={update("password")}
+-
+-                />
+-
+-
+-
+-
+-
+-                <ErrBox msg={error}/>
+-
+-
+-
+-
+-
+-                <Btn
+-
+-                    full
+-
+-                    disabled={loading}
+-
+-                    onClick={submit}
+-
+-                >
+-
+-                    {
+-
+-                        loading
+-
+-                            ?
+-
+-                            "Please wait..."
+-
+-                            :
+-
+-                            mode==="login"
+-
+-                                ?
+-
+-                                "Login →"
+-
+-                                :
+-
+-                                "Create Account →"
+-
+-                    }
+-
+-
+-                </Btn>
+-
+-
+-
+-            </div>
+-
+-
+-        </Card>
+-
+-
+-    )
+-
+-}
+\ No newline at end of file
+diff --git a/src/components/auth/AuthPage.jsx b/src/components/auth/AuthPage.jsx
+deleted file mode 100644
+index 5f0e8db..0000000
+--- a/src/components/auth/AuthPage.jsx
++++ /dev/null
+@@ -1,24 +0,0 @@
+-import AuthCard from "./AuthCard";
+-
+-
+-export default function AuthPage({onAuth}){
+-
+-    return (
+-
+-        <div
+-            style={{
+-                minHeight:"100vh",
+-                background:"#0F172A",
+-                display:"flex",
+-                alignItems:"center",
+-                justifyContent:"center"
+-            }}
+-        >
+-
+-            <AuthCard onAuth={onAuth}/>
+-
+-        </div>
+-
+-    )
+-
+-}
+\ No newline at end of file
+diff --git a/src/components/auth/LoginForm.jsx b/src/components/auth/LoginForm.jsx
+deleted file mode 100644
+index 86c6e13..0000000
+--- a/src/components/auth/LoginForm.jsx
++++ /dev/null
+@@ -1,70 +0,0 @@
+-import { useState } from "react";
+-import { api } from "../../api";
+-import { Btn, Inp, ErrBox } from "../ui";
+-
+-export default function LoginForm({ onAuth }) {
+-    const [f, setF] = useState({
+-        email: "",
+-        password: "",
+-    });
+-
+-    const [loading, setLoading] = useState(false);
+-    const [err, setErr] = useState("");
+-
+-    const upd = (key) => (e) => {
+-        setF((prev) => ({
+-            ...prev,
+-            [key]: e.target.value,
+-        }));
+-    };
+-
+-    const submit = async () => {
+-        if (!f.email || !f.password) {
+-            setErr("Email and password are required");
+-            return;
+-        }
+-
+-        try {
+-            setLoading(true);
+-            setErr("");
+-
+-            const res = await api.post("/api/auth/login", f);
+-
+-            if (!res.token || !res.user) {
+-                throw new Error("Invalid login response from server");
+-            }
+-
+-            onAuth(res.token, res.user);
+-        } catch (e) {
+-            setErr(e.message || "Login failed");
+-        } finally {
+-            setLoading(false);
+-        }
+-    };
+-
+-    return (
+-        <>
+-            <Inp
+-                label="Email"
+-                type="email"
+-                placeholder="you@example.com"
+-                value={f.email}
+-                onChange={upd("email")}
+-            />
+-
+-            <Inp
+-                label="Password"
+-                type="password"
+-                placeholder="Password"
+-                value={f.password}
+-                onChange={upd("password")}
+-            />
+-
+-            <ErrBox msg={err} />
+-
+-            <Btn full disabled={loading} onClick={submit}>
+-                {loading ? "Signing in..." : "Sign In →"}
+-            </Btn>
+-        </>
+-    );
+-}
+\ No newline at end of file
+diff --git a/src/components/auth/RegisterForm.jsx b/src/components/auth/RegisterForm.jsx
+deleted file mode 100644
+index 84bbfd6..0000000
+--- a/src/components/auth/RegisterForm.jsx
++++ /dev/null
+@@ -1,97 +0,0 @@
+-import { useState } from "react";
+-import { api } from "../../api";
+-import { Btn, Inp, Sel, ErrBox } from "../ui";
+-
+-export default function RegisterForm({ onAuth }) {
+-    const [f, setF] = useState({
+-        fullName: "",
+-        phone: "",
+-        email: "",
+-        password: "",
+-        role: "customer",
+-    });
+-
+-    const [err, setErr] = useState("");
+-    const [loading, setLoading] = useState(false);
+-
+-    const upd = (key) => (e) => {
+-        setF((prev) => ({
+-            ...prev,
+-            [key]: e.target.value,
+-        }));
+-    };
+-
+-    const submit = async () => {
+-        if (!f.fullName || !f.phone || !f.email || !f.password) {
+-            setErr("All fields are required");
+-            return;
+-        }
+-
+-        try {
+-            setLoading(true);
+-            setErr("");
+-
+-            await api.post("/api/auth/register", f);
+-
+-            const res = await api.post("/api/auth/login", {
+-                email: f.email,
+-                password: f.password,
+-            });
+-
+-            if (!res.token || !res.user) {
+-                throw new Error("Invalid authentication response from server");
+-            }
+-
+-            onAuth(res.token, res.user);
+-        } catch (e) {
+-            setErr(e.message || "Registration failed");
+-        } finally {
+-            setLoading(false);
+-        }
+-    };
+-
+-    return (
+-        <>
+-            <Inp
+-                label="Full Name"
+-                value={f.fullName}
+-                onChange={upd("fullName")}
+-            />
+-
+-            <Inp
+-                label="Phone"
+-                value={f.phone}
+-                onChange={upd("phone")}
+-            />
+-
+-            <Sel
+-                label="Account Type"
+-                value={f.role}
+-                onChange={upd("role")}
+-            >
+-                <option value="customer">Hire Artisan</option>
+-                <option value="artisan">Provide Services</option>
+-            </Sel>
+-
+-            <Inp
+-                label="Email"
+-                type="email"
+-                value={f.email}
+-                onChange={upd("email")}
+-            />
+-
+-            <Inp
+-                label="Password"
+-                type="password"
+-                value={f.password}
+-                onChange={upd("password")}
+-            />
+-
+-            <ErrBox msg={err} />
+-
+-            <Btn full disabled={loading} onClick={submit}>
+-                {loading ? "Creating account..." : "Create Account →"}
+-            </Btn>
+-        </>
+-    );
+-}
+\ No newline at end of file
+diff --git a/src/components/ui.jsx b/src/components/ui.jsx
+deleted file mode 100644
+index 6560dc8..0000000
+--- a/src/components/ui.jsx
++++ /dev/null
+@@ -1,56 +0,0 @@
+-import { C, sc } from "../theme";
+-
+-export const Btn = ({ children, onClick, variant = "primary", size = "md", disabled, full, style: sx }) => {
+-    const base = { border: "none", borderRadius: 8, cursor: disabled ? "not-allowed" : "pointer", fontWeight: 600, fontSize: size === "sm" ? 13 : 14, padding: size === "sm" ? "6px 14px" : "10px 22px", transition: "all .15s", opacity: disabled ? 0.6 : 1, display: "inline-flex", alignItems: "center", gap: 6, width: full ? "100%" : "auto", justifyContent: full ? "center" : "flex-start", ...sx };
+-    const variants = { primary: { background: C.accent, color: "#fff" }, danger: { background: C.danger, color: "#fff" }, success: { background: C.success, color: "#fff" }, ghost: { background: "transparent", color: C.text, border: `1.5px solid ${C.border}` }, dark: { background: C.sidebar, color: "#fff" }, purple: { background: C.purple, color: "#fff" }, info: { background: C.info, color: "#fff" } };
+-    return <button onClick={onClick} disabled={disabled} style={{ ...base, ...variants[variant] }}>{children}</button>;
+-};
+-
+-export const Inp = ({ label, ...p }) => (
+-    <div style={{ marginBottom: 14 }}>
+-        {label && <label style={{ display: "block", marginBottom: 5, fontSize: 13, fontWeight: 600, color: C.text }}>{label}</label>}
+-        <input style={{ width: "100%", padding: "9px 12px", borderRadius: 8, fontSize: 14, border: `1.5px solid ${C.border}`, background: "#fff", color: C.text, outline: "none", boxSizing: "border-box" }} {...p} />
+-    </div>
+-);
+-
+-export const Sel = ({ label, children, ...p }) => (
+-    <div style={{ marginBottom: 14 }}>
+-        {label && <label style={{ display: "block", marginBottom: 5, fontSize: 13, fontWeight: 600, color: C.text }}>{label}</label>}
+-        <select style={{ width: "100%", padding: "9px 12px", borderRadius: 8, fontSize: 14, border: `1.5px solid ${C.border}`, background: "#fff", color: C.text, outline: "none", boxSizing: "border-box" }} {...p}>{children}</select>
+-    </div>
+-);
+-
+-export const Tex = ({ label, ...p }) => (
+-    <div style={{ marginBottom: 14 }}>
+-        {label && <label style={{ display: "block", marginBottom: 5, fontSize: 13, fontWeight: 600, color: C.text }}>{label}</label>}
+-        <textarea style={{ width: "100%", padding: "9px 12px", borderRadius: 8, fontSize: 14, border: `1.5px solid ${C.border}`, background: "#fff", color: C.text, outline: "none", minHeight: 90, resize: "vertical", boxSizing: "border-box" }} {...p} />
+-    </div>
+-);
+-
+-export const Card    = ({ children, style }) => <div style={{ background: C.card, borderRadius: 12, padding: 22, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: `1px solid ${C.border}`, ...style }}>{children}</div>;
+-export const Badge   = ({ status }) => <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: sc(status) + "20", color: sc(status), textTransform: "capitalize" }}>{status || "—"}</span>;
+-export const Spinner = () => <div style={{ display: "flex", justifyContent: "center", padding: 48 }}><div style={{ width: 34, height: 34, border: `3px solid ${C.border}`, borderTop: `3px solid ${C.accent}`, borderRadius: "50%", animation: "spin .7s linear infinite" }} /></div>;
+-export const Empty   = ({ msg = "Nothing here yet", icon = "📭" }) => <div style={{ textAlign: "center", padding: "48px 24px", color: C.muted }}><div style={{ fontSize: 40, marginBottom: 10 }}>{icon}</div><p style={{ fontWeight: 500 }}>{msg}</p></div>;
+-export const ErrBox  = ({ msg }) => msg ? <div style={{ background: "#FEF2F2", border: `1px solid ${C.danger}40`, borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 13, color: C.danger }}>{msg}</div> : null;
+-export const Stat    = ({ icon, label, value, color }) => <Card><div style={{ display: "flex", alignItems: "center", gap: 14 }}><div style={{ fontSize: 30 }}>{icon}</div><div><div style={{ fontSize: 26, fontWeight: 800, color: color || C.accent }}>{value}</div><div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{label}</div></div></div></Card>;
+-
+-export const Toast = ({ msg, type, onClose }) => msg ? (
+-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, background: type === "error" ? C.danger : C.success, color: "#fff", padding: "12px 20px", borderRadius: 10, fontWeight: 600, fontSize: 14, boxShadow: "0 4px 20px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 10 }}>
+-        {msg}<button onClick={onClose} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>×</button>
+-    </div>
+-) : null;
+-
+-export const Modal = ({ open, onClose, title, children, maxWidth = 540 }) => {
+-    if (!open) return null;
+-    return (
+-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+-            <div style={{ background: "#fff", borderRadius: 16, padding: 28, width: "100%", maxWidth, maxHeight: "88vh", overflow: "auto" }}>
+-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
+-                    <h2 style={{ fontSize: 18, fontWeight: 800, color: C.text }}>{title}</h2>
+-                    <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, color: C.muted }}>×</button>
+-                </div>
+-                {children}
+-            </div>
+-        </div>
+-    );
+-};
+diff --git a/src/main.jsx b/src/main.jsx
+index 7497ae8..86f424c 100644
+--- a/src/main.jsx
++++ b/src/main.jsx
+@@ -1,10 +1,13 @@
+-import React from 'react';
+-import ReactDOM from 'react-dom/client';
+-import App from './App.jsx';
+-import './index.css';
++import { StrictMode } from "react";
++import { createRoot } from "react-dom/client";
++import { BrowserRouter } from "react-router-dom";
++import App from "./App.jsx";
++import "./index.css";
+ 
+-ReactDOM.createRoot(document.getElementById('root')).render(
+-  <React.StrictMode>
+-    <App />
+-  </React.StrictMode>
++createRoot(document.getElementById("root")).render(
++  <StrictMode>
++    <BrowserRouter>
++      <App />
++    </BrowserRouter>
++  </StrictMode>,
+ );
+diff --git a/src/pages/Chat.jsx b/src/pages/Chat.jsx
+index 353e6c0..8ef9fd5 100644
+--- a/src/pages/Chat.jsx
++++ b/src/pages/Chat.jsx
+@@ -32,9 +32,7 @@ export function Chat() {
+     <div className="mx-auto flex h-[calc(100vh-9rem)] max-w-2xl flex-col">
+       <Link to={`/jobs/${jobId}`} className="text-sm text-muted no-underline">Back to the job</Link>
+       <h1 className="font-display text-3xl">Job chat</h1>
+-        <p className="mb-4 text-sm text-muted">
+-            Send messages to the other person assigned to this job.
+-        </p>
++      <p className="mb-4 text-sm text-muted">History for this job. The send box is ready for a future POST.</p>
+       <div className="flex-1 space-y-3 overflow-y-auto rounded-card border border-line bg-cream p-4">
+         {error && <p className="text-sm text-copper-deep">{error}</p>}
+         {!error && messages.length === 0 && <p className="text-sm text-muted">No messages yet.</p>}
+@@ -50,46 +48,17 @@ export function Chat() {
+           );
+         })}
+       </div>
+-
+-        <form
+-            className="mt-3 flex gap-2"
+-            onSubmit={async (e) => {
+-                e.preventDefault();
+-
+-                const text = draft.trim();
+-
+-                if (!text) return;
+-
+-                setError("");
+-
+-                try {
+-                    await craftad.sendChatMessage(token, jobId, text);
+-
+-                    setDraft("");
+-
+-                    const data = await craftad.chat(token, jobId);
+-                    setMessages(listOf(data, ["messages"]));
+-                } catch (err) {
+-                    setError(err.message);
+-                }
+-            }}
+-        >
+-            <input
+-                value={draft}
+-                onChange={(e) => setDraft(e.target.value)}
+-                placeholder="Write a message"
+-                className="min-h-12 flex-1 rounded-full border border-line bg-cream px-4 outline-none"
+-            />
+-
+-            <button
+-                type="submit"
+-                disabled={!draft.trim()}
+-                className="min-h-12 rounded-full bg-copper px-5 text-sm font-medium text-cream disabled:opacity-50"
+-            >
+-                Send
+-            </button>
+-        </form>
+-
++      <form
++        className="mt-3 flex gap-2"
++        onSubmit={(e) => {
++          e.preventDefault();
++          if (!draft.trim()) return;
++          setError("The live API can show chat history, but it doesn’t accept new messages yet.");
++        }}
++      >
++        <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Write a message" className="min-h-12 flex-1 rounded-full border border-line bg-cream px-4 outline-none" />
++        <button className="min-h-12 rounded-full bg-copper px-5 text-sm font-medium text-cream">Send</button>
++      </form>
+     </div>
+   );
+ }
+diff --git a/src/pages/Dashboard.jsx b/src/pages/Dashboard.jsx
+index ca165c5..03be93c 100644
+--- a/src/pages/Dashboard.jsx
++++ b/src/pages/Dashboard.jsx
+@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
+ import { Link } from "react-router-dom";
+ import { craftad, listOf } from "../api";
+ import { useSession } from "../session";
++import { loadSocial, saveSocial } from "../components/ShareBar";
+ 
+ export function Dashboard() {
+   const { token, user } = useSession();
+@@ -12,12 +13,15 @@ export function Dashboard() {
+   const [years, setYears] = useState("1");
+   const [bio, setBio] = useState("");
+   const [profileNote, setProfileNote] = useState("");
++  const [social, setSocial] = useState({});
++  const [socialNote, setSocialNote] = useState("");
+ 
+   useEffect(() => {
+     if (!token || !user) return;
+     const load = user.role === "artisan" ? craftad.openJobs(token) : craftad.myJobs(token);
+     load.then((data) => setJobs(listOf(data, ["jobs"]))).catch((err) => setNote(err.message));
+     craftad.wallet(token).then((data) => setBalance(data.wallet?.balance ?? null)).catch(() => setBalance(null));
++    setSocial(loadSocial());
+   }, [token, user]);
+ 
+   return (
+@@ -69,6 +73,28 @@ export function Dashboard() {
+           {profileNote && <p className="text-sm text-muted">{profileNote}</p>}
+         </form>
+       )}
++      <form
++        className="grid gap-3 rounded-card border border-line bg-cream p-5 sm:grid-cols-2"
++        onSubmit={(e) => {
++          e.preventDefault();
++          saveSocial(social);
++          setSocialNote("Social links saved on this device.");
++        }}
++      >
++        <h2 className="font-display text-2xl sm:col-span-2">Social</h2>
++        <input value={social.whatsapp || ""} onChange={(e) => setSocial({ ...social, whatsapp: e.target.value })} placeholder="WhatsApp number" className="min-h-12 rounded-2xl border border-line px-4" />
++        <input value={social.instagram || ""} onChange={(e) => setSocial({ ...social, instagram: e.target.value })} placeholder="Instagram username" className="min-h-12 rounded-2xl border border-line px-4" />
++        <input value={social.facebook || ""} onChange={(e) => setSocial({ ...social, facebook: e.target.value })} placeholder="Facebook page or profile" className="min-h-12 rounded-2xl border border-line px-4" />
++        <input value={social.x || ""} onChange={(e) => setSocial({ ...social, x: e.target.value })} placeholder="X username" className="min-h-12 rounded-2xl border border-line px-4" />
++        <div className="flex flex-wrap gap-2 sm:col-span-2">
++          {social.whatsapp && <a className="text-sm text-copper" href={`https://wa.me/${social.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">WhatsApp</a>}
++          {social.instagram && <a className="text-sm text-copper" href={`https://instagram.com/${social.instagram.replace("@", "")}`} target="_blank" rel="noreferrer">Instagram</a>}
++          {social.facebook && <a className="text-sm text-copper" href={social.facebook.startsWith("http") ? social.facebook : `https://facebook.com/${social.facebook}`} target="_blank" rel="noreferrer">Facebook</a>}
++          {social.x && <a className="text-sm text-copper" href={`https://x.com/${social.x.replace("@", "")}`} target="_blank" rel="noreferrer">X</a>}
++        </div>
++        <button className="min-h-11 w-fit rounded-full bg-ink px-4 text-sm font-medium text-cream sm:col-span-2">Save social links</button>
++        {socialNote && <p className="text-sm text-muted sm:col-span-2">{socialNote}</p>}
++      </form>
+       <section className="grid gap-3">
+         {jobs.slice(0, 4).map((job) => (
+           <Link key={job._id} to={`/jobs/${job._id}`} className="rounded-card border border-line bg-cream p-4 no-underline">
+diff --git a/src/pages/Home.jsx b/src/pages/Home.jsx
+index ed217aa..458deac 100644
+--- a/src/pages/Home.jsx
++++ b/src/pages/Home.jsx
+@@ -1,6 +1,7 @@
+ import { Link, Navigate } from "react-router-dom";
+ import { ArrowRight, MessageSquare, ShieldCheck, Star, Wallet } from "lucide-react";
+ import { SiteMark } from "../components/SiteMark";
++import { ShareBar } from "../components/ShareBar";
+ import { useSession } from "../session";
+ 
+ const trades = [
+@@ -109,6 +110,15 @@ export function Home() {
+           <Link to="/register" className="mt-6 inline-flex min-h-11 items-center rounded-full bg-copper px-4 text-sm font-medium text-cream no-underline">Join as an artisan</Link>
+         </div>
+       </section>
++      <section className="mx-auto max-w-6xl px-4 pb-16">
++        <div className="rounded-card border border-line bg-cream p-6">
++          <h2 className="font-display text-3xl">Pass it on</h2>
++          <p className="mt-2 max-w-xl text-sm text-muted">Send Craftad to someone who needs a plumber, a carpenter, or a day’s work.</p>
++          <div className="mt-4">
++            <ShareBar title="Share on social" text="Find a trusted artisan on Craftad. Post a job, compare prices, and pay when the work is done." />
++          </div>
++        </div>
++      </section>
+     </div>
+   );
+ }
+diff --git a/src/pages/JobDetail.jsx b/src/pages/JobDetail.jsx
+index cb529f9..149304b 100644
+--- a/src/pages/JobDetail.jsx
++++ b/src/pages/JobDetail.jsx
+@@ -1,6 +1,7 @@
+ import { useEffect, useState } from "react";
+ import { Link, useParams } from "react-router-dom";
+ import { craftad, listOf } from "../api";
++import { ShareBar } from "../components/ShareBar";
+ import { useSession } from "../session";
+ 
+ export function JobDetail() {
+@@ -27,8 +28,9 @@ export function JobDetail() {
+       try {
+         const data = await craftad.applications(token, jobId);
+         setApps(listOf(data, ["applications"]));
+-      } catch {
++      } catch (err) {
+         setApps([]);
++        setError(err instanceof Error ? err.message : "Could not load applications");
+       }
+     }
+   }
+@@ -76,6 +78,9 @@ export function JobDetail() {
+           {user?.role === "customer" && job.status === "completed" && <button className="min-h-11 rounded-full bg-copper px-4 text-sm text-cream" onClick={() => run(() => craftad.confirmJob(token, jobId), "You confirmed the job")}>Confirm it’s done</button>}
+         </div>
+       </article>
++      <div className="rounded-card border border-line bg-cream p-5">
++        <ShareBar title="Share this job" text={`${job.title} in ${job.location}. Budget ₦${(job.budget || 0).toLocaleString()} on Craftad.`} />
++      </div>
+       {user?.role === "artisan" && job.status === "open" && (
+         <form className="rounded-card border border-line bg-cream p-6" onSubmit={(e) => { e.preventDefault(); run(() => craftad.apply(token, jobId, { message, proposedPrice: Number(price) }), "Application sent"); }}>
+           <h2 className="font-display text-2xl">Apply</h2>
+@@ -87,19 +92,25 @@ export function JobDetail() {
+       {user?.role === "customer" && apps.length > 0 && (
+         <section className="rounded-card border border-line bg-cream p-6">
+           <h2 className="font-display text-2xl">Applications</h2>
++          <p className="mt-1 text-sm text-muted">Accept locks the artisan’s price from your wallet. Fund the wallet first if the balance is short.</p>
+           <ul className="mt-4 space-y-3">
+-            {apps.map((app) => (
+-              <li key={app._id} className="rounded-2xl bg-paper p-4">
+-                <p className="text-sm">{app.message}</p>
+-                <p className="mt-1 text-sm font-medium">₦{(app.proposedPrice || 0).toLocaleString()} · {app.status}</p>
+-                {app.status === "pending" && (
++            {apps.map((app) => {
++              const appId = app._id || app.id;
++              const artisanName = app.artisan?.fullName || app.artisan?.email || "Artisan";
++              return (
++              <li key={appId} className="rounded-2xl bg-paper p-4">
++                <p className="text-sm font-medium">{artisanName}</p>
++                <p className="mt-1 text-sm">{app.message}</p>
++                <p className="mt-1 text-sm font-medium">₦{(app.proposedPrice || 0).toLocaleString()} · {app.status || "pending"}</p>
++                {(app.status || "pending") === "pending" && (
+                   <div className="mt-3 flex gap-2">
+-                    <button className="min-h-10 rounded-full bg-ink px-4 text-sm text-cream" onClick={() => run(() => craftad.acceptApplication(token, app._id), "Application accepted")}>Accept</button>
+-                    <button className="min-h-10 rounded-full border border-line px-4 text-sm" onClick={() => run(() => craftad.rejectApplication(token, app._id), "Application rejected")}>Reject</button>
++                    <button className="min-h-10 rounded-full bg-ink px-4 text-sm text-cream" onClick={() => run(() => craftad.acceptApplication(token, appId), "Application accepted")}>Accept</button>
++                    <button className="min-h-10 rounded-full border border-line px-4 text-sm" onClick={() => run(() => craftad.rejectApplication(token, appId), "Application rejected")}>Reject</button>
+                   </div>
+                 )}
+               </li>
+-            ))}
++              );
++            })}
+           </ul>
+         </section>
+       )}
+diff --git a/src/pages/Jobs.jsx b/src/pages/Jobs.jsx
+index 3ad6cad..7787f56 100644
+--- a/src/pages/Jobs.jsx
++++ b/src/pages/Jobs.jsx
+@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
+ import { Link, useSearchParams } from "react-router-dom";
+ import { ArrowLeft, Search } from "lucide-react";
+ import { craftad, listOf } from "../api";
++import { ShareBar } from "../components/ShareBar";
+ import { useSession } from "../session";
+ 
+ export function Jobs() {
+@@ -88,8 +89,8 @@ export function Jobs() {
+       ) : (
+         <ul className="grid gap-3">
+           {shown.map((job) => (
+-            <li key={job._id}>
+-              <Link to={`/jobs/${job._id}`} className="block rounded-card border border-line bg-cream p-5 no-underline">
++            <li key={job._id} className="rounded-card border border-line bg-cream p-5">
++              <Link to={`/jobs/${job._id}`} className="block no-underline">
+                 <div className="flex flex-wrap items-center justify-between gap-2">
+                   <h2 className="font-display text-2xl text-ink">{job.title}</h2>
+                   <span className="rounded-full bg-paper px-3 py-1 text-xs capitalize">{job.status?.replaceAll("_", " ")}</span>
+@@ -97,6 +98,9 @@ export function Jobs() {
+                 <p className="mt-2 text-sm text-muted">{job.description}</p>
+                 <p className="mt-3 text-sm">{job.category} · {job.location} · ₦{(job.budget || 0).toLocaleString()}</p>
+               </Link>
++              <div className="mt-4 border-t border-line pt-4">
++                <ShareBar title="Share" text={`${job.title} in ${job.location} on Craftad`} url={`/jobs/${job._id}`} />
++              </div>
+             </li>
+           ))}
+         </ul>
+diff --git a/src/pages/admin/AdminEarnings.jsx b/src/pages/admin/AdminEarnings.jsx
+deleted file mode 100644
+index 7c63834..0000000
+--- a/src/pages/admin/AdminEarnings.jsx
++++ /dev/null
+@@ -1,49 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C, extract, fmtMoney } from "../../theme";
+-import { api } from "../../api";
+-import { Btn, Inp, Card, Stat, Spinner, Toast } from "../../components/ui";
+-
+-export default function AdminEarnings({ token }) {
+-    const [data, setData]       = useState(null);
+-    const [loading, setLoading] = useState(true);
+-    const [amount, setAmount]   = useState("");
+-    const [withdrawing, setWithdrawing] = useState(false);
+-    const [toast, setToast]     = useState(null);
+-
+-    useEffect(() => {
+-        api.get("/api/payments/platform-earnings", token)
+-            .then((d) => setData(extract(d, "earnings", "data", d)))
+-            .catch((e) => console.error(e.message))
+-            .finally(() => setLoading(false));
+-    }, [token]);
+-
+-    const withdraw = async () => {
+-        setWithdrawing(true);
+-        try {
+-            await api.post("/api/admin/withdraw", { amount: Number(amount) }, token);
+-            setToast({ msg: "Platform withdrawal submitted!", type: "success" });
+-            setAmount("");
+-        } catch (e) { setToast({ msg: e.message, type: "error" }); }
+-        finally { setWithdrawing(false); }
+-    };
+-
+-    if (loading) return <Spinner />;
+-    return (
+-        <div>
+-            <h2 style={{ fontSize: 22, fontWeight: 800, color: C.text, marginBottom: 22 }}>Platform Earnings</h2>
+-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 22 }}>
+-                <Stat icon="💰" label="Total Earnings"    value={fmtMoney(data?.totalEarnings || 0)}                                               color={C.purple}  />
+-                <Stat icon="💸" label="Total Withdrawn"   value={fmtMoney(data?.totalWithdrawn || 0)}                                              color={C.danger}  />
+-                <Stat icon="🏦" label="Available Balance" value={fmtMoney(data?.availableBalance || (data?.totalEarnings - data?.totalWithdrawn) || 0)} color={C.success} />
+-            </div>
+-            <Card>
+-                <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 14 }}>Withdraw Platform Earnings</h3>
+-                <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
+-                    <div style={{ flex: 1 }}><Inp label="Amount (₦)" type="number" placeholder="Enter amount" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
+-                    <Btn onClick={withdraw} disabled={withdrawing || !amount} style={{ marginBottom: 14 }}>{withdrawing ? "Processing…" : "💸 Withdraw"}</Btn>
+-                </div>
+-            </Card>
+-            <Toast msg={toast?.msg} type={toast?.type} onClose={() => setToast(null)} />
+-        </div>
+-    );
+-}
+diff --git a/src/pages/admin/AdminHome.jsx b/src/pages/admin/AdminHome.jsx
+deleted file mode 100644
+index 335b6d4..0000000
+--- a/src/pages/admin/AdminHome.jsx
++++ /dev/null
+@@ -1,49 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C, arr, extract, fmtMoney } from "../../theme";
+-import { api } from "../../api";
+-import { Stat, Spinner } from "../../components/ui";
+-import JobCard from "../../components/JobCard";
+-
+-export default function AdminHome({ token }) {
+-    const [stats, setStats]     = useState(null);
+-    const [loading, setLoading] = useState(true);
+-
+-    useEffect(() => {
+-        api.get("/api/admin/dashboard", token)
+-            .then((d) => setStats(extract(d, "stats", "data", d)))
+-            .catch((e) => console.error(e.message))
+-            .finally(() => setLoading(false));
+-    }, [token]);
+-
+-    if (loading) return <Spinner />;
+-    return (
+-        <div>
+-            <h2 style={{ fontSize: 22, fontWeight: 800, color: C.text, marginBottom: 22 }}>Platform Overview</h2>
+-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14, marginBottom: 20 }}>
+-                <Stat icon="👥" label="Total Users"      value={stats?.totalUsers    || 0} color={C.info}    />
+-                <Stat icon="🔧" label="Total Artisans"   value={stats?.totalArtisans || 0} color={C.success} />
+-                <Stat icon="📋" label="Total Jobs"       value={stats?.totalJobs     || 0} color={C.accent}  />
+-                <Stat icon="💹" label="Platform Revenue" value={fmtMoney(stats?.totalEarnings || 0)} color={C.purple} />
+-            </div>
+-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
+-                <Stat icon="⏳" label="Pending Jobs"   value={stats?.pendingJobs   || 0} color={C.accent}  />
+-                <Stat icon="✅" label="Completed Jobs" value={stats?.completedJobs || 0} color={C.success} />
+-                <Stat icon="❌" label="Cancelled Jobs" value={stats?.cancelledJobs || 0} color={C.danger}  />
+-            </div>
+-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
+-                <div style={{ background: "#fff", borderRadius: 12, padding: 22, border: `1px solid ${C.border}` }}>
+-                    <div style={{ fontWeight: 700, marginBottom: 4, color: C.text }}>💰 Total Earnings</div>
+-                    <div style={{ fontSize: 24, fontWeight: 800, color: C.purple }}>{fmtMoney(stats?.totalEarnings || 0)}</div>
+-                </div>
+-                <div style={{ background: "#fff", borderRadius: 12, padding: 22, border: `1px solid ${C.border}` }}>
+-                    <div style={{ fontWeight: 700, marginBottom: 4, color: C.text }}>🏦 Available Balance</div>
+-                    <div style={{ fontSize: 24, fontWeight: 800, color: C.success }}>{fmtMoney(stats?.availableBalance || 0)}</div>
+-                </div>
+-            </div>
+-            {arr(stats?.recentJobs).length > 0 && (<>
+-                <h3 style={{ fontSize: 16, fontWeight: 700, margin: "24px 0 14px", color: C.text }}>Recent Jobs</h3>
+-                {arr(stats.recentJobs).slice(0, 5).map((j) => <JobCard key={j._id} job={j} />)}
+-            </>)}
+-        </div>
+-    );
+-}
+diff --git a/src/pages/admin/AdminUsers.jsx b/src/pages/admin/AdminUsers.jsx
+deleted file mode 100644
+index bcc932f..0000000
+--- a/src/pages/admin/AdminUsers.jsx
++++ /dev/null
+@@ -1,94 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C, arr, extract, fmtDate } from "../../theme";
+-import { api } from "../../api";
+-import { Btn, Card, Badge, Spinner, Empty, Toast } from "../../components/ui";
+-
+-export default function AdminUsers({ token }) {
+-    const [users, setUsers]       = useState([]);
+-    const [loading, setLoading]   = useState(true);
+-    const [q, setQ]               = useState("");
+-    const [roleFilter, setRoleFilter] = useState("");
+-    const [toast, setToast]       = useState(null);
+-
+-    useEffect(() => {
+-        api.get("/api/admin/users", token)
+-            .then((d) => setUsers(arr(extract(d, "users", "data"))))
+-            .catch((e) => console.error(e.message))
+-            .finally(() => setLoading(false));
+-    }, [token]);
+-
+-    // NOTE: add this route to your backend to enable suspend/ban:
+-    // router.patch("/users/:userId/status", protect, authorizeRoles("admin"), async (req,res) => {
+-    //   const user = await User.findByIdAndUpdate(req.params.userId, { accountStatus: req.body.accountStatus }, { new: true });
+-    //   res.json({ success: true, data: user });
+-    // });
+-    const updateStatus = async (userId, accountStatus) => {
+-        try {
+-            await api.patch(`/api/admin/users/${userId}/status`, { accountStatus }, token);
+-            setUsers((u) => u.map((x) => x._id === userId ? { ...x, accountStatus } : x));
+-            setToast({ msg: `User ${accountStatus}.`, type: "success" });
+-        } catch (e) { setToast({ msg: "Add PATCH /api/admin/users/:userId/status to your backend first.", type: "error" }); }
+-    };
+-
+-    if (loading) return <Spinner />;
+-
+-    const filtered = users.filter((u) =>
+-        `${u.fullName}${u.email}${u.role}`.toLowerCase().includes(q.toLowerCase()) &&
+-        (!roleFilter || u.role === roleFilter)
+-    );
+-
+-    return (
+-        <div>
+-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
+-                <h2 style={{ fontSize: 22, fontWeight: 800, color: C.text }}>Users <span style={{ color: C.muted, fontWeight: 400, fontSize: 16 }}>({users.length})</span></h2>
+-                <div style={{ display: "flex", gap: 10 }}>
+-                    <input placeholder="🔍 Search…" value={q} onChange={(e) => setQ(e.target.value)} style={{ padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontSize: 13, outline: "none", width: 180 }} />
+-                    <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} style={{ padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${C.border}`, fontSize: 13, outline: "none", background: "#fff" }}>
+-                        <option value="">All Roles</option>
+-                        <option value="customer">Customer</option>
+-                        <option value="artisan">Artisan</option>
+-                        <option value="admin">Admin</option>
+-                    </select>
+-                </div>
+-            </div>
+-            {filtered.length === 0 ? <Empty msg="No users found" icon="👥" /> : (
+-                <Card style={{ padding: 0, overflow: "hidden" }}>
+-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+-                        <thead><tr style={{ background: C.bg }}>
+-                            {["Name","Email","Phone","Role","Status","Joined","Actions"].map((h) => <th key={h} style={{ padding: "11px 14px", textAlign: "left", fontSize: 11, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5 }}>{h}</th>)}
+-                        </tr></thead>
+-                        <tbody>
+-                            {filtered.map((u, i) => (
+-                                <tr key={u._id} style={{ borderTop: `1px solid ${C.border}`, background: i % 2 === 0 ? "#fff" : "#FAFAFA" }}>
+-                                    <td style={{ padding: "11px 14px" }}>
+-                                        <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+-                                            <div style={{ width: 30, height: 30, borderRadius: "50%", background: u.accountStatus === "banned" ? C.danger : C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, color: "#fff", flexShrink: 0, opacity: u.accountStatus !== "active" ? 0.6 : 1 }}>
+-                                                {(u.fullName || u.email || "U")[0].toUpperCase()}
+-                                            </div>
+-                                            <span style={{ fontSize: 14, fontWeight: 600, color: u.accountStatus === "banned" ? C.danger : C.text }}>{u.fullName || "—"}</span>
+-                                        </div>
+-                                    </td>
+-                                    <td style={{ padding: "11px 14px", fontSize: 13, color: C.muted }}>{u.email}</td>
+-                                    <td style={{ padding: "11px 14px", fontSize: 13, color: C.muted }}>{u.phone || "—"}</td>
+-                                    <td style={{ padding: "11px 14px" }}><Badge status={u.role} /></td>
+-                                    <td style={{ padding: "11px 14px" }}><Badge status={u.accountStatus || "active"} /></td>
+-                                    <td style={{ padding: "11px 14px", fontSize: 13, color: C.muted }}>{fmtDate(u.createdAt)}</td>
+-                                    <td style={{ padding: "11px 14px" }}>
+-                                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+-                                            {u.role !== "admin" && (<>
+-                                                {u.accountStatus !== "suspended" && u.accountStatus !== "banned" && <Btn size="sm" variant="ghost" onClick={() => updateStatus(u._id, "suspended")}>Suspend</Btn>}
+-                                                {u.accountStatus !== "banned" && <Btn size="sm" variant="danger" onClick={() => updateStatus(u._id, "banned")}>Ban</Btn>}
+-                                                {(u.accountStatus === "suspended" || u.accountStatus === "banned") && <Btn size="sm" variant="success" onClick={() => updateStatus(u._id, "active")}>Restore</Btn>}
+-                                            </>)}
+-                                        </div>
+-                                    </td>
+-                                </tr>
+-                            ))}
+-                        </tbody>
+-                    </table>
+-                </Card>
+-            )}
+-            <Toast msg={toast?.msg} type={toast?.type} onClose={() => setToast(null)} />
+-        </div>
+-    );
+-}
+diff --git a/src/pages/admin/AdminWithdrawals.jsx b/src/pages/admin/AdminWithdrawals.jsx
+deleted file mode 100644
+index 5a28a54..0000000
+--- a/src/pages/admin/AdminWithdrawals.jsx
++++ /dev/null
+@@ -1,388 +0,0 @@
+-import { useEffect, useState } from "react";
+-import { C, fmtMoney, fmtDate } from "../../theme";
+-import { api } from "../../api";
+-
+-import {
+-    Card,
+-    Btn,
+-    Spinner,
+-    Empty,
+-    Badge,
+-    Toast
+-} from "../../components/ui";
+-
+-
+-export default function AdminWithdrawals({token}) {
+-
+-
+-    const [withdrawals,setWithdrawals] = useState([]);
+-
+-    const [loading,setLoading] = useState(true);
+-
+-    const [toast,setToast] = useState(null);
+-
+-
+-
+-    const toast$ = (msg,type="success")=>{
+-
+-        setToast({
+-            msg,
+-            type
+-        });
+-
+-        setTimeout(
+-            ()=>setToast(null),
+-            3000
+-        );
+-
+-    };
+-
+-
+-
+-    const load = async()=>{
+-
+-        try{
+-
+-            const d =
+-                await api.get(
+-                    "/api/wallet/history",
+-                    token
+-                );
+-
+-
+-            setWithdrawals(
+-                d.data || d
+-            );
+-
+-
+-        }catch(e){
+-
+-            toast$(e.message,"error");
+-
+-        }
+-        finally{
+-
+-            setLoading(false);
+-
+-        }
+-
+-    };
+-
+-
+-
+-    useEffect(()=>{
+-
+-        load();
+-
+-    },[]);
+-
+-
+-
+-
+-
+-    const approve = async(id)=>{
+-
+-
+-        if(
+-            !confirm(
+-                "Approve this withdrawal?"
+-            )
+-        ) return;
+-
+-
+-        try{
+-
+-            await api.patch(
+-                `/api/wallet/approve/${id}`,
+-                {},
+-                token
+-            );
+-
+-
+-            toast$(
+-                "Withdrawal approved"
+-            );
+-
+-
+-            load();
+-
+-
+-        }catch(e){
+-
+-            toast$(
+-                e.message,
+-                "error"
+-            );
+-
+-        }
+-
+-    };
+-
+-
+-
+-
+-
+-
+-    const reject = async(id)=>{
+-
+-
+-        if(
+-            !confirm(
+-                "Reject this withdrawal?"
+-            )
+-        ) return;
+-
+-
+-
+-        try{
+-
+-
+-            await api.patch(
+-                `/api/wallet/reject/${id}`,
+-                {},
+-                token
+-            );
+-
+-
+-            toast$(
+-                "Withdrawal rejected"
+-            );
+-
+-
+-            load();
+-
+-
+-
+-        }catch(e){
+-
+-            toast$(
+-                e.message,
+-                "error"
+-            );
+-
+-        }
+-
+-    };
+-
+-
+-
+-
+-
+-    if(loading)
+-        return <Spinner/>;
+-
+-
+-
+-
+-    return (
+-
+-        <div>
+-
+-
+-            <Card
+-                style={{
+-                    background:
+-                        "linear-gradient(135deg,#0A1628,#1F3A5F)",
+-                    color:"#fff",
+-                    padding:28,
+-                    marginBottom:25
+-                }}
+-            >
+-
+-                <h1>
+-                    💸 Withdrawal Requests
+-                </h1>
+-
+-                <p style={{
+-                    opacity:.7
+-                }}>
+-                    Review and process artisan payments
+-                </p>
+-
+-
+-            </Card>
+-
+-
+-
+-
+-
+-            <Card>
+-
+-
+-                {
+-                    withdrawals.length===0
+-
+-                        ?
+-
+-                        <Empty
+-                            icon="💰"
+-                            msg="No withdrawal requests"
+-                        />
+-
+-
+-                        :
+-
+-
+-                        withdrawals.map(w=>(
+-
+-
+-                            <div
+-                                key={w._id}
+-                                style={{
+-                                    padding:18,
+-                                    marginBottom:12,
+-                                    border:
+-                                        `1px solid ${C.border}`,
+-                                    borderRadius:12
+-                                }}
+-                            >
+-
+-
+-                                <div
+-                                    style={{
+-                                        display:"flex",
+-                                        justifyContent:"space-between",
+-                                        marginBottom:12
+-                                    }}
+-                                >
+-
+-                                    <div>
+-
+-
+-                                        <h3 style={{
+-                                            margin:0
+-                                        }}>
+-                                            {w.user?.fullName}
+-                                        </h3>
+-
+-
+-                                        <small>
+-                                            {w.user?.email}
+-                                        </small>
+-
+-
+-                                    </div>
+-
+-
+-                                    <Badge
+-                                        status={w.status}
+-                                    />
+-
+-
+-                                </div>
+-
+-
+-
+-
+-
+-                                <div
+-                                    style={{
+-                                        display:"grid",
+-                                        gridTemplateColumns:
+-                                            "repeat(auto-fit,minmax(150px,1fr))",
+-                                        gap:10,
+-                                        marginBottom:15
+-                                    }}
+-                                >
+-
+-                                    <div>
+-                                        Amount
+-                                        <strong>
+-                                            {fmtMoney(w.amount)}
+-                                        </strong>
+-                                    </div>
+-
+-
+-                                    <div>
+-                                        Bank
+-                                        <strong>
+-                                            {w.bankName}
+-                                        </strong>
+-                                    </div>
+-
+-
+-                                    <div>
+-                                        Account
+-                                        <strong>
+-                                            {w.accountNumber}
+-                                        </strong>
+-                                    </div>
+-
+-
+-                                    <div>
+-                                        Date
+-                                        <strong>
+-                                            {fmtDate(w.createdAt)}
+-                                        </strong>
+-                                    </div>
+-
+-
+-                                </div>
+-
+-
+-
+-
+-
+-                                {
+-                                    w.status==="pending"
+-
+-                                    &&
+-
+-                                    <div
+-                                        style={{
+-                                            display:"flex",
+-                                            gap:10
+-                                        }}
+-                                    >
+-
+-                                        <Btn
+-                                            onClick={()=>
+-                                                approve(w._id)
+-                                            }
+-                                        >
+-                                            ✅ Approve
+-                                        </Btn>
+-
+-
+-
+-                                        <Btn
+-                                            variant="danger"
+-                                            onClick={()=>
+-                                                reject(w._id)
+-                                            }
+-                                        >
+-                                            ❌ Reject
+-                                        </Btn>
+-
+-
+-                                    </div>
+-
+-                                }
+-
+-
+-
+-                            </div>
+-
+-
+-                        ))
+-
+-                }
+-
+-
+-            </Card>
+-
+-
+-            <Toast
+-                msg={toast?.msg}
+-                type={toast?.type}
+-                onClose={()=>
+-                    setToast(null)
+-                }
+-            />
+-
+-
+-        </div>
+-
+-    );
+-
+-}
+\ No newline at end of file
+diff --git a/src/pages/artisan/ActiveJobs.jsx b/src/pages/artisan/ActiveJobs.jsx
+deleted file mode 100644
+index cf2e730..0000000
+--- a/src/pages/artisan/ActiveJobs.jsx
++++ /dev/null
+@@ -1,149 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C } from "../../theme";
+-import { api } from "../../api";
+-import { Btn, Spinner, Empty, Toast } from "../../components/ui";
+-import JobCard from "../../components/JobCard";
+-
+-export default function ActiveJobs({ token }) {
+-    const [jobs, setJobs] = useState([]);
+-    const [loading, setLoading] = useState(true);
+-    const [toast, setToast] = useState(null);
+-
+-    const loadJobs = async () => {
+-        try {
+-            setLoading(true);
+-
+-            const res = await api.get(
+-                "/api/job/my-jobs",
+-                token
+-            );
+-
+-            const artisanJobs = (res.jobs || []).filter(
+-                (job) =>
+-                    ["assigned", "in_progress"].includes(job.status)
+-            );
+-
+-            setJobs(artisanJobs);
+-
+-        } catch (e) {
+-            console.error("Active jobs:", e.message);
+-        } finally {
+-            setLoading(false);
+-        }
+-    };
+-
+-    useEffect(() => {
+-        loadJobs();
+-    }, [token]);
+-
+-    const startJob = async (jobId) => {
+-        try {
+-            await api.patch(
+-                `/api/job/${jobId}/start`,
+-                {},
+-                token
+-            );
+-
+-            setToast({
+-                msg: "Job started successfully!",
+-                type: "success"
+-            });
+-
+-            await loadJobs();
+-
+-        } catch (e) {
+-            setToast({
+-                msg: e.message,
+-                type: "error"
+-            });
+-        }
+-    };
+-
+-    const completeJob = async (jobId) => {
+-        try {
+-            await api.patch(
+-                `/api/job/${jobId}/complete`,
+-                {},
+-                token
+-            );
+-
+-            setToast({
+-                msg: "Job completed successfully!",
+-                type: "success"
+-            });
+-
+-            await loadJobs();
+-
+-        } catch (e) {
+-            setToast({
+-                msg: e.message,
+-                type: "error"
+-            });
+-        }
+-    };
+-
+-    if (loading) {
+-        return <Spinner />;
+-    }
+-
+-    return (
+-        <div>
+-            <h2
+-                style={{
+-                    fontSize: 22,
+-                    fontWeight: 800,
+-                    color: C.text,
+-                    marginBottom: 22
+-                }}
+-            >
+-                Active Jobs
+-            </h2>
+-
+-            {jobs.length === 0 ? (
+-                <Empty
+-                    msg="No active jobs."
+-                    icon="⚡"
+-                />
+-            ) : (
+-                jobs.map((job) => (
+-                    <JobCard
+-                        key={job._id}
+-                        job={job}
+-                        actions={[
+-                            job.status === "assigned" && (
+-                                <Btn
+-                                    key="start"
+-                                    size="sm"
+-                                    onClick={() =>
+-                                        startJob(job._id)
+-                                    }
+-                                >
+-                                    ▶ Start Job
+-                                </Btn>
+-                            ),
+-
+-                            job.status === "in_progress" && (
+-                                <Btn
+-                                    key="complete"
+-                                    variant="success"
+-                                    size="sm"
+-                                    onClick={() =>
+-                                        completeJob(job._id)
+-                                    }
+-                                >
+-                                    ✅ Mark Complete
+-                                </Btn>
+-                            )
+-                        ]}
+-                    />
+-                ))
+-            )}
+-
+-            <Toast
+-                msg={toast?.msg}
+-                type={toast?.type}
+-                onClose={() => setToast(null)}
+-            />
+-        </div>
+-    );
+-}
+\ No newline at end of file
+diff --git a/src/pages/artisan/ArtisanProfile.jsx b/src/pages/artisan/ArtisanProfile.jsx
+deleted file mode 100644
+index a81f406..0000000
+--- a/src/pages/artisan/ArtisanProfile.jsx
++++ /dev/null
+@@ -1,137 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C, arr, extract, SKILLS } from "../../theme";
+-import { api } from "../../api";
+-import { Btn, Inp, Tex, Card, Spinner, Toast } from "../../components/ui";
+-
+-export default function ArtisanProfile({ token }) {
+-
+-    const [profile, setProfile] = useState(null);
+-    const [loading, setLoading] = useState(true);
+-    const [saving, setSaving]   = useState(false);
+-    const [f, setF]             = useState({ skills: [], yearsOfExperience: "", bio: "", serviceAreas: "", serviceRadiusKm: "10", lat: "", lng: "" });
+-    const [toast, setToast]     = useState(null);
+-    const upd = (k) => (e) => setF((p) => ({ ...p, [k]: e.target.value }));
+-    const toggleSkill = (skill) => setF((p) => ({ ...p, skills: p.skills.includes(skill) ? p.skills.filter((s) => s !== skill) : [...p.skills, skill] }));
+-
+-    useEffect(() => {
+-        api.get("/api/artisans/me", token)
+-            .then((d) => {
+-                const p = extract(d, "artisan", "profile", "data");
+-                setProfile(p);
+-                setF({ skills: arr(p?.skills), yearsOfExperience: p?.yearsOfExperience || "", bio: p?.bio || "", serviceAreas: arr(p?.serviceAreas).join(", "), serviceRadiusKm: p?.serviceRadiusKm || "10", lat: p?.location?.coordinates?.[1] || "", lng: p?.location?.coordinates?.[0] || "" });
+-            })
+-            .catch(() => setProfile(null))
+-            .finally(() => setLoading(false));
+-    }, [token]);
+-
+-    const geolocate = () => navigator.geolocation?.getCurrentPosition((pos) => setF((p) => ({ ...p, lat: pos.coords.latitude, lng: pos.coords.longitude })));
+-
+-    const save = async () => {
+-        if (f.skills.length === 0) {
+-            setToast({ msg: "Select at least one skill.", type: "error" });
+-            return;
+-        }
+-
+-        if (!f.lat || !f.lng) {
+-            setToast({ msg: "Location is required.", type: "error" });
+-            return;
+-        }
+-
+-        setSaving(true);
+-
+-        const payload = {
+-            skills: f.skills,
+-            yearsOfExperience: Number(f.yearsOfExperience) || 0,
+-            bio: f.bio,
+-            serviceAreas: f.serviceAreas
+-                .split(",")
+-                .map((s) => s.trim())
+-                .filter(Boolean),
+-            serviceRadiusKm: Number(f.serviceRadiusKm) || 10,
+-            location: {
+-                type: "Point",
+-                coordinates: [
+-                    Number(f.lng),
+-                    Number(f.lat)
+-                ]
+-            }
+-        };
+-
+-        // 👇 Check what is being sent
+-        console.log("Sending payload:", payload);
+-
+-        try {
+-            if (profile) {
+-                await api.patch(
+-                    "/api/artisans/update",
+-                    payload,
+-                    token
+-                );
+-            } else {
+-                await api.post(
+-                    "/api/artisans/create",
+-                    payload,
+-                    token
+-                );
+-            }
+-
+-            setToast({
+-                msg: "Profile saved!",
+-                type: "success"
+-            });
+-
+-        } catch (e) {
+-            setToast({
+-                msg: e.message,
+-                type: "error"
+-            });
+-        } finally {
+-            setSaving(false);
+-        }
+-    };
+-
+-    if (loading) return <Spinner />;
+-    return (
+-        <div style={{ maxWidth: 580 }}>
+-            <h2 style={{ fontSize: 22, fontWeight: 800, color: C.text, marginBottom: 6 }}>{profile ? "My Artisan Profile" : "Set Up Your Profile"}</h2>
+-            <p style={{ color: C.muted, marginBottom: 22, fontSize: 14 }}>Complete your profile to start receiving job matches near you.</p>
+-            {profile && (
+-                <Card style={{ marginBottom: 18, background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
+-                    <div style={{ fontWeight: 700, color: C.success, marginBottom: 4 }}>✅ Profile Active</div>
+-                    <div style={{ fontSize: 13, color: C.muted, display: "flex", gap: 16, flexWrap: "wrap" }}>
+-                        <span>⭐ {profile.ratingAverage?.toFixed(1) || "0.0"} rating</span>
+-                        <span>🏆 {profile.totalJobsCompleted || 0} jobs</span>
+-                        <span>🏅 {profile.verificationLevel}</span>
+-                    </div>
+-                </Card>
+-            )}
+-            <Card>
+-                <div style={{ marginBottom: 16 }}>
+-                    <label style={{ display: "block", marginBottom: 8, fontSize: 13, fontWeight: 600, color: C.text }}>Your Skills</label>
+-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+-                        {SKILLS.map((skill) => (
+-                            <button key={skill} onClick={() => toggleSkill(skill)} style={{ padding: "6px 14px", borderRadius: 20, border: `1.5px solid ${f.skills.includes(skill) ? C.accent : C.border}`, background: f.skills.includes(skill) ? C.accent + "15" : "#fff", color: f.skills.includes(skill) ? C.accent : C.muted, fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all .15s" }}>
+-                                {skill.charAt(0).toUpperCase() + skill.slice(1)}
+-                            </button>
+-                        ))}
+-                    </div>
+-                </div>
+-                <Inp label="Years of Experience" type="number" placeholder="e.g. 5" value={f.yearsOfExperience} onChange={upd("yearsOfExperience")} />
+-                <Tex label="Bio" placeholder="Tell customers about your expertise…" value={f.bio} onChange={upd("bio")} />
+-                <Inp label="Service Areas (comma-separated)" placeholder="e.g. Ikeja, Surulere, Lekki" value={f.serviceAreas} onChange={upd("serviceAreas")} />
+-                <Inp label="Service Radius (km)" type="number" placeholder="10" value={f.serviceRadiusKm} onChange={upd("serviceRadiusKm")} />
+-                <div style={{ marginBottom: 16 }}>
+-                    <label style={{ display: "block", marginBottom: 8, fontSize: 13, fontWeight: 600, color: C.text }}>Your Location</label>
+-                    <Btn variant="ghost" size="sm" onClick={geolocate} style={{ marginBottom: 10 }}>📍 Use My Current Location</Btn>
+-                    <div style={{ display: "flex", gap: 12 }}>
+-                        <Inp label="Latitude"  type="number" placeholder="6.5244" value={f.lat} onChange={upd("lat")} />
+-                        <Inp label="Longitude" type="number" placeholder="3.3792" value={f.lng} onChange={upd("lng")} />
+-                    </div>
+-                    {f.lat && f.lng && <div style={{ fontSize: 12, color: C.success, marginTop: -8 }}>✅ Location set</div>}
+-                </div>
+-                <Btn onClick={save} disabled={saving}>{saving ? "Saving…" : profile ? "💾 Save Changes" : "🚀 Create Profile"}</Btn>
+-            </Card>
+-            <Toast msg={toast?.msg} type={toast?.type} onClose={() => setToast(null)} />
+-        </div>
+-    );
+-}
+diff --git a/src/pages/artisan/ArtisanWallet.jsx b/src/pages/artisan/ArtisanWallet.jsx
+deleted file mode 100644
+index 198dca8..0000000
+--- a/src/pages/artisan/ArtisanWallet.jsx
++++ /dev/null
+@@ -1,158 +0,0 @@
+-import { useEffect, useState } from "react";
+-import { C, fmtMoney } from "../../theme";
+-import { api } from "../../api";
+-import { Card, Spinner, Empty, Btn, Inp } from "../../components/ui";
+-
+-export default function ArtisanWallet({ token }) {
+-    const [wallet, setWallet] = useState(null);
+-    const [amount, setAmount] = useState("");
+-    const [loading, setLoading] = useState(true);
+-    const [funding, setFunding] = useState(false);
+-    const [message, setMessage] = useState("");
+-
+-    const loadWallet = async () => {
+-        try {
+-            setLoading(true);
+-
+-            const res = await api.get(
+-                "/api/wallet/me",
+-                token
+-            );
+-
+-            setWallet(res.wallet);
+-
+-        } catch (error) {
+-            console.error(
+-                "Wallet error:",
+-                error.message
+-            );
+-        } finally {
+-            setLoading(false);
+-        }
+-    };
+-
+-    useEffect(() => {
+-        loadWallet();
+-    }, [token]);
+-
+-    const fundWallet = async () => {
+-        if (!amount || Number(amount) <= 0) {
+-            setMessage("Enter a valid amount.");
+-            return;
+-        }
+-
+-        try {
+-            setFunding(true);
+-            setMessage("");
+-
+-            const res = await api.post(
+-                "/api/wallet/fund",
+-                {
+-                    amount: Number(amount)
+-                },
+-                token
+-            );
+-
+-            setWallet(res.wallet);
+-            setAmount("");
+-            setMessage("Wallet funded successfully.");
+-
+-        } catch (error) {
+-            setMessage(error.message);
+-        } finally {
+-            setFunding(false);
+-        }
+-    };
+-
+-    if (loading) {
+-        return <Spinner />;
+-    }
+-
+-    return (
+-        <div>
+-            <h2
+-                style={{
+-                    fontSize: 22,
+-                    fontWeight: 800,
+-                    color: C.text,
+-                    marginBottom: 22
+-                }}
+-            >
+-                Artisan Wallet
+-            </h2>
+-
+-            <Card
+-                style={{
+-                    background: C.sidebar,
+-                    color: "#fff",
+-                    marginBottom: 20
+-                }}
+-            >
+-                <p
+-                    style={{
+-                        margin: 0,
+-                        opacity: 0.6,
+-                        fontSize: 13
+-                    }}
+-                >
+-                    Available Balance
+-                </p>
+-
+-                <h1
+-                    style={{
+-                        margin: "8px 0 0",
+-                        fontSize: 34
+-                    }}
+-                >
+-                    {fmtMoney(wallet?.balance || 0)}
+-                </h1>
+-            </Card>
+-
+-            <Card>
+-                <h3
+-                    style={{
+-                        marginTop: 0,
+-                        marginBottom: 16
+-                    }}
+-                >
+-                    Fund Wallet
+-                </h3>
+-
+-                <Inp
+-                    label="Amount (₦)"
+-                    type="number"
+-                    placeholder="e.g. 10000"
+-                    value={amount}
+-                    onChange={(e) =>
+-                        setAmount(e.target.value)
+-                    }
+-                />
+-
+-                <Btn
+-                    onClick={fundWallet}
+-                    disabled={
+-                        funding ||
+-                        !amount ||
+-                        Number(amount) <= 0
+-                    }
+-                >
+-                    {funding
+-                        ? "Funding..."
+-                        : "💰 Fund Wallet"}
+-                </Btn>
+-
+-                {message && (
+-                    <p
+-                        style={{
+-                            marginTop: 12,
+-                            color: C.text,
+-                            fontSize: 14
+-                        }}
+-                    >
+-                        {message}
+-                    </p>
+-                )}
+-            </Card>
+-        </div>
+-    );
+-}
+\ No newline at end of file
+diff --git a/src/pages/artisan/ForYou.jsx b/src/pages/artisan/ForYou.jsx
+deleted file mode 100644
+index b39ad7b..0000000
+--- a/src/pages/artisan/ForYou.jsx
++++ /dev/null
+@@ -1,183 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C } from "../../theme";
+-import { api } from "../../api";
+-import { Btn, Spinner, Empty, Toast, Modal, Inp, Tex } from "../../components/ui";
+-import JobCard from "../../components/JobCard";
+-
+-export default function ForYou({ token }) {
+-    const [jobs, setJobs] = useState([]);
+-    const [loading, setLoading] = useState(true);
+-    const [toast, setToast] = useState(null);
+-
+-    const [selectedJob, setSelectedJob] = useState(null);
+-    const [message, setMessage] = useState("");
+-    const [proposedPrice, setProposedPrice] = useState("");
+-    const [submitting, setSubmitting] = useState(false);
+-
+-    useEffect(() => {
+-        api.get("/api/job/open-jobs", token)
+-            .then((res) => {
+-                setJobs(res.jobs || []);
+-            })
+-            .catch((e) => {
+-                console.error("Open jobs:", e.message);
+-            })
+-            .finally(() => {
+-                setLoading(false);
+-            });
+-    }, [token]);
+-
+-    const apply = async () => {
+-        if (!selectedJob) return;
+-
+-        if (!message.trim() || !proposedPrice) {
+-            setToast({
+-                msg: "Message and proposed price are required.",
+-                type: "error"
+-            });
+-            return;
+-        }
+-
+-        if (Number(proposedPrice) <= 0) {
+-            setToast({
+-                msg: "Proposed price must be greater than 0.",
+-                type: "error"
+-            });
+-            return;
+-        }
+-
+-        try {
+-            setSubmitting(true);
+-
+-            await api.post(
+-                `/api/applications/apply/${selectedJob._id}`,
+-                {
+-                    message: message.trim(),
+-                    proposedPrice: Number(proposedPrice)
+-                },
+-                token
+-            );
+-
+-            setJobs((current) =>
+-                current.filter((job) => job._id !== selectedJob._id)
+-            );
+-
+-            setToast({
+-                msg: "Application submitted successfully!",
+-                type: "success"
+-            });
+-
+-            setSelectedJob(null);
+-            setMessage("");
+-            setProposedPrice("");
+-
+-        } catch (e) {
+-            setToast({
+-                msg: e.message,
+-                type: "error"
+-            });
+-        } finally {
+-            setSubmitting(false);
+-        }
+-    };
+-
+-    if (loading) {
+-        return <Spinner />;
+-    }
+-
+-    return (
+-        <div>
+-            <h2
+-                style={{
+-                    fontSize: 22,
+-                    fontWeight: 800,
+-                    color: C.text,
+-                    marginBottom: 6
+-                }}
+-            >
+-                Jobs Near You
+-            </h2>
+-
+-            <p
+-                style={{
+-                    color: C.muted,
+-                    marginBottom: 20,
+-                    fontSize: 14
+-                }}
+-            >
+-                Browse available jobs and submit applications.
+-            </p>
+-
+-            {jobs.length === 0 ? (
+-                <Empty
+-                    msg="No open jobs available."
+-                    icon="🔍"
+-                />
+-            ) : (
+-                jobs.map((job) => (
+-                    <JobCard
+-                        key={job._id}
+-                        job={job}
+-                        actions={[
+-                            <Btn
+-                                key="apply"
+-                                size="sm"
+-                                onClick={() => setSelectedJob(job)}
+-                            >
+-                                Apply Now
+-                            </Btn>
+-                        ]}
+-                    />
+-                ))
+-            )}
+-
+-            <Modal
+-                open={!!selectedJob}
+-                onClose={() => setSelectedJob(null)}
+-                title="Apply for Job"
+-            >
+-                <p
+-                    style={{
+-                        marginBottom: 16,
+-                        color: C.muted,
+-                        fontSize: 14
+-                    }}
+-                >
+-                    {selectedJob?.title}
+-                </p>
+-
+-                <Tex
+-                    label="Application Message"
+-                    placeholder="Explain why you're suitable for this job..."
+-                    value={message}
+-                    onChange={(e) => setMessage(e.target.value)}
+-                />
+-
+-                <Inp
+-                    label="Proposed Price (₦)"
+-                    type="number"
+-                    placeholder="20000"
+-                    value={proposedPrice}
+-                    onChange={(e) => setProposedPrice(e.target.value)}
+-                />
+-
+-                <Btn
+-                    onClick={apply}
+-                    disabled={
+-                        submitting ||
+-                        !message.trim() ||
+-                        !proposedPrice
+-                    }
+-                >
+-                    {submitting ? "Submitting..." : "Submit Application"}
+-                </Btn>
+-            </Modal>
+-
+-            <Toast
+-                msg={toast?.msg}
+-                type={toast?.type}
+-                onClose={() => setToast(null)}
+-            />
+-        </div>
+-    );
+-}
+\ No newline at end of file
+diff --git a/src/pages/artisan/JobHistory.jsx b/src/pages/artisan/JobHistory.jsx
+deleted file mode 100644
+index 173e4df..0000000
+--- a/src/pages/artisan/JobHistory.jsx
++++ /dev/null
+@@ -1,78 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C, arr, extract } from "../../theme";
+-import { api } from "../../api";
+-import { Spinner, Empty } from "../../components/ui";
+-import JobCard from "../../components/JobCard";
+-
+-export default function JobHistory({ token }) {
+-    const [jobs, setJobs]       = useState([]);
+-    const [loading, setLoading] = useState(true);
+-    const [search, setSearch]   = useState("");
+-
+-    useEffect(() => {
+-        api.get("/api/job/my-jobs", token)
+-            .then((res) => {
+-                const history = (res.jobs || []).filter(
+-                    (job) =>
+-                        ["completed", "customer_confirmed", "paid"].includes(
+-                            job.status
+-                        )
+-                );
+-
+-                setJobs(history);
+-            })
+-            .catch((e) => {
+-                console.error("History:", e.message);
+-            })
+-            .finally(() => setLoading(false));
+-    }, [token]);
+-
+-    if (loading) return <Spinner />;
+-
+-    const filtered = jobs.filter(
+-        (j) =>
+-            !search.trim() ||
+-            `${j.title || ""} ${j.category || ""} ${j.description || ""}`
+-                .toLowerCase()
+-                .includes(search.toLowerCase())
+-    );
+-
+-    return (
+-        <div>
+-            <h2
+-                style={{
+-                    fontSize: 22,
+-                    fontWeight: 800,
+-                    color: C.text,
+-                    marginBottom: 14
+-                }}
+-            >
+-                Job History
+-            </h2>
+-
+-            <input
+-                value={search}
+-                onChange={(e) => setSearch(e.target.value)}
+-                placeholder="🔍 Search history…"
+-                style={{
+-                    width: "100%",
+-                    padding: "10px 14px",
+-                    borderRadius: 8,
+-                    border: `1.5px solid ${C.border}`,
+-                    fontSize: 14,
+-                    outline: "none",
+-                    marginBottom: 18,
+-                    boxSizing: "border-box"
+-                }}
+-            />
+-
+-            {filtered.length === 0 ? (
+-                <Empty msg="No jobs found" icon="📖" />
+-            ) : (
+-                filtered.map((job) => (
+-                    <JobCard key={job._id} job={job} />
+-                ))
+-            )}
+-        </div>
+-    );
+-}
+diff --git a/src/pages/customer/CustomerHome.jsx b/src/pages/customer/CustomerHome.jsx
+deleted file mode 100644
+index 6f02961..0000000
+--- a/src/pages/customer/CustomerHome.jsx
++++ /dev/null
+@@ -1,296 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C, arr, extract, fmtMoney, fmtDate, greeting } from "../../theme";
+-import { api } from "../../api";
+-import { Btn, Card, Stat, Spinner, Empty, Modal, Badge, Sel, Tex, Toast } from "../../components/ui";
+-import JobCard from "../../components/JobCard";
+-
+-export default function CustomerHome({ token, user }) {
+-    const [jobs, setJobs]         = useState([]);
+-    const [loading, setLoading]   = useState(true);
+-    const [search, setSearch]     = useState("");
+-    const [sel, setSel]           = useState(null);
+-    const [apps, setApps]         = useState([]);
+-    const [appsL, setAppsL]       = useState(false);
+-    const [reviewJob, setReviewJob]       = useState(null);
+-    const [reviewRating, setReviewRating] = useState(5);
+-    const [reviewMsg, setReviewMsg]       = useState("");
+-    const [toast, setToast] = useState(null);
+-    const toast$ = (msg, type = "success") => { setToast({ msg, type }); setTimeout(() => setToast(null), 3500); };
+-
+-    // ✅ Fixed: use /api/jobs/history (not /api/jobs which is artisan/admin only)
+-useEffect(() => {
+-    const loadJobs = async () => {
+-        try {
+-            const d = await api.get("/api/job/my-jobs", token);
+-            setJobs(arr(extract(d, "jobs", "data")));
+-        } catch (e) {
+-            console.error("Jobs:", e.message);
+-        } finally {
+-            setLoading(false);
+-        }
+-    };
+-
+-    loadJobs();
+-
+-    // Refresh jobs every 5 seconds
+-    const interval = setInterval(loadJobs, 5000);
+-
+-    return () => clearInterval(interval);
+-}, [token]);
+-
+-
+-    const loadApps = (jobId) => {
+-        setAppsL(true);
+-
+-        api.get(`/api/applications/job/${jobId}`, token)
+-            .then((d) => {
+-                setApps(d.applications || []);
+-            })
+-            .catch((e) => {
+-                console.error("Applications:", e.message);
+-                setApps([]);
+-            })
+-            .finally(() => {
+-                setAppsL(false);
+-            });
+-    };
+-
+-    const assign = async (applicationId) => {
+-        try {
+-            // 1. Accept the artisan's application
+-            const response = await api.patch(
+-                `/api/applications/accept/${applicationId}`,
+-                {},
+-                token
+-            );
+-
+-            // 2. Get the job ID
+-            const jobId = sel?._id;
+-
+-            if (!jobId) {
+-                throw new Error("Job ID not found");
+-            }
+-
+-            // 3. Fund the job's agreed price into escrow
+-            await api.post(
+-                `/api/payments/fund/${jobId}`,
+-                {},
+-                token
+-            );
+-
+-            toast$("Artisan assigned and payment funded successfully!");
+-
+-            // 4. Close the modal
+-            setSel(null);
+-
+-            // 5. Refresh jobs from backend
+-            const jobsResponse = await api.get(
+-                "/api/job/my-jobs",
+-                token
+-            );
+-
+-            setJobs(jobsResponse.jobs || []);
+-
+-        } catch (e) {
+-            toast$(e.message, "error");
+-        }
+-    };
+-
+-    const confirmJob = async (jobId) => {
+-        try {
+-            await api.patch(
+-                `/api/job/${jobId}/confirm`,
+-                {},
+-                token
+-            );
+-
+-            toast$("Job completion confirmed!");
+-
+-            setJobs((current) =>
+-                current.map((job) =>
+-                    job._id === jobId
+-                        ? { ...job, status: "customer_confirmed" }
+-                        : job
+-                )
+-            );
+-
+-            if (sel?._id === jobId) {
+-                setSel((current) =>
+-                    current
+-                        ? { ...current, status: "customer_confirmed" }
+-                        : current
+-                );
+-            }
+-
+-        } catch (e) {
+-            toast$(e.message, "error");
+-        }
+-    };
+-
+-    const pay = async (jobId) => {
+-        if (!confirm("Release payment to artisan? This cannot be undone.")) return;
+-        try {
+-            await api.patch(`/api/payments/release/${jobId}`, {}, token)
+-            toast$("Payment released to artisan!");
+-            setJobs((j) => j.map((x) => x._id === jobId ? { ...x, status: "paid" } : x));
+-        } catch (e) { toast$(e.message, "error"); }
+-    };
+-
+-    const submitReview = async () => {
+-        try {
+-            await api.post(`/api/reviews/${reviewJob}`, { rating: reviewRating, comment: reviewMsg }, token);
+-            toast$("Review submitted!");
+-            setReviewJob(null);
+-        } catch (e) { toast$(e.message, "error"); }
+-    };
+-
+-    if (loading) return <Spinner />;
+-
+-    const pending = jobs.filter((j) => j.status === "open");
+-    const active = jobs.filter((j) =>
+-        ["assigned", "in_progress"].includes(j.status)
+-    );
+-    const completed = jobs.filter((j) =>
+-        ["completed", "customer_confirmed","paid"].includes(j.status)
+-    );
+-    const filtered  = jobs.filter((j) => {
+-        if (!search.trim()) return true;
+-        const q = search.toLowerCase();
+-        return j.title?.toLowerCase().includes(q) || j.category?.toLowerCase().includes(q) || j.description?.toLowerCase().includes(q);
+-    });
+-
+-    return (
+-        <div>
+-            {/* Hero greeting */}
+-            <Card style={{ marginBottom: 24, background: "linear-gradient(135deg,#0A1628,#1F3A5F)", color: "white", padding: 28 }}>
+-                <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800 }}>{greeting()}, {user?.fullName?.split(" ")[0] || "Customer"} 👋</h1>
+-                <p style={{ marginTop: 8, opacity: 0.75, fontSize: 14 }}>Find trusted artisans around you and manage your jobs easily.</p>
+-                <div style={{ display: "flex", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
+-                    <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Search your jobs..." style={{ flex: 1, minWidth: 220, padding: 12, borderRadius: 10, border: "none", outline: "none", fontSize: 14 }} />
+-                </div>
+-            </Card>
+-
+-            {/* Stats */}
+-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 14, marginBottom: 26 }}>
+-                <Stat icon="⏳" label="Pending"   value={pending.length}   color={C.accent}  />
+-                <Stat icon="⚡" label="Active"    value={active.length}    color={C.info}    />
+-                <Stat icon="✅" label="Completed" value={completed.length} color={C.success} />
+-                <Stat icon="💼" label="Total"     value={jobs.length}      color={C.purple}  />
+-            </div>
+-
+-            {/* Jobs list */}
+-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+-                <h2 style={{ fontSize: 18, fontWeight: 800, color: C.text }}>My Jobs</h2>
+-                <span style={{ color: C.muted, fontSize: 13 }}>{filtered.length} jobs</span>
+-            </div>
+-
+-            {filtered.length === 0
+-                ? <Empty msg="No jobs found. Post a job to get started." icon="🛠️" />
+-                : filtered.map((job) => (
+-                    <JobCard key={job._id} job={job}
+-                        onClick={() => { setSel(job); loadApps(job._id); }}
+-                             actions={[
+-                                 job.status === "completed" &&
+-                                 <Btn
+-                                     key="confirm"
+-                                     variant="success"
+-                                     size="sm"
+-                                     onClick={() => confirmJob(job._id)}
+-                                 >
+-                                     ✅ Confirm Completion
+-                                 </Btn>,
+-
+-                                 job.status === "customer_confirmed" &&
+-                                 <Btn
+-                                     key="p"
+-                                     variant="success"
+-                                     size="sm"
+-                                     onClick={() => pay(job._id)}
+-                                 >
+-                                     💳 Release Payment
+-                                 </Btn>,
+-
+-                                 job.status === "paid" &&
+-                                 <Btn
+-                                     key="paid"
+-                                     variant="success"
+-                                     size="sm"
+-                                     disabled
+-                                 >
+-                                     ✓ Paid
+-                                 </Btn>,
+-
+-                                 ["customer_confirmed", "paid"].includes(job.status) &&
+-                                 <Btn
+-                                     key="r"
+-                                     variant="purple"
+-                                     size="sm"
+-                                     onClick={() => setReviewJob(job._id)}
+-                                 >
+-                                     ⭐ Review
+-                                 </Btn>,
+-                             ]}
+-                    />
+-                ))
+-            }
+-
+-            {/* Job detail modal */}
+-            <Modal open={!!sel} onClose={() => setSel(null)} title={sel?.title || "Job Details"} maxWidth={600}>
+-                {appsL ? (
+-                    <Spinner />
+-                ) : apps.length === 0 ? (
+-                    <Empty msg="No applicants yet" icon="👤" />
+-                ) : (
+-                    apps.map((a) => (
+-                        <div
+-                            key={a._id}
+-                            style={{
+-                                display: "flex",
+-                                alignItems: "center",
+-                                justifyContent: "space-between",
+-                                padding: "12px 14px",
+-                                borderRadius: 10,
+-                                border: `1px solid ${C.border}`,
+-                                marginBottom: 8
+-                            }}
+-                        >
+-                            <div>
+-                                <div style={{ fontWeight: 600, fontSize: 14 }}>
+-                                    {a.artisan?.fullName || "Artisan"}
+-                                </div>
+-
+-                                <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
+-                                    {a.message || "No message"}
+-                                </div>
+-
+-                                <div style={{ fontSize: 13, fontWeight: 700, marginTop: 6 }}>
+-                                    Proposed Price: {fmtMoney(a.proposedPrice)}
+-                                </div>
+-                            </div>
+-
+-                            {sel.status === "open" && (
+-                                <Btn
+-                                    size="sm"
+-                                    onClick={() => assign(a._id)}
+-                                >
+-                                    Accept
+-                                </Btn>
+-                            )}
+-                        </div>
+-                    ))
+-                )}
+-            </Modal>
+-
+-            {/* Review modal */}
+-            <Modal open={!!reviewJob} onClose={() => setReviewJob(null)} title="Leave a Review">
+-                <Sel label="Rating" value={reviewRating} onChange={(e) => setReviewRating(Number(e.target.value))}>
+-                    {[5,4,3,2,1].map((n) => <option key={n} value={n}>{"⭐".repeat(n)} — {["Excellent","Great","Good","Fair","Poor"][5-n]}</option>)}
+-                </Sel>
+-                <Tex label="Your review" placeholder="Share your experience…" value={reviewMsg} onChange={(e) => setReviewMsg(e.target.value)} />
+-                <Btn onClick={submitReview}>Submit Review</Btn>
+-            </Modal>
+-
+-            <Toast msg={toast?.msg} type={toast?.type} onClose={() => setToast(null)} />
+-        </div>
+-    );
+-}
+diff --git a/src/pages/customer/CustomerWallet.jsx b/src/pages/customer/CustomerWallet.jsx
+deleted file mode 100644
+index 5a4d84b..0000000
+--- a/src/pages/customer/CustomerWallet.jsx
++++ /dev/null
+@@ -1,144 +0,0 @@
+-import { useState, useEffect } from "react";
+-import { C, fmtMoney, fmtDate } from "../../theme";
+-import { api } from "../../api";
+-import { Card, Badge, Spinner, Empty } from "../../components/ui";
+-
+-export default function CustomerWallet({ token }) {
+-    const [wallet, setWallet] = useState(null);
+-    const [transactions, setTransactions] = useState([]);
+-    const [loading, setLoading] = useState(true);
+-
+-    useEffect(() => {
+-        const loadWallet = async () => {
+-            try {
+-                setLoading(true);
+-
+-                const [walletRes, transactionRes] = await Promise.all([
+-                    api.get("/api/wallet/me", token),
+-                    api.get("/api/transactions/my", token)
+-                ]);
+-
+-                setWallet(walletRes.wallet);
+-                setTransactions(transactionRes.transactions || []);
+-            } catch (error) {
+-                console.error("Wallet:", error.message);
+-            } finally {
+-                setLoading(false);
+-            }
+-        };
+-
+-        loadWallet();
+-    }, [token]);
+-
+-    if (loading) {
+-        return <Spinner />;
+-    }
+-
+-    return (
+-        <div>
+-            <h2
+-                style={{
+-                    fontSize: 22,
+-                    fontWeight: 800,
+-                    color: C.text,
+-                    marginBottom: 22
+-                }}
+-            >
+-                Wallet
+-            </h2>
+-
+-            <Card
+-                style={{
+-                    background: `linear-gradient(135deg, ${C.sidebar}, #1A3347)`,
+-                    marginBottom: 22
+-                }}
+-            >
+-                <div
+-                    style={{
+-                        color: "rgba(255,255,255,0.5)",
+-                        fontSize: 13,
+-                        marginBottom: 8
+-                    }}
+-                >
+-                    Available Balance
+-                </div>
+-
+-                <div
+-                    style={{
+-                        color: "#fff",
+-                        fontSize: 34,
+-                        fontWeight: 800
+-                    }}
+-                >
+-                    {fmtMoney(wallet?.balance || 0)}
+-                </div>
+-            </Card>
+-
+-            <h3
+-                style={{
+-                    fontSize: 16,
+-                    fontWeight: 700,
+-                    marginBottom: 14,
+-                    color: C.text
+-                }}
+-            >
+-                Transaction History
+-            </h3>
+-
+-            {transactions.length === 0 ? (
+-                <Empty
+-                    msg="No transactions yet"
+-                    icon="💳"
+-                />
+-            ) : (
+-                transactions.map((transaction) => (
+-                    <div
+-                        key={transaction._id}
+-                        style={{
+-                            display: "flex",
+-                            justifyContent: "space-between",
+-                            alignItems: "center",
+-                            padding: "12px 0",
+-                            borderBottom: `1px solid ${C.border}`
+-                        }}
+-                    >
+-                        <div>
+-                            <div
+-                                style={{
+-                                    fontWeight: 600,
+-                                    fontSize: 14
+-                                }}
+-                            >
+-                                {transaction.description ||
+-                                    transaction.type}
+-                            </div>
+-
+-                            <div
+-                                style={{
+-                                    fontSize: 12,
+-                                    color: C.muted,
+-                                    marginTop: 2
+-                                }}
+-                            >
+-                                {fmtDate(transaction.createdAt)}
+-                            </div>
+-                        </div>
+-
+-                        <div style={{ textAlign: "right" }}>
+-                            <div
+-                                style={{
+-                                    fontWeight: 700,
+-                                    color: C.accent
+-                                }}
+-                            >
+-                                {fmtMoney(transaction.amount)}
+-                            </div>
+-
+-                            <Badge status={transaction.status} />
+-                        </div>
+-                    </div>
+-                ))
+-            )}
+-        </div>
+-    );
+-}
+\ No newline at end of file
+diff --git a/src/pages/customer/PostJob.jsx b/src/pages/customer/PostJob.jsx
+deleted file mode 100644
+index 033f166..0000000
+--- a/src/pages/customer/PostJob.jsx
++++ /dev/null
+@@ -1,192 +0,0 @@
+-import { useState } from "react";
+-import { C, SKILLS } from "../../theme";
+-import { api } from "../../api";
+-import { Btn, Inp, Sel, Tex, Card, Toast } from "../../components/ui";
+-
+-export default function PostJob({ token, onPost }) {
+-    const [f, setF] = useState({
+-        title: "",
+-        category: "",
+-        description: "",
+-        budget: "",
+-        location: ""
+-    });
+-
+-    const [loading, setLoading] = useState(false);
+-    const [toast, setToast] = useState(null);
+-
+-    const upd = (key) => (e) => {
+-        setF((prev) => ({
+-            ...prev,
+-            [key]: e.target.value
+-        }));
+-    };
+-
+-    const submit = async () => {
+-        if (
+-            !f.title ||
+-            !f.category ||
+-            !f.description ||
+-            !f.budget ||
+-            !f.location
+-        ) {
+-            setToast({
+-                msg: "All fields are required.",
+-                type: "error"
+-            });
+-            return;
+-        }
+-
+-        if (Number(f.budget) <= 0) {
+-            setToast({
+-                msg: "Budget must be greater than 0.",
+-                type: "error"
+-            });
+-            return;
+-        }
+-
+-        setLoading(true);
+-
+-        try {
+-            await api.post(
+-                "/api/job/create-job",
+-                {
+-                    title: f.title,
+-                    category: f.category,
+-                    description: f.description,
+-                    budget: Number(f.budget),
+-                    location: f.location
+-                },
+-                token
+-            );
+-
+-            setToast({
+-                msg: "Job posted successfully!",
+-                type: "success"
+-            });
+-
+-            setF({
+-                title: "",
+-                category: "",
+-                description: "",
+-                budget: "",
+-                location: ""
+-            });
+-
+-            setTimeout(() => {
+-                onPost?.();
+-            }, 800);
+-
+-        } catch (e) {
+-            setToast({
+-                msg: e.message,
+-                type: "error"
+-            });
+-        } finally {
+-            setLoading(false);
+-        }
+-    };
+-
+-    return (
+-        <div style={{ maxWidth: 580 }}>
+-            <h2
+-                style={{
+-                    fontSize: 22,
+-                    fontWeight: 800,
+-                    color: C.text,
+-                    marginBottom: 6
+-                }}
+-            >
+-                Post a New Job
+-            </h2>
+-
+-            <p
+-                style={{
+-                    color: C.muted,
+-                    marginBottom: 24,
+-                    fontSize: 14
+-                }}
+-            >
+-                Describe your need and get matched with skilled artisans.
+-            </p>
+-
+-            <Card>
+-                <Inp
+-                    label="Job Title"
+-                    placeholder="e.g. Fix leaking kitchen sink"
+-                    value={f.title}
+-                    onChange={upd("title")}
+-                />
+-
+-                <Sel
+-                    label="Service Category"
+-                    value={f.category}
+-                    onChange={upd("category")}
+-                >
+-                    <option value="">Select a category...</option>
+-
+-                    {SKILLS
+-                        .filter((category) =>
+-                            [
+-                                "electrician",
+-                                "plumber",
+-                                "carpenter",
+-                                "mechanic",
+-                                "welder",
+-                                "painter",
+-                                "cleaner"
+-                            ].includes(category)
+-                        )
+-                        .map((category) => (
+-                            <option key={category} value={category}>
+-                                {category.charAt(0).toUpperCase() +
+-                                    category.slice(1)}
+-                            </option>
+-                        ))}
+-                </Sel>
+-
+-                <Tex
+-                    label="Job Description"
+-                    placeholder="Describe the work in detail..."
+-                    value={f.description}
+-                    onChange={upd("description")}
+-                />
+-
+-                <Inp
+-                    label="Budget (₦)"
+-                    type="number"
+-                    placeholder="e.g. 20000"
+-                    value={f.budget}
+-                    onChange={upd("budget")}
+-                />
+-
+-                <Inp
+-                    label="Location"
+-                    placeholder="e.g. Lagos"
+-                    value={f.location}
+-                    onChange={upd("location")}
+-                />
+-
+-                <Btn
+-                    onClick={submit}
+-                    disabled={
+-                        loading ||
+-                        !f.title ||
+-                        !f.category ||
+-                        !f.description ||
+-                        !f.budget ||
+-                        !f.location
+-                    }
+-                >
+-                    {loading ? "Posting..." : "🚀 Post Job"}
+-                </Btn>
+-            </Card>
+-
+-            <Toast
+-                msg={toast?.msg}
+-                type={toast?.type}
+-                onClose={() => setToast(null)}
+-            />
+-        </div>
+-    );
+-}
+\ No newline at end of file
+diff --git a/src/pages/landing/Hero.jsx b/src/pages/landing/Hero.jsx
+deleted file mode 100644
+index 7171a23..0000000
+--- a/src/pages/landing/Hero.jsx
++++ /dev/null
+@@ -1,231 +0,0 @@
+-import { C } from "../../theme";
+-import { Btn } from "../../components/ui";
+-
+-export default function Hero({ onLogin }) {
+-    return (
+-        <section
+-            style={{
+-                minHeight: "100vh",
+-                display: "flex",
+-                justifyContent: "space-between",
+-                alignItems: "center",
+-                flexWrap: "wrap",
+-                gap: 70,
+-                padding: "80px 8%",
+-                background:
+-                    "linear-gradient(135deg,#0F172A 0%,#1E3A8A 60%,#0EA5E9 100%)",
+-                color: "#fff",
+-                overflow: "hidden",
+-                position: "relative"
+-            }}
+-        >
+-            {/* LEFT */}
+-            <div
+-                style={{
+-                    flex: 1,
+-                    minWidth: 340,
+-                    maxWidth: 650
+-                }}
+-            >
+-                <div
+-                    style={{
+-                        display: "inline-block",
+-                        padding: "8px 18px",
+-                        background: "rgba(255,255,255,.12)",
+-                        border: "1px solid rgba(255,255,255,.15)",
+-                        borderRadius: 50,
+-                        fontSize: 14,
+-                        marginBottom: 25
+-                    }}
+-                >
+-                    ⭐ Trusted by Thousands of Customers
+-                </div>
+-
+-                <h1
+-                    style={{
+-                        fontSize: 60,
+-                        lineHeight: 1.1,
+-                        fontWeight: 900,
+-                        marginBottom: 25
+-                    }}
+-                >
+-                    Hire Trusted
+-                    <br />
+-                    Artisans Near You
+-                </h1>
+-
+-                <p
+-                    style={{
+-                        fontSize: 19,
+-                        lineHeight: 1.8,
+-                        opacity: .9,
+-                        maxWidth: 560
+-                    }}
+-                >
+-                    Connect with verified plumbers, eectricians,
+-                    mechanics, painters, cleaners, technicians and
+-                    skilled professionals around your location.
+-                    Post your job in minutes and receive offers from
+-                    trusted artisans nearby.
+-                </p>
+-
+-                {/* Features */}
+-                <div
+-                    style={{
+-                        marginTop: 30,
+-                        display: "grid",
+-                        gap: 12,
+-                        fontSize: 16
+-                    }}
+-                >
+-                    <div>✔ Verified Professionals</div>
+-                    <div>✔ Secure Escrow Payments</div>
+-                    <div>✔ Fast Response Time</div>
+-                    <div>✔ Reviews & Ratings</div>
+-                </div>
+-
+-                {/* Buttons */}
+-                <div
+-                    style={{
+-                        display: "flex",
+-                        gap: 20,
+-                        marginTop: 40,
+-                        flexWrap: "wrap"
+-                    }}
+-                >
+-                    <Btn onClick={onLogin}>
+-                        🚀 Hire an Artisan
+-                    </Btn>
+-
+-                    <button
+-                        style={{
+-                            padding: "14px 28px",
+-                            borderRadius: 12,
+-                            border: "1px solid rgba(255,255,255,.4)",
+-                            background: "transparent",
+-                            color: "#fff",
+-                            fontWeight: 600,
+-                            cursor: "pointer"
+-                        }}
+-                    >
+-                        👷 Become an Artisan
+-                    </button>
+-                </div>
+-
+-                {/* Stats */}
+-                <div
+-                    style={{
+-                        display: "flex",
+-                        gap: 40,
+-                        marginTop: 60,
+-                        flexWrap: "wrap"
+-                    }}
+-                >
+-                    <div>
+-                        <h2 style={{ margin: 0, fontSize: 34 }}>500+</h2>
+-                        <small>Verified Artisans</small>
+-                    </div>
+-
+-                    <div>
+-                        <h2 style={{ margin: 0, fontSize: 34 }}>2,000+</h2>
+-                        <small>Jobs Completed</small>
+-                    </div>
+-
+-                    <div>
+-                        <h2 style={{ margin: 0, fontSize: 34 }}>4.9★</h2>
+-                        <small>Customer Rating</small>
+-                    </div>
+-                </div>
+-            </div>
+-
+-            {/* RIGHT */}
+-            <div
+-                style={{
+-                    flex: 1,
+-                    minWidth: 340,
+-                    display: "flex",
+-                    justifyContent: "center",
+-                    position: "relative"
+-                }}
+-            >
+-                {/* Floating Card */}
+-                <div
+-                    style={{
+-                        position: "absolute",
+-                        top: 40,
+-                        left: 20,
+-                        background: "#fff",
+-                        color: "#111",
+-                        padding: "15px 20px",
+-                        borderRadius: 16,
+-                        boxShadow: "0 20px 40px rgba(0,0,0,.25)",
+-                        zIndex: 2
+-                    }}
+-                >
+-                    <div style={{ fontWeight: 700 }}>
+-                        ⭐ 4.9 Rating
+-                    </div>
+-
+-                    <small>
+-                        Trusted Professionals
+-                    </small>
+-                </div>
+-
+-                {/* Hero Card */}
+-                <div
+-                    style={{
+-                        width: 460,
+-                        height: 460,
+-                        borderRadius: 35,
+-                        background:
+-                            "rgba(255,255,255,.08)",
+-                        backdropFilter: "blur(10px)",
+-                        border:
+-                            "1px solid rgba(255,255,255,.12)",
+-                        display: "flex",
+-                        justifyContent: "center",
+-                        alignItems: "center",
+-                        boxShadow:
+-                            "0 25px 60px rgba(0,0,0,.35)"
+-                    }}
+-                >
+-                    <img
+-                        src="/images/hero-artisan.jpeg"
+-                        alt="Craftad Hero"
+-                        style={{
+-                            width: "100%",
+-                            maxWidth: 500,
+-                            objectFit: "contain"
+-                        }}
+-                    />
+-                </div>
+-
+-                {/* Floating Card */}
+-                <div
+-                    style={{
+-                        position: "absolute",
+-                        bottom: 30,
+-                        right: 20,
+-                        background: "#fff",
+-                        color: "#111",
+-                        padding: "15px 20px",
+-                        borderRadius: 16,
+-                        boxShadow: "0 20px 40px rgba(0,0,0,.25)"
+-                    }}
+-                >
+-                    <div
+-                        style={{
+-                            fontWeight: 700
+-                        }}
+-                    >
+-                        💼 2,000+ Jobs
+-                    </div>
+-
+-                    <small>
+-                        Successfully Completed
+-                    </small>
+-                </div>
+-            </div>
+-        </section>
+-    );
+-}
+\ No newline at end of file
+diff --git a/src/pages/landing/HowItWorks.jsx b/src/pages/landing/HowItWorks.jsx
+deleted file mode 100644
+index c38aed6..0000000
+--- a/src/pages/landing/HowItWorks.jsx
++++ /dev/null
+@@ -1,95 +0,0 @@
+-export default function HowItWorks(){
+-
+-
+-    return (
+-
+-        <section
+-
+-            style={{
+-                background:"#f8fafc",
+-                padding:"70px"
+-            }}
+-
+-        >
+-
+-
+-            <h2>
+-
+-                How ArtisanConnect Works
+-
+-            </h2>
+-
+-
+-
+-            <div
+-
+-                style={{
+-                    display:"flex",
+-                    justifyContent:"space-around",
+-                    marginTop:40
+-                }}
+-
+-            >
+-
+-
+-                <div>
+-
+-                    <h1>
+-                        1
+-                    </h1>
+-
+-                    <h3>
+-                        Describe your job
+-                    </h3>
+-
+-                    <p>
+-                        Tell us what needs fixing
+-                    </p>
+-
+-                </div>
+-
+-
+-
+-                <div>
+-
+-                    <h1>
+-                        2
+-                    </h1>
+-
+-                    <h3>
+-                        Get matched
+-                    </h3>
+-
+-                    <p>
+-                        Find nearby professionals
+-                    </p>
+-
+-                </div>
+-
+-
+-
+-                <div>
+-
+-                    <h1>
+-                        3
+-                    </h1>
+-
+-                    <h3>
+-                        Relax
+-                    </h3>
+-
+-                    <p>
+-                        Your job gets completed
+-                    </p>
+-
+-                </div>
+-
+-
+-            </div>
+-
+-
+-        </section>
+-
+-    )
+-
+-}
+\ No newline at end of file
+diff --git a/src/pages/landing/LandingPage.jsx b/src/pages/landing/LandingPage.jsx
+deleted file mode 100644
+index 6dcaddb..0000000
+--- a/src/pages/landing/LandingPage.jsx
++++ /dev/null
+@@ -1,27 +0,0 @@
+-import Navbar from "../../pages/landing/Navbar";
+-
+-import Hero from "./Hero.jsx";
+-import ServiceCards from "./ServiceCards.jsx";
+-import HowItWorks from "./HowItWorks.jsx";
+-import TrustSection from "./TrustSection.jsx";
+-import Stats from "./Stats.jsx";
+-
+-
+-export default function LandingPage({ onLogin }) {
+-
+-    return (
+-        <>
+-            <Navbar onLogin={onLogin} />
+-
+-            <Hero onLogin={onLogin}/>
+-
+-            <ServiceCards />
+-
+-            <HowItWorks />
+-
+-            <TrustSection />
+-
+-            <Stats />
+-        </>
+-    )
+-}
+\ No newline at end of file
+diff --git a/src/pages/landing/Navbar.jsx b/src/pages/landing/Navbar.jsx
+deleted file mode 100644
+index 4c612a9..0000000
+--- a/src/pages/landing/Navbar.jsx
++++ /dev/null
+@@ -1,118 +0,0 @@
+-import { C } from "../../theme";
+-import { Btn } from "../../components/ui";
+-
+-export default function Navbar({ onLogin }) {
+-    return (
+-        <header
+-            style={{
+-                position: "sticky",
+-                top: 0,
+-                zIndex: 1000,
+-                display: "flex",
+-                justifyContent: "space-between",
+-                alignItems: "center",
+-                padding: "18px 8%",
+-                background: "#0F172A",
+-                borderBottom: "1px solid rgba(255,255,255,.08)",
+-                backdropFilter: "blur(12px)"
+-            }}
+-        >
+-            {/* Logo */}
+-            <a
+-                href="#home"
+-                style={{
+-                    display: "flex",
+-                    alignItems: "center",
+-                    gap: 10,
+-                    textDecoration: "none"
+-                }}
+-            >
+-                <div
+-                    style={{
+-                        width: 42,
+-                        height: 42,
+-                        borderRadius: 12,
+-                        background: C.accent,
+-                        display: "flex",
+-                        alignItems: "center",
+-                        justifyContent: "center",
+-                        color: "#fff",
+-                        fontSize: 22
+-                    }}
+-                >
+-                    🛠️
+-                </div>
+-
+-                <div>
+-                    <h2
+-                        style={{
+-                            color: "#fff",
+-                            margin: 0,
+-                            fontWeight: 800
+-                        }}
+-                    >
+-                        Craftad
+-                    </h2>
+-
+-                    <small
+-                        style={{
+-                            color: "rgba(255,255,255,.6)"
+-                        }}
+-                    >
+-                        Trusted Handymen
+-                    </small>
+-                </div>
+-            </a>
+-
+-            {/* Navigation */}
+-            <nav
+-                style={{
+-                    display: "flex",
+-                    gap: 35
+-                }}
+-            >
+-                <a href="#home" style={linkStyle}>Home</a>
+-                <a href="#services" style={linkStyle}>Services</a>
+-                <a href="#about" style={linkStyle}>About</a>
+-                <a href="#how" style={linkStyle}>How It Works</a>
+-                <a href="#contact" style={linkStyle}>Contact</a>
+-            </nav>
+-
+-            {/* Buttons */}
+-            <div
+-                style={{
+-                    display: "flex",
+-                    alignItems: "center",
+-                    gap: 15
+-                }}
+-            >
+-                <button
+-                    onClick={onLogin}
+-                    style={{
+-                        background: "transparent",
+-                        border: "none",
+-                        color: "#fff",
+-                        fontWeight: 600,
+-                        cursor: "pointer",
+-                        fontSize: 15
+-                    }}
+-                >
+-                    Login
+-                </button>
+-
+-                <Btn onClick={onLogin}>
+-                    Get Started
+-                </Btn>
+-            </div>
+-        </header>
+-    );
+-}
+-
+-const linkStyle = {
+-    color: "#fff",
+-    textDecoration: "none",
+-    fontWeight: 600,
+-    fontSize: 15,
+-    transition: "0.3s",
+-    opacity: 0.9
+-};
+\ No newline at end of file
+diff --git a/src/pages/landing/ServiceCards.jsx b/src/pages/landing/ServiceCards.jsx
+deleted file mode 100644
+index 6fe0f30..0000000
+--- a/src/pages/landing/ServiceCards.jsx
++++ /dev/null
+@@ -1,114 +0,0 @@
+-const services=[
+-
+-    ["🔧","Plumbing"],
+-    ["⚡","Electrical"],
+-    ["🎨","Painting"],
+-    ["🪚","Carpentry"],
+-    ["❄️","AC Repair"],
+-    ["🧹","Cleaning"]
+-
+-];
+-
+-
+-export default function ServiceCards(){
+-
+-
+-    return (
+-
+-        <section
+-
+-            style={{
+-                padding:"70px 50px"
+-            }}
+-
+-        >
+-
+-
+-            <h2>
+-
+-                Popular Services
+-
+-            </h2>
+-
+-
+-
+-            <div
+-
+-                style={{
+-                    display:"grid",
+-                    gridTemplateColumns:"repeat(3,1fr)",
+-                    gap:25,
+-                    marginTop:30
+-                }}
+-
+-            >
+-
+-
+-                {
+-
+-                    services.map(service=>(
+-
+-
+-                        <div
+-
+-                            key={service[1]}
+-
+-                            style={{
+-
+-                                padding:30,
+-
+-                                borderRadius:20,
+-
+-                                boxShadow:"0 10px 30px #ddd",
+-
+-                                background:"#fff"
+-
+-                            }}
+-
+-                        >
+-
+-
+-                            <div
+-
+-                                style={{
+-                                    fontSize:40
+-                                }}
+-
+-                            >
+-
+-                                {service[0]}
+-
+-                            </div>
+-
+-
+-                            <h3>
+-
+-                                {service[1]}
+-
+-                            </h3>
+-
+-
+-                            <p>
+-
+-                                Professional nearby experts
+-
+-                            </p>
+-
+-
+-                        </div>
+-
+-
+-                    ))
+-
+-                }
+-
+-
+-
+-            </div>
+-
+-
+-        </section>
+-
+-    )
+-
+-}
+diff --git a/src/pages/landing/Stats.jsx b/src/pages/landing/Stats.jsx
+deleted file mode 100644
+index 236a801..0000000
+--- a/src/pages/landing/Stats.jsx
++++ /dev/null
+@@ -1,36 +0,0 @@
+-
+-export default function Stats(){
+-
+-    return (
+-
+-        <section
+-            style={{
+-                display:"flex",
+-                gap:50,
+-                padding:50
+-            }}
+-        >
+-
+-            <div>
+-                <h1>500+</h1>
+-                <p>Artisans</p>
+-            </div>
+-
+-
+-            <div>
+-                <h1>2000+</h1>
+-                <p>Jobs Completed</p>
+-            </div>
+-
+-
+-            <div>
+-                <h1>98%</h1>
+-                <p>Happy Customers</p>
+-            </div>
+-
+-
+-        </section>
+-
+-    )
+-
+-}
+\ No newline at end of file
+diff --git a/src/pages/landing/TrustSection.jsx b/src/pages/landing/TrustSection.jsx
+deleted file mode 100644
+index 36b89d8..0000000
+--- a/src/pages/landing/TrustSection.jsx
++++ /dev/null
+@@ -1,38 +0,0 @@
+-export default function TrustSection(){
+-
+-
+-    return (
+-
+-        <section>
+-
+-            <h2>
+-                Why Choose Us?
+-            </h2>
+-
+-
+-            <ul>
+-
+-                <li>
+-                    Verified artisans
+-                </li>
+-
+-                <li>
+-                    Location based matching
+-                </li>
+-
+-                <li>
+-                    Secure payments
+-                </li>
+-
+-                <li>
+-                    Customer reviews
+-                </li>
+-
+-            </ul>
+-
+-
+-        </section>
+-
+-    )
+-
+-}
+\ No newline at end of file
+diff --git a/src/theme.js b/src/theme.js
+deleted file mode 100644
+index e15c0e4..0000000
+--- a/src/theme.js
++++ /dev/null
+@@ -1,30 +0,0 @@
+-export const C = {
+-    sidebar: "#0A1628", accent: "#F59E0B", bg: "#F0F4F8", card: "#FFFFFF",
+-    text: "#0F172A", muted: "#64748B", border: "#E2E8F0",
+-    success: "#10B981", danger: "#EF4444", info: "#3B82F6", purple: "#8B5CF6",
+-};
+-
+-export const statusColors = {
+-    pending: "#F59E0B", assigned: "#8B5CF6", accepted: "#3B82F6",
+-    "in-progress": "#06B6D4", completed: "#10B981", paid: "#10B981",
+-    cancelled: "#EF4444", approved: "#10B981", rejected: "#EF4444",
+-    successful: "#10B981", failed: "#EF4444", suspended: "#F59E0B",
+-    banned: "#EF4444", customer: "#3B82F6", artisan: "#8B5CF6", admin: "#EF4444",
+-};
+-
+-export const sc = (s) => statusColors[s?.toLowerCase()] || "#64748B";
+-export const fmtDate  = (d) => d ? new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" }) : "—";
+-export const fmtMoney = (n) => `₦${Number(n || 0).toLocaleString()}`;
+-export const arr      = (v) => (Array.isArray(v) ? v : []);
+-export const extract  = (d, ...keys) => { for (const k of keys) { if (d?.[k]) return d[k]; } return d || []; };
+-export const greeting = () => { const h = new Date().getHours(); return h < 12 ? "Good Morning ☀️" : h < 17 ? "Good Afternoon 🌤️" : "Good Evening 🌙"; };
+-
+-export const SKILLS = ["electrician","plumber","generator repair","mechanic","locksmith","cleaner","painter","welder","houseAgent","chef","laundry","labourer","declutter"];
+-
+-export const globalStyle = `
+-    * { box-sizing: border-box; margin: 0; padding: 0; }
+-    body { font-family: Inter, system-ui, sans-serif; background: #F0F4F8; }
+-    @keyframes spin { to { transform: rotate(360deg); } }
+-    input:focus, select:focus, textarea:focus { border-color: #F59E0B !important; box-shadow: 0 0 0 3px rgba(245,158,11,0.15) !important; outline: none; }
+-    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 99px; }
+-`;
+diff --git a/vite.config.js b/vite.config.js
+index 829e9b9..0ce1839 100644
+--- a/vite.config.js
++++ b/vite.config.js
+@@ -1,11 +1,7 @@
+-import { defineConfig } from 'vite';
+-import react from '@vitejs/plugin-react';
+-import tailwindcss from '@tailwindcss/vite';
++import { defineConfig } from "vite";
++import react from "@vitejs/plugin-react";
++import tailwindcss from "@tailwindcss/vite";
+ 
+-// https://vite.dev/config/
+ export default defineConfig({
+-    plugins: [
+-        react(),
+-        tailwindcss(),
+-    ],
+-});
+\ No newline at end of file
++  plugins: [react(), tailwindcss()],
++});
