@@ -1,6 +1,6 @@
-
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, Send } from "lucide-react";
 import { craftad, listOf } from "../api";
 import { useSession } from "../session";
 
@@ -78,27 +78,36 @@ export function Chat() {
     };
 
     return (
-        <div className="mx-auto flex h-[calc(100vh-9rem)] max-w-2xl flex-col">
-            <Link
-                to={`/jobs/${jobId}`}
-                className="text-sm text-muted no-underline"
-            >
-                Back to the job
-            </Link>
+        <div className="mx-auto flex h-[calc(100vh-10rem)] max-w-3xl flex-col pb-6">
 
-            <h1 className="font-display text-3xl">Job chat</h1>
+            {/* Top Back Link & Header */}
+            <div className="mb-4">
+                <Link
+                    to={`/jobs/${jobId}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted hover:text-copper transition-colors no-underline"
+                >
+                    <ArrowLeft size={14} /> Back to job details
+                </Link>
 
-            <p className="mb-4 text-sm text-muted">
-                Communicate directly with the other person on this job.
-            </p>
+                <h1 className="mt-2 font-display text-3xl tracking-tight sm:text-4xl text-ink">Project chat room</h1>
+                <p className="text-sm text-muted">
+                    Secure real-time communication channel with your project counterpart.
+                </p>
+            </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto rounded-card border border-line bg-cream p-4">
+            {/* Messages Box Container */}
+            <div className="flex-1 space-y-3.5 overflow-y-auto rounded-[1.75rem] border border-line bg-cream p-5 shadow-sm">
                 {error && (
-                    <p className="text-sm text-copper-deep">{error}</p>
+                    <div className="rounded-2xl border border-copper/30 bg-copper/5 px-4 py-3 text-sm text-copper-deep shadow-sm">
+                        {error}
+                    </div>
                 )}
 
                 {!error && messages.length === 0 && (
-                    <p className="text-sm text-muted">No messages yet.</p>
+                    <div className="flex h-full flex-col items-center justify-center text-center p-8 text-muted">
+                        <p className="font-display text-xl text-ink">No messages yet.</p>
+                        <p className="text-xs mt-1">Start the conversation by sending a message below.</p>
+                    </div>
                 )}
 
                 {messages.map((msg) => {
@@ -117,21 +126,21 @@ export function Chat() {
                             }`}
                         >
                             <div
-                                className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
+                                className={`max-w-[75%] rounded-2xl px-5 py-3 text-sm shadow-sm ${
                                     mine
-                                        ? "bg-ink text-cream"
-                                        : "bg-paper text-ink"
+                                        ? "bg-copper text-cream rounded-br-none"
+                                        : "bg-paper border border-line text-ink rounded-bl-none"
                                 }`}
                             >
-                                <p>{msg.text}</p>
+                                <p className="leading-relaxed">{msg.text}</p>
 
                                 <p
-                                    className={`mt-1 text-xs ${
-                                        mine ? "text-line" : "text-muted"
+                                    className={`mt-1.5 text-[10px] text-right font-medium ${
+                                        mine ? "text-cream/75" : "text-muted"
                                     }`}
                                 >
                                     {msg.createdAt
-                                        ? new Date(msg.createdAt).toLocaleString()
+                                        ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                                         : ""}
                                 </p>
                             </div>
@@ -140,22 +149,24 @@ export function Chat() {
                 })}
             </div>
 
-            <form className="mt-3 flex gap-2" onSubmit={handleSend}>
+            {/* Message Input Form */}
+            <form className="mt-4 flex gap-3" onSubmit={handleSend}>
                 <input
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
-                    placeholder="Write a message"
+                    placeholder="Write a message..."
                     maxLength={2000}
                     disabled={sending}
-                    className="min-h-12 flex-1 rounded-full border border-line bg-cream px-4 outline-none"
+                    className="min-h-12 flex-1 rounded-2xl border border-line bg-paper px-5 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10 disabled:opacity-50"
                 />
 
                 <button
                     type="submit"
                     disabled={sending || !draft.trim()}
-                    className="min-h-12 rounded-full bg-copper px-5 text-sm font-medium text-cream disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-ink px-6 text-sm font-semibold text-cream transition-all hover:bg-copper shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                    {sending ? "Sending..." : "Send"}
+                    <span>{sending ? "Sending..." : "Send"}</span>
+                    <Send size={16} />
                 </button>
             </form>
         </div>

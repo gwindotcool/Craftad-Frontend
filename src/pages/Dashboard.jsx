@@ -1,7 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-// 1. Import useQuery from React Query
-import { useQuery } from "@tanstack/react-query";
 import { craftad, listOf } from "../api";
 import { useSession } from "../session";
 import { SocialLinksForm } from "../components/SocialLinksForm";
@@ -9,137 +7,132 @@ import { SocialLinksForm } from "../components/SocialLinksForm";
 export function Dashboard() {
     const { token, user } = useSession();
 
-    // Artisan Profile State
+    const [jobs, setJobs] = useState([]);
+    const [balance, setBalance] = useState(null);
+    const [note, setNote] = useState("");
+
     const [skills, setSkills] = useState("");
     const [years, setYears] = useState("1");
     const [bio, setBio] = useState("");
     const [profileNote, setProfileNote] = useState("");
 
-    // 2. Fetch Jobs with React Query (Auto-caching, auto-retries)
-    const {
-        data: jobs = [],
-        isLoading: loadingJobs,
-        error: jobsError
-    } = useQuery({
-        queryKey: ['jobs', user?.role],
-        queryFn: async () => {
-            const data = user?.role === "artisan"
-                ? await craftad.openJobs(token)
-                : await craftad.myJobs(token);
-            return listOf(data, ["jobs"]);
-        },
-        enabled: !!token && !!user // Only run if the user is logged in
-    });
+    useEffect(() => {
+        if (!token || !user) return;
 
-    // 3. Fetch Wallet Balance with React Query
-    const {
-        data: balance = null,
-        isLoading: loadingWallet
-    } = useQuery({
-        queryKey: ['wallet', 'balance'],
-        queryFn: async () => {
-            const data = await craftad.wallet(token);
-            return data.wallet?.balance ?? null;
-        },
-        enabled: !!token && !!user
-    });
+        const load =
+            user.role === "artisan"
+                ? craftad.openJobs(token)
+                : craftad.myJobs(token);
+
+        load
+            .then((data) => setJobs(listOf(data, ["jobs"])))
+            .catch((err) => setNote(err.message));
+
+        craftad
+            .wallet(token)
+            .then((data) => setBalance(data.wallet?.balance ?? null))
+            .catch(() => setBalance(null));
+
+    }, [token, user]);
 
     return (
-        <div className="space-y-8">
-            {/* Welcome panel and dashboard statistics */}
-            <div className="space-y-6">
-                <div className="relative overflow-hidden rounded-[1.75rem] bg-ink p-7 text-cream shadow-sm sm:p-9">
-                    <div className="absolute -right-12 -top-16 h-56 w-56 rounded-full border border-cream/10" />
-                    <div className="absolute -right-5 -top-9 h-40 w-40 rounded-full border border-cream/10" />
+        <div className="space-y-10 pb-12">
+            {/* Hero Welcome Banner */}
+            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-ink via-ink/95 to-copper-deep p-8 text-cream shadow-xl sm:p-10">
+                <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border border-cream/10 bg-white/5 blur-2xl" />
+                <div className="absolute -left-12 -bottom-16 h-48 w-48 rounded-full border border-copper/20 bg-copper/10 blur-xl" />
 
-                    <div className="relative">
-                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-copper">
-                            YOUR CRAFTAD SPACE
-                        </p>
+                <div className="relative z-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+                    <div className="space-y-3">
+                        <div className="inline-flex items-center gap-2 rounded-full bg-cream/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-copper backdrop-blur-md">
+                            <span className="h-1.5 w-1.5 rounded-full bg-copper animate-pulse" />
+                            {user?.role} Workspace
+                        </div>
 
-                        <p className="mt-5 text-sm capitalize text-cream/65">
-                            {user?.role} dashboard
-                        </p>
-
-                        <h1 className="mt-2 font-display text-3xl leading-tight sm:text-5xl">
-                            Good to see you, {user?.fullName?.split(" ")[0] || "there"}.
+                        <h1 className="font-display text-3xl tracking-tight sm:text-5xl">
+                            Welcome back, {user?.fullName?.split(" ")[0] || "there"}.
                         </h1>
 
-                        <p className="mt-3 max-w-lg text-sm leading-relaxed text-cream/70">
+                        <p className="max-w-xl text-sm leading-relaxed text-cream/75">
                             {user?.role === "artisan"
-                                ? "Find new opportunities, manage your work, and keep your business moving."
-                                : "Manage your jobs, connect with skilled artisans, and keep track of your projects."}
+                                ? "Your next high-value project is waiting. Explore open opportunities and manage your deliverables seamlessly."
+                                : "Monitor active escrow projects, track your wallet liquidity, and collaborate with verified professionals."}
                         </p>
                     </div>
-                </div>
 
-                <div className="grid gap-4 sm:grid-cols-3">
-                    <Stat
-                        label={user?.role === "artisan" ? "Open jobs" : "Your jobs"}
-                        value={loadingJobs ? "..." : String(jobs.length)} // Show loading state
-                        description="Available in your workspace"
-                    />
-
-                    <Stat
-                        label="Wallet balance"
-                        value={
-                            loadingWallet ? "..." : // Show loading state
-                                balance === null
-                                    ? "—"
-                                    : `₦${balance.toLocaleString()}`
-                        }
-                        description="Your current wallet balance"
-                    />
-
-                    <Stat
-                        label="Your next step"
-                        value={user?.role === "customer" ? "Post a job" : "Apply for work"}
-                        description={
-                            user?.role === "customer"
-                                ? "Find the right person for the job"
-                                : "Explore opportunities on Craftad"
-                        }
-                    />
+                    <div className="flex shrink-0 gap-3">
+                        {user?.role === "customer" && (
+                            <Link
+                                to="/jobs/new"
+                                className="inline-flex min-h-12 items-center rounded-full bg-copper px-6 text-sm font-semibold text-cream shadow-lg shadow-copper/25 transition-all hover:bg-copper-deep hover:shadow-xl hover:-translate-y-0.5 no-underline"
+                            >
+                                + Post a new job
+                            </Link>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* Display React Query Errors */}
-            {jobsError && (
-                <p className="rounded-2xl border border-line bg-cream px-4 py-3 text-sm text-copper-deep">
-                    Failed to load jobs: {jobsError.message}
-                </p>
+            {/* Metrics Overview Grid */}
+            <div className="grid gap-5 sm:grid-cols-3">
+                <StatCard
+                    label={user?.role === "artisan" ? "Open workspace jobs" : "Active projects"}
+                    value={String(jobs.length)}
+                    description="Total jobs currently tracked"
+                    trend="Live sync"
+                />
+
+                <StatCard
+                    label="Escrow Wallet balance"
+                    value={balance === null ? "—" : `₦${balance.toLocaleString()}`}
+                    description="Available withdrawable funds"
+                    trend="Secure"
+                />
+
+                <StatCard
+                    label="Account status"
+                    value="Verified"
+                    description={user?.role === "customer" ? "Customer account active" : "Artisan profile live"}
+                    trend="Trusted"
+                />
+            </div>
+
+            {note && (
+                <div className="rounded-2xl border border-copper/30 bg-copper/5 px-5 py-4 text-sm text-copper-deep shadow-sm">
+                    {note}
+                </div>
             )}
 
-            {/* Dashboard actions */}
-            <div className="flex flex-wrap gap-3">
-                {user?.role === "customer" && (
-                    <Link
-                        to="/jobs/new"
-                        className="inline-flex min-h-11 items-center rounded-full bg-copper px-5 text-sm font-semibold text-cream no-underline transition-colors hover:bg-copper-deep"
-                    >
-                        Post a job
-                    </Link>
-                )}
+            {/* Action Toolbar */}
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-line/80 bg-cream/60 p-4 backdrop-blur-sm">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted px-2">Quick filters:</span>
 
                 <Link
                     to="/jobs?view=all"
-                    className="inline-flex min-h-11 items-center rounded-full border border-line bg-cream px-5 text-sm font-medium text-ink no-underline transition-colors hover:border-copper"
+                    className="inline-flex min-h-10 items-center rounded-full border border-line bg-paper px-4 text-xs font-medium text-ink no-underline transition-all hover:border-copper hover:bg-cream hover:shadow-sm"
                 >
-                    All jobs
+                    Browse all marketplace jobs
                 </Link>
 
                 <Link
                     to="/jobs?view=assigned"
-                    className="inline-flex min-h-11 items-center rounded-full border border-line bg-cream px-5 text-sm font-medium text-ink no-underline transition-colors hover:border-copper"
+                    className="inline-flex min-h-10 items-center rounded-full border border-line bg-paper px-4 text-xs font-medium text-ink no-underline transition-all hover:border-copper hover:bg-cream hover:shadow-sm"
                 >
-                    Assigned jobs
+                    Assigned jobs view
+                </Link>
+
+                <Link
+                    to="/wallet"
+                    className="inline-flex min-h-10 items-center rounded-full border border-line bg-paper px-4 text-xs font-medium text-ink no-underline transition-all hover:border-copper hover:bg-cream hover:shadow-sm ml-auto"
+                >
+                    View detailed ledger →
                 </Link>
             </div>
 
-            {/* Artisan profile */}
+            {/* Artisan Profile Section (If artisan) */}
             {user?.role === "artisan" && (
                 <form
-                    className="grid gap-4 rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm sm:p-8"
+                    className="grid gap-6 rounded-[2rem] border border-line bg-cream p-8 shadow-sm transition-all sm:p-10"
                     onSubmit={async (e) => {
                         e.preventDefault();
                         setProfileNote("");
@@ -163,7 +156,8 @@ export function Dashboard() {
                             } catch {
                                 await craftad.createArtisan(token, body);
                             }
-                            setProfileNote("Artisan profile saved.");
+
+                            setProfileNote("Artisan profile saved successfully.");
                         } catch (err) {
                             setProfileNote(
                                 err instanceof Error
@@ -174,126 +168,130 @@ export function Dashboard() {
                     }}
                 >
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-copper">
-                            YOUR PROFESSIONAL DETAILS
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-copper">
+                            PROFESSIONAL CREDENTIALS
                         </p>
-
-                        <h2 className="mt-2 font-display text-2xl text-ink sm:text-3xl">
-                            Artisan profile
+                        <h2 className="mt-1 font-display text-2xl text-ink sm:text-3xl">
+                            Artisan portfolio profile
                         </h2>
-
-                        <p className="mt-2 text-sm leading-relaxed text-muted">
-                            Tell customers about your skills and experience.
+                        <p className="mt-1 text-sm text-muted">
+                            Update your public expertise so customers can evaluate your craftsmanship.
                         </p>
                     </div>
 
-                    <input
-                        value={skills}
-                        onChange={(e) => setSkills(e.target.value)}
-                        placeholder="Skills, separated by commas"
-                        className="min-h-12 rounded-xl border border-line bg-paper px-4 outline-none transition focus:border-copper"
-                        required
-                    />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <input
+                            value={skills}
+                            onChange={(e) => setSkills(e.target.value)}
+                            placeholder="Skills (e.g. Carpentry, Plumbing, UI Design)"
+                            className="min-h-12 rounded-xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
+                            required
+                        />
 
-                    <input
-                        type="number"
-                        min={0}
-                        value={years}
-                        onChange={(e) => setYears(e.target.value)}
-                        placeholder="Years of experience"
-                        className="min-h-12 rounded-xl border border-line bg-paper px-4 outline-none transition focus:border-copper"
-                        required
-                    />
+                        <input
+                            type="number"
+                            min={0}
+                            value={years}
+                            onChange={(e) => setYears(e.target.value)}
+                            placeholder="Years of experience"
+                            className="min-h-12 rounded-xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
+                            required
+                        />
+                    </div>
 
                     <textarea
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
-                        rows={4}
-                        placeholder="Write a short introduction about your work..."
-                        className="rounded-xl border border-line bg-paper px-4 py-3 outline-none transition focus:border-copper"
+                        rows={3}
+                        placeholder="Write a compelling professional summary..."
+                        className="rounded-xl border border-line bg-paper p-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
                     />
 
-                    <button className="min-h-11 w-fit rounded-full bg-ink px-6 text-sm font-semibold text-cream transition-colors hover:bg-copper">
-                        Save profile
-                    </button>
-
-                    {profileNote && (
-                        <p className="text-sm text-muted">{profileNote}</p>
-                    )}
+                    <div className="flex items-center gap-4">
+                        <button className="min-h-11 rounded-full bg-ink px-7 text-sm font-semibold text-cream transition-all hover:bg-copper hover:shadow-md">
+                            Save changes
+                        </button>
+                        {profileNote && (
+                            <span className="text-sm font-medium text-copper-deep">{profileNote}</span>
+                        )}
+                    </div>
                 </form>
             )}
 
-            {/* Social links - ISOLATED COMPONENT */}
-            <div className="grid gap-4 rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm sm:grid-cols-2 sm:p-8">
-                <div className="sm:col-span-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-copper">
-                        STAY CONNECTED
+            {/* Social Links Modular Card */}
+            <div className="grid gap-6 rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10">
+                <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-copper">
+                        NETWORKING CHANNELS
                     </p>
-                    <h2 className="mt-2 font-display text-2xl text-ink sm:text-3xl">
-                        Social links
+                    <h2 className="mt-1 font-display text-2xl text-ink sm:text-3xl">
+                        Social links & handles
                     </h2>
-                    <p className="mt-2 text-sm text-muted">
-                        Add your social accounts so people can connect with you.
+                    <p className="mt-1 text-sm text-muted">
+                        Connect your digital profiles for direct client communication.
                     </p>
                 </div>
-                <div className="sm:col-span-2">
-                    <SocialLinksForm />
-                </div>
+                <SocialLinksForm />
             </div>
 
-            {/* Recent jobs */}
-            <section className="space-y-4">
-                <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-copper">
-                        YOUR ACTIVITY
-                    </p>
-
-                    <h2 className="mt-2 font-display text-2xl text-ink sm:text-3xl">
-                        Recent jobs
-                    </h2>
-
-                    <p className="mt-2 text-sm text-muted">
-                        Keep track of the work happening on Craftad.
-                    </p>
+            {/* Recent Activity Feed */}
+            <section className="space-y-5">
+                <div className="flex items-end justify-between">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-copper">
+                            WORKSPACE STREAM
+                        </p>
+                        <h2 className="mt-1 font-display text-2xl text-ink sm:text-3xl">
+                            Recent jobs ledger
+                        </h2>
+                    </div>
+                    <Link to="/jobs" className="text-xs font-semibold text-copper hover:underline">
+                        View all activity →
+                    </Link>
                 </div>
 
-                <div className="grid gap-3">
-                    {loadingJobs && (
-                        <div className="rounded-[1.25rem] border border-line bg-cream p-8 text-center text-muted">
-                            Loading your jobs...
-                        </div>
-                    )}
-
-                    {!loadingJobs && jobs.slice(0, 4).map((job) => (
+                <div className="grid gap-3.5">
+                    {jobs.slice(0, 4).map((job) => (
                         <Link
                             key={job._id}
                             to={`/jobs/${job._id}`}
-                            className="group rounded-[1.25rem] border border-line bg-cream p-5 no-underline transition-all hover:-translate-y-0.5 hover:border-copper/40 hover:shadow-md"
+                            className="group flex flex-col justify-between gap-4 rounded-2xl border border-line bg-cream p-6 no-underline transition-all hover:-translate-y-0.5 hover:border-copper/50 hover:shadow-lg sm:flex-row sm:items-center"
                         >
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                                <h3 className="font-semibold text-ink transition-colors group-hover:text-copper">
-                                    {job.title}
-                                </h3>
-
-                                <span className="rounded-full bg-paper px-3 py-1 text-xs capitalize text-muted">
-                                    {job.status?.replaceAll("_", " ")}
-                                </span>
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-3">
+                                    <h3 className="font-semibold text-ink transition-colors group-hover:text-copper">
+                                        {job.title}
+                                    </h3>
+                                    <span className="rounded-full bg-paper px-3 py-0.5 text-xs font-medium uppercase tracking-wider text-muted border border-line/60">
+                                        {job.category || "General"}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-muted">
+                                    📍 {job.location || "Remote / Standard"}
+                                </p>
                             </div>
 
-                            <p className="mt-2 text-sm text-muted">
-                                {job.location} · ₦{(job.budget || 0).toLocaleString()} · {job.category}
-                            </p>
+                            <div className="flex items-center gap-6">
+                                <div className="text-left sm:text-right">
+                                    <p className="font-display text-lg font-bold text-ink">
+                                        ₦{(job.budget || 0).toLocaleString()}
+                                    </p>
+                                    <p className="text-xs capitalize text-copper font-medium">
+                                        {job.status?.replaceAll("_", " ")}
+                                    </p>
+                                </div>
+                                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-paper border border-line text-muted transition-colors group-hover:border-copper group-hover:text-copper">
+                                    →
+                                </span>
+                            </div>
                         </Link>
                     ))}
 
-                    {!loadingJobs && jobs.length === 0 && (
-                        <div className="rounded-[1.25rem] border border-dashed border-line bg-cream p-8 text-center">
-                            <p className="font-display text-xl text-ink">
-                                Nothing here yet.
-                            </p>
-
-                            <p className="mt-2 text-sm text-muted">
-                                Your job activity will appear here when you get started.
+                    {jobs.length === 0 && (
+                        <div className="rounded-2xl border border-dashed border-line bg-cream p-12 text-center">
+                            <p className="font-display text-xl text-ink">No recent job activity found.</p>
+                            <p className="mt-1 text-sm text-muted">
+                                Your active pipeline will populate here automatically once work begins.
                             </p>
                         </div>
                     )}
@@ -303,12 +301,17 @@ export function Dashboard() {
     );
 }
 
-function Stat({ label, value, description }) {
+function StatCard({ label, value, description, trend }) {
     return (
-        <div className="rounded-[1.25rem] border border-line bg-cream p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:p-6">
-            <p className="text-sm font-medium text-muted">{label}</p>
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-line bg-cream p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-copper/40 hover:shadow-md sm:p-7">
+            <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted">{label}</p>
+                <span className="rounded-full bg-paper px-2.5 py-1 text-[10px] font-bold text-copper border border-line">
+                    {trend}
+                </span>
+            </div>
 
-            <p className="mt-3 break-words font-display text-2xl text-ink sm:text-3xl">
+            <p className="mt-4 break-words font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">
                 {value}
             </p>
 

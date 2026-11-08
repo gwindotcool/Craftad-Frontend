@@ -14,6 +14,14 @@ export function AdminLayout() {
             label: "Users",
             path: "/admin/users",
         },
+        {
+            label: "Transactions",
+            path: "/admin/transactions",
+        },
+        {
+            label: "Escrow & Revenue",
+            path: "/admin/escrows",
+        },
     ];
 
     function handleSignOut() {

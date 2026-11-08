@@ -6,10 +6,13 @@ import { SessionProvider } from "./session";
 
 import { AdminSessionProvider } from "./admin/AdminSession";
 import { AdminLogin } from "./admin/AdminLogin";
+import { AdminRegister } from "./admin/AdminRegister";
 import { RequireAdmin } from "./admin/RequireAdmin";
 import { AdminLayout } from "./admin/AdminLayout";
 import { AdminDashboard } from "./admin/AdminDashboard";
 import { AdminUsers } from "./admin/AdminUsers";
+import { AdminTransactionsPage } from "./admin/AdminTransactionsPage.jsx";
+import { AdminEscrowPage } from "./admin/AdminEscrowPage.jsx"; // Added
 
 import { Auth } from "./pages/Auth";
 import { Chat } from "./pages/Chat";
@@ -126,6 +129,9 @@ export default function App() {
 
                         <Route path="dashboard" element={<AdminDashboard />} />
                         <Route path="users" element={<AdminUsers />} />
+                        <Route path="transactions" element={<AdminTransactionsPage />} />
+                        <Route path="escrows" element={<AdminEscrowPage />} />
+                        <Route path="register" element={<AdminRegister />} />
                     </Route>
 
                     {/* Unknown routes */}

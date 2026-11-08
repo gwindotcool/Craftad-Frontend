@@ -1,6 +1,6 @@
-
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { CheckCircle2, MapPin, Clock, ArrowLeft, Star, MessageSquare, Send } from "lucide-react";
 import { craftad, listOf } from "../api";
 import { ShareBar } from "../components/ShareBar";
 import { useSession } from "../session";
@@ -26,18 +26,18 @@ function StatusBadge({ status }) {
     const label = (status || "unknown").replaceAll("_", " ");
 
     return (
-        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-cream px-3 py-1.5 text-xs font-semibold capitalize text-ink">
-      <span className="h-2 w-2 rounded-full bg-copper" />
+        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-3.5 py-1.5 text-xs font-semibold capitalize text-ink shadow-sm">
+            <span className="h-2 w-2 rounded-full bg-copper animate-pulse" />
             {label}
-    </span>
+        </span>
     );
 }
 
 function SectionHeading({ eyebrow, title, description }) {
     return (
-        <div className="mb-5">
+        <div className="mb-6">
             {eyebrow && (
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-copper-deep">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-copper">
                     {eyebrow}
                 </p>
             )}
@@ -45,7 +45,7 @@ function SectionHeading({ eyebrow, title, description }) {
                 {title}
             </h2>
             {description && (
-                <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
+                <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-muted">
                     {description}
                 </p>
             )}
@@ -112,20 +112,20 @@ export function JobDetail() {
 
     if (!job) {
         return (
-            <div className="mx-auto max-w-4xl py-8">
+            <div className="mx-auto max-w-4xl py-12">
                 <Link
                     to="/jobs"
-                    className="text-sm font-medium text-muted no-underline hover:text-copper-deep"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted no-underline hover:text-copper transition-colors"
                 >
-                    ← Back to jobs
+                    <ArrowLeft size={14} /> Back to jobs
                 </Link>
 
-                <div className="mt-6 rounded-card border border-line bg-cream p-8">
+                <div className="mt-6 rounded-[2rem] border border-line bg-cream p-10 text-center shadow-sm">
                     <p className="font-display text-2xl text-ink">
-                        {error ? "We couldn't find this job" : "Finding your job…"}
+                        {error ? "We couldn't find this job" : "Finding your job details…"}
                     </p>
                     <p className="mt-2 text-sm text-muted">
-                        {error || "Please wait while we load the details."}
+                        {error || "Please wait while we load the workspace information."}
                     </p>
                 </div>
             </div>
@@ -140,103 +140,88 @@ export function JobDetail() {
         (job.status === "customer_confirmed" || job.status === "paid");
 
     return (
-        <div className="mx-auto max-w-7xl space-y-7 pb-12">
-            {/* Top navigation */}
+        <div className="mx-auto max-w-7xl space-y-8 pb-12">
+
+            {/* Top Navigation & Status */}
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <Link
                     to="/jobs"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-muted no-underline transition hover:text-copper-deep"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted no-underline transition hover:text-copper"
                 >
-                    <span aria-hidden="true">←</span>
-                    All jobs
+                    <ArrowLeft size={14} />
+                    Back to jobs workspace
                 </Link>
 
                 <StatusBadge status={job.status} />
             </div>
 
-            {/* Feedback */}
+            {/* Error & Success Notification Banners */}
             {error && (
-                <div
-                    role="alert"
-                    className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
-                >
+                <div role="alert" className="rounded-2xl border border-copper/30 bg-copper/5 px-5 py-4 text-sm text-copper-deep shadow-sm">
                     {error}
                 </div>
             )}
 
             {note && (
-                <div
-                    role="status"
-                    className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800"
-                >
-                    {note}
+                <div role="status" className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 px-5 py-4 text-sm text-emerald-800 shadow-sm flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                    <span>{note}</span>
                 </div>
             )}
 
-            {/* Editorial job heading */}
-            <header className="relative overflow-hidden rounded-card bg-ink px-6 py-8 text-cream sm:px-10 sm:py-11">
-                <div className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full border border-white/10" />
-                <div className="pointer-events-none absolute -right-2 -top-10 h-52 w-52 rounded-full border border-white/10" />
-                <div className="pointer-events-none absolute -bottom-28 right-28 h-56 w-56 rounded-full bg-copper/20 blur-3xl" />
+            {/* Editorial Job Header Banner */}
+            <header className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-ink via-ink/95 to-copper-deep px-8 py-10 text-cream shadow-xl sm:px-12 sm:py-14">
+                <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border border-cream/10 bg-white/5 blur-2xl" />
+                <div className="absolute -left-12 -bottom-16 h-48 w-48 rounded-full border border-copper/20 bg-copper/10 blur-xl" />
 
-                <div className="relative max-w-3xl">
+                <div className="relative z-10 max-w-3xl">
                     <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full bg-copper px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white">
-              {job.category || "General service"}
-            </span>
-                        <span className="text-xs text-white/60">
-              Craftad job
-            </span>
+                        <span className="rounded-full bg-copper px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white shadow-sm">
+                            {job.category || "General service"}
+                        </span>
+                        <span className="text-xs font-medium text-cream/70">
+                            Craftad Verified Project
+                        </span>
                     </div>
 
-                    <h1 className="mt-6 max-w-3xl font-display text-4xl leading-[1.08] tracking-tight sm:text-6xl">
+                    <h1 className="mt-5 max-w-3xl font-display text-3xl leading-tight tracking-tight sm:text-5xl">
                         {job.title}
                     </h1>
 
-                    <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-white/70">
-            <span className="inline-flex items-center gap-2">
-              <span aria-hidden="true">⌖</span>
-                {job.location || "Location not specified"}
-            </span>
+                    <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-cream/80">
+                        <span className="inline-flex items-center gap-2">
+                            <MapPin size={16} className="text-copper" />
+                            {job.location || "Location not specified"}
+                        </span>
                         <span className="inline-flex items-center gap-2 capitalize">
-              <span aria-hidden="true">◷</span>
+                            <Clock size={16} className="text-copper" />
                             {job.status?.replaceAll("_", " ") || "Status unavailable"}
-            </span>
+                        </span>
                     </div>
-                </div>
-
-                <div className="relative mt-8 flex flex-wrap items-center gap-3 border-t border-white/15 pt-5">
-          <span className="text-xs font-medium text-white/60">
-            Clear expectations. Better work.
-          </span>
-                    <span className="h-1 w-1 rounded-full bg-copper" />
-                    <span className="text-xs font-medium text-white/60">
-            Powered by Craftad
-          </span>
                 </div>
             </header>
 
-            {/* Main two-column layout */}
-            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_370px]">
+            {/* Main Two-Column Layout */}
+            <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_390px]">
 
                 {/* LEFT COLUMN */}
-                <div className="min-w-0 space-y-6">
+                <div className="min-w-0 space-y-8">
 
-                    {/* Job description */}
-                    <section className="rounded-card border border-line bg-cream p-6 shadow-sm sm:p-8">
+                    {/* Job Description Card */}
+                    <section className="rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10">
                         <SectionHeading
-                            eyebrow="The brief"
+                            eyebrow="PROJECT BRIEF"
                             title="About this job"
-                            description="Here's what the customer needs help with."
+                            description="Detailed requirements and specifications outlined by the customer."
                         />
 
-                        <p className="whitespace-pre-wrap text-sm leading-8 text-muted sm:text-base">
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted sm:text-base">
                             {job.description || "No job description was provided."}
                         </p>
 
-                        <div className="mt-7 grid gap-3 border-t border-line pt-6 sm:grid-cols-2">
-                            <div className="rounded-2xl bg-paper p-4">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted">
+                        <div className="mt-8 grid gap-4 border-t border-line pt-6 sm:grid-cols-2">
+                            <div className="rounded-2xl bg-paper p-5 border border-line/60">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
                                     Service category
                                 </p>
                                 <p className="mt-2 font-semibold capitalize text-ink">
@@ -244,8 +229,8 @@ export function JobDetail() {
                                 </p>
                             </div>
 
-                            <div className="rounded-2xl bg-paper p-4">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted">
+                            <div className="rounded-2xl bg-paper p-5 border border-line/60">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
                                     Work location
                                 </p>
                                 <p className="mt-2 font-semibold text-ink">
@@ -255,24 +240,24 @@ export function JobDetail() {
                         </div>
                     </section>
 
-                    {/* Job progress */}
-                    <section className="rounded-card border border-line bg-cream p-6 shadow-sm sm:p-8">
+                    {/* Job Progress Tracker */}
+                    <section className="rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10">
                         <SectionHeading
-                            eyebrow="The journey"
-                            title="Job progress"
-                            description="Every job moves through clear stages, so both sides know what comes next."
+                            eyebrow="MILESTONE PIPELINE"
+                            title="Job progress tracking"
+                            description="Every project moves through verified stages so both parties remain fully aligned."
                         />
 
-                        <div className="mt-7 space-y-0">
+                        <div className="mt-8 space-y-0">
                             {stages.map((stage, index) => {
                                 const complete = stageIndex >= index && stageIndex !== -1;
                                 const current = stageIndex === index;
 
                                 return (
-                                    <div key={stage.key} className="relative flex gap-4 pb-6 last:pb-0">
+                                    <div key={stage.key} className="relative flex gap-5 pb-8 last:pb-0">
                                         {index !== stages.length - 1 && (
                                             <div
-                                                className={`absolute left-[15px] top-8 h-[calc(100%-24px)] w-px ${
+                                                className={`absolute left-[19px] top-9 h-[calc(100%-20px)] w-0.5 ${
                                                     complete && stageIndex > index
                                                         ? "bg-copper"
                                                         : "bg-line"
@@ -281,18 +266,18 @@ export function JobDetail() {
                                         )}
 
                                         <div
-                                            className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${
+                                            className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition-all ${
                                                 current
-                                                    ? "border-copper bg-copper text-white"
+                                                    ? "border-copper bg-copper text-white shadow-md shadow-copper/25"
                                                     : complete
                                                         ? "border-copper bg-copper/10 text-copper-deep"
                                                         : "border-line bg-paper text-muted"
                                             }`}
                                         >
-                                            {complete && !current ? "✓" : index + 1}
+                                            {complete && !current ? <CheckCircle2 size={16} /> : index + 1}
                                         </div>
 
-                                        <div className="min-w-0 pt-0.5">
+                                        <div className="min-w-0 pt-1">
                                             <p
                                                 className={`text-sm font-semibold ${
                                                     current ? "text-copper-deep" : "text-ink"
@@ -300,12 +285,12 @@ export function JobDetail() {
                                             >
                                                 {stage.label}
                                                 {current && (
-                                                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-copper">
-                            Current stage
-                          </span>
+                                                    <span className="ml-2.5 rounded-full bg-copper/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-copper border border-copper/20">
+                                                        Current stage
+                                                    </span>
                                                 )}
                                             </p>
-                                            <p className="mt-1 text-xs leading-5 text-muted">
+                                            <p className="mt-1 text-xs leading-relaxed text-muted">
                                                 {stage.description}
                                             </p>
                                         </div>
@@ -315,31 +300,31 @@ export function JobDetail() {
                         </div>
 
                         {stageIndex === -1 && (
-                            <p className="mt-4 rounded-xl bg-paper p-3 text-xs text-muted">
-                                This job has a status outside the standard progress stages.
+                            <p className="mt-4 rounded-xl bg-paper p-4 text-xs text-muted border border-line">
+                                This job currently has a status outside standard progress milestones.
                             </p>
                         )}
                     </section>
 
-                    {/* Applications */}
+                    {/* Customer Applications Review */}
                     {isCustomer && (
-                        <section className="rounded-card border border-line bg-cream p-6 shadow-sm sm:p-8">
+                        <section className="rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10">
                             <SectionHeading
-                                eyebrow="Find the right person"
-                                title="Artisan applications"
-                                description="Review the offers and choose the artisan who best fits the job."
+                                eyebrow="APPLICATIONS"
+                                title="Artisan applicants"
+                                description="Review proposed quotes and background credentials to select the best professional."
                             />
 
                             {apps.length === 0 ? (
-                                <div className="rounded-2xl border border-dashed border-line bg-paper px-5 py-8 text-center">
-                                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-cream text-xl text-copper-deep">
-                                        ✳
+                                <div className="rounded-2xl border border-dashed border-line bg-paper px-6 py-12 text-center">
+                                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-cream text-copper mb-3 border border-line">
+                                        ✨
                                     </div>
-                                    <p className="mt-4 font-display text-xl text-ink">
+                                    <p className="font-display text-xl text-ink">
                                         No applications yet
                                     </p>
-                                    <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted">
-                                        When artisans apply for this job, their messages and proposed prices will appear here.
+                                    <p className="mx-auto mt-1 max-w-sm text-sm leading-relaxed text-muted">
+                                        When qualified artisans apply for this job, their introductory messages and price proposals will show up here.
                                     </p>
                                 </div>
                             ) : (
@@ -355,11 +340,11 @@ export function JobDetail() {
                                         return (
                                             <article
                                                 key={appId}
-                                                className="rounded-2xl border border-line bg-paper p-4 sm:p-5"
+                                                className="rounded-2xl border border-line bg-paper p-6 shadow-sm transition-all hover:border-copper/40"
                                             >
                                                 <div className="flex flex-wrap items-start justify-between gap-4">
-                                                    <div className="flex min-w-0 items-center gap-3">
-                                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink font-display text-lg text-cream">
+                                                    <div className="flex min-w-0 items-center gap-3.5">
+                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink font-display text-lg text-cream shadow-sm">
                                                             {artisanName.charAt(0).toUpperCase()}
                                                         </div>
 
@@ -367,7 +352,7 @@ export function JobDetail() {
                                                             <h3 className="truncate font-semibold text-ink">
                                                                 {artisanName}
                                                             </h3>
-                                                            <p className="mt-1 text-xs capitalize text-muted">
+                                                            <p className="mt-0.5 text-xs capitalize text-muted">
                                                                 {app.status || "pending"} application
                                                             </p>
                                                         </div>
@@ -377,30 +362,30 @@ export function JobDetail() {
                                                         <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
                                                             Proposed price
                                                         </p>
-                                                        <p className="mt-1 font-display text-2xl text-copper-deep">
+                                                        <p className="mt-0.5 font-display text-2xl font-bold text-copper-deep">
                                                             {formatMoney(app.proposedPrice)}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-4 rounded-xl bg-cream p-4">
+                                                <div className="mt-5 rounded-xl bg-cream p-4 border border-line/60">
                                                     <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
-                                                        Artisan's message
+                                                        Artisan proposal message
                                                     </p>
-                                                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink">
+                                                    <p className="mt-1.5 whitespace-pre-wrap text-sm leading-relaxed text-ink">
                                                         {app.message || "No message provided."}
                                                     </p>
                                                 </div>
 
                                                 {pending && (
-                                                    <div className="mt-4 flex flex-wrap gap-2">
+                                                    <div className="mt-5 flex flex-wrap gap-3">
                                                         <button
                                                             type="button"
-                                                            className="min-h-10 rounded-full bg-ink px-5 text-xs font-semibold text-cream transition hover:bg-pine"
+                                                            className="min-h-11 rounded-full bg-ink px-6 text-xs font-semibold text-cream transition hover:bg-copper shadow-sm"
                                                             onClick={() =>
                                                                 run(
                                                                     () => craftad.acceptApplication(token, appId),
-                                                                    "Application accepted"
+                                                                    "Application accepted successfully."
                                                                 )
                                                             }
                                                         >
@@ -409,11 +394,11 @@ export function JobDetail() {
 
                                                         <button
                                                             type="button"
-                                                            className="min-h-10 rounded-full border border-line bg-cream px-5 text-xs font-semibold text-copper-deep transition hover:border-copper"
+                                                            className="min-h-11 rounded-full border border-line bg-cream px-6 text-xs font-semibold text-copper-deep transition hover:border-copper"
                                                             onClick={() =>
                                                                 run(
                                                                     () => craftad.rejectApplication(token, appId),
-                                                                    "Application rejected"
+                                                                    "Application rejected."
                                                                 )
                                                             }
                                                         >
@@ -429,10 +414,10 @@ export function JobDetail() {
                         </section>
                     )}
 
-                    {/* Artisan application */}
+                    {/* Artisan Application Form */}
                     {isArtisan && job.status === "open" && (
                         <form
-                            className="rounded-card border border-line bg-cream p-6 shadow-sm sm:p-8"
+                            className="rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10"
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 run(
@@ -441,54 +426,55 @@ export function JobDetail() {
                                             message,
                                             proposedPrice: Number(price),
                                         }),
-                                    "Application sent"
+                                    "Application sent successfully."
                                 );
                             }}
                         >
                             <SectionHeading
-                                eyebrow="Make your move"
+                                eyebrow="SUBMIT PROPOSAL"
                                 title="Apply for this job"
-                                description="Introduce yourself and tell the customer how you can help."
+                                description="Introduce your expertise and let the customer know how you plan to execute the work."
                             />
 
                             <label className="mt-6 block text-sm font-semibold text-ink">
-                                Your message
+                                Proposal message
                                 <textarea
                                     required
-                                    rows={5}
+                                    rows={4}
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm leading-6 text-ink outline-none transition placeholder:text-muted/70 focus:border-copper"
-                                    placeholder="Tell the customer why you're a good fit for this job…"
+                                    className="mt-2 w-full rounded-2xl border border-line bg-paper p-4 text-sm leading-relaxed text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
+                                    placeholder="Explain why you are the ideal professional for this job..."
                                 />
                             </label>
 
                             <label className="mt-5 block text-sm font-semibold text-ink">
-                                Your proposed price (₦)
+                                Proposed price (₦)
                                 <input
                                     required
                                     type="number"
                                     min={0}
                                     value={price}
                                     onChange={(e) => setPrice(e.target.value)}
-                                    className="mt-2 min-h-12 w-full rounded-2xl border border-line bg-white px-4 text-sm text-ink outline-none transition placeholder:text-muted/70 focus:border-copper"
-                                    placeholder="Enter your price"
+                                    className="mt-2 min-h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
+                                    placeholder="Enter quote in Naira"
                                 />
                             </label>
 
                             <button
                                 type="submit"
-                                className="mt-6 min-h-12 rounded-full bg-copper px-7 text-sm font-semibold text-white transition hover:bg-copper-deep"
+                                className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-copper px-8 text-sm font-semibold text-white transition hover:bg-copper-deep shadow-md"
                             >
-                                Send application
+                                <span>Send application proposal</span>
+                                <Send size={16} />
                             </button>
                         </form>
                     )}
 
-                    {/* Review */}
+                    {/* Review Form */}
                     {canReview && (
                         <form
-                            className="rounded-card border border-line bg-cream p-6 shadow-sm sm:p-8"
+                            className="rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10"
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 run(
@@ -497,138 +483,135 @@ export function JobDetail() {
                                             rating: Number(rating),
                                             comment,
                                         }),
-                                    "Review saved"
+                                    "Review saved successfully."
                                 );
                             }}
                         >
                             <SectionHeading
-                                eyebrow="Help the community"
-                                title="Review the work"
-                                description="Your feedback helps other customers make confident choices."
+                                eyebrow="COMMUNITY FEEDBACK"
+                                title="Review completed work"
+                                description="Rate your experience to help maintain high quality standards across the marketplace."
                             />
 
                             <label className="mt-6 block text-sm font-semibold text-ink">
-                                Your rating
+                                Star rating
                                 <select
                                     value={rating}
                                     onChange={(e) => setRating(e.target.value)}
-                                    className="mt-2 min-h-12 w-full rounded-2xl border border-line bg-white px-4 text-sm outline-none focus:border-copper"
+                                    className="mt-2 min-h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none focus:border-copper focus:ring-2 focus:ring-copper/10"
                                 >
                                     {[5, 4, 3, 2, 1].map((n) => (
                                         <option key={n} value={n}>
-                                            {n} {n === 1 ? "star" : "stars"}
+                                            ★ {n} {n === 1 ? "Star" : "Stars"}
                                         </option>
                                     ))}
                                 </select>
                             </label>
 
                             <label className="mt-5 block text-sm font-semibold text-ink">
-                                Your comments
+                                Feedback comments
                                 <textarea
-                                    rows={4}
+                                    rows={3}
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
-                                    placeholder="How was your experience?"
-                                    className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm outline-none transition placeholder:text-muted/70 focus:border-copper"
+                                    placeholder="Describe your collaboration experience..."
+                                    className="mt-2 w-full rounded-2xl border border-line bg-paper p-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
                                 />
                             </label>
 
                             <button
                                 type="submit"
-                                className="mt-6 min-h-12 rounded-full bg-ink px-7 text-sm font-semibold text-cream transition hover:bg-pine"
+                                className="mt-6 min-h-12 rounded-full bg-ink px-8 text-sm font-semibold text-cream transition hover:bg-copper shadow-sm"
                             >
-                                Submit review
+                                Submit verified review
                             </button>
                         </form>
                     )}
                 </div>
 
                 {/* RIGHT SIDEBAR */}
-                <aside className="space-y-5 lg:sticky lg:top-6">
+                <aside className="space-y-6 lg:sticky lg:top-6">
 
-                    {/* Price panel */}
-                    <section className="overflow-hidden rounded-card border border-line bg-cream shadow-sm">
-                        <div className="bg-paper px-6 py-5">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-copper-deep">
-                                Job overview
+                    {/* Financial Numbers Panel */}
+                    <section className="overflow-hidden rounded-[2rem] border border-line bg-cream shadow-sm">
+                        <div className="bg-paper px-7 py-5 border-b border-line/60">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-copper">
+                                FINANCIAL METRICS
                             </p>
-                            <h2 className="mt-2 font-display text-2xl text-ink">
-                                The numbers
+                            <h2 className="mt-1 font-display text-2xl text-ink">
+                                Budget & Pricing
                             </h2>
                         </div>
 
-                        <div className="space-y-5 p-6">
+                        <div className="space-y-6 p-7">
                             <div>
                                 <p className="text-xs font-medium text-muted">
-                                    Customer budget
+                                    Customer budget ceiling
                                 </p>
-                                <p className="mt-1 font-display text-3xl text-ink">
+                                <p className="mt-1 font-display text-3xl font-bold text-ink">
                                     {formatMoney(job.budget)}
                                 </p>
                             </div>
 
                             <div className="border-t border-line pt-5">
                                 <p className="text-xs font-medium text-muted">
-                                    Agreed price
+                                    Agreed milestone price
                                 </p>
-                                <p className="mt-1 font-display text-3xl text-copper-deep">
+                                <p className="mt-1 font-display text-3xl font-bold text-copper-deep">
                                     {job.agreedPrice
                                         ? formatMoney(job.agreedPrice)
-                                        : "Not set"}
+                                        : "Not set yet"}
                                 </p>
                             </div>
 
-                            <div className="rounded-2xl bg-paper p-4">
-                                <p className="text-xs leading-6 text-muted">
+                            <div className="rounded-2xl bg-paper p-4 border border-line/60">
+                                <p className="text-xs leading-relaxed text-muted">
                                     {job.agreedPrice
-                                        ? "The agreed price is displayed here for easy reference."
-                                        : "The final price will be agreed when the customer accepts an artisan's application."}
+                                        ? "The final agreed price is locked into escrow for this contract."
+                                        : "Final price gets locked automatically when an application is accepted."}
                                 </p>
                             </div>
                         </div>
                     </section>
 
-                    {/* Action panel */}
-                    <section className="rounded-card border border-line bg-cream p-6 shadow-sm">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-copper-deep">
-                            Next step
+                    {/* Action & Next Steps Panel */}
+                    <section className="rounded-[2rem] border border-line bg-cream p-7 shadow-sm">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-copper">
+                            NEXT ACTIONS
                         </p>
 
-                        <h2 className="mt-2 font-display text-2xl text-ink">
+                        <h2 className="mt-1 font-display text-2xl text-ink">
                             {isArtisan && job.status === "open"
-                                ? "This could be your next job."
+                                ? "Opportunity available"
                                 : isArtisan && job.status === "assigned"
-                                    ? "Ready to get started?"
+                                    ? "Ready to begin?"
                                     : isArtisan && job.status === "in_progress"
-                                        ? "Keep the customer updated."
+                                        ? "Deliver & complete"
                                         : isCustomer && job.status === "completed"
-                                            ? "Is the work complete?"
-                                            : isCustomer && job.status === "open"
-                                                ? "Find your artisan."
-                                                : "Keep things moving."}
+                                            ? "Review milestone"
+                                            : "Project progress"}
                         </h2>
 
-                        <p className="mt-2 text-sm leading-6 text-muted">
+                        <p className="mt-2 text-sm leading-relaxed text-muted">
                             {isArtisan && job.status === "open"
-                                ? "Send an application with your message and proposed price."
+                                ? "Submit an application with your proposed fee to secure this contract."
                                 : isArtisan && job.status === "assigned"
-                                    ? "Start the work when you're ready."
+                                    ? "Initiate work when you are ready to start the project timeline."
                                     : isArtisan && job.status === "in_progress"
-                                        ? "Mark the job complete when the work is finished."
+                                        ? "Mark the job complete once deliverables have been successfully met."
                                         : isCustomer && job.status === "completed"
-                                            ? "Confirm the job once you're satisfied with the work."
-                                            : isCustomer && job.status === "open"
-                                                ? "Review applications as artisans respond."
-                                                : "Use the job progress and chat to stay informed."}
+                                            ? "Confirm the completed work to release escrow funds to the artisan."
+                                            : "Monitor milestones and communicate securely through chat."}
                         </p>
 
-                        <div className="mt-5 space-y-3">
+                        <div className="mt-6 space-y-3.5">
                             {job.status !== "open" && (
                                 <Link
                                     to={`/chat/${jobId}`}
-                                    className="flex min-h-12 w-full items-center justify-center rounded-full bg-ink px-5 text-sm font-semibold text-cream no-underline transition hover:bg-pine"
+                                    className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-cream no-underline transition hover:bg-copper shadow-sm"
                                 >
-                                    Open job chat
+                                    <MessageSquare size={16} />
+                                    <span>Open project chat</span>
                                 </Link>
                             )}
 
@@ -636,9 +619,9 @@ export function JobDetail() {
                                 <>
                                     <button
                                         type="button"
-                                        className="min-h-12 w-full rounded-full bg-copper px-5 text-sm font-semibold text-white transition hover:bg-copper-deep"
+                                        className="min-h-12 w-full rounded-full bg-copper px-6 text-sm font-semibold text-white transition hover:bg-copper-deep shadow-md"
                                         onClick={() =>
-                                            run(() => craftad.startJob(token, jobId), "Job started")
+                                            run(() => craftad.startJob(token, jobId), "Job started successfully.")
                                         }
                                     >
                                         Start work
@@ -646,15 +629,15 @@ export function JobDetail() {
 
                                     <button
                                         type="button"
-                                        className="min-h-11 w-full rounded-full border border-line px-5 text-sm font-semibold text-copper-deep transition hover:bg-paper"
+                                        className="min-h-11 w-full rounded-full border border-line bg-paper px-6 text-sm font-semibold text-copper-deep transition hover:border-copper"
                                         onClick={() =>
                                             run(
                                                 () => craftad.rejectJob(token, jobId),
-                                                "You declined this job"
+                                                "You have declined this job."
                                             )
                                         }
                                     >
-                                        Decline job
+                                        Decline job assignment
                                     </button>
                                 </>
                             )}
@@ -662,11 +645,11 @@ export function JobDetail() {
                             {isArtisan && job.status === "in_progress" && (
                                 <button
                                     type="button"
-                                    className="min-h-12 w-full rounded-full bg-copper px-5 text-sm font-semibold text-white transition hover:bg-copper-deep"
+                                    className="min-h-12 w-full rounded-full bg-copper px-6 text-sm font-semibold text-white transition hover:bg-copper-deep shadow-md"
                                     onClick={() =>
                                         run(
                                             () => craftad.completeJob(token, jobId),
-                                            "Marked complete"
+                                            "Job marked as complete."
                                         )
                                     }
                                 >
@@ -677,11 +660,11 @@ export function JobDetail() {
                             {isCustomer && job.status === "completed" && (
                                 <button
                                     type="button"
-                                    className="min-h-12 w-full rounded-full bg-copper px-5 text-sm font-semibold text-white transition hover:bg-copper-deep"
+                                    className="min-h-12 w-full rounded-full bg-copper px-6 text-sm font-semibold text-white transition hover:bg-copper-deep shadow-md"
                                     onClick={() =>
                                         run(
                                             () => craftad.confirmJob(token, jobId),
-                                            "You confirmed the job"
+                                            "Job confirmed and escrow released."
                                         )
                                     }
                                 >
@@ -691,29 +674,29 @@ export function JobDetail() {
 
                             {isArtisan && job.status === "open" && (
                                 <a
-                                    href="#"
+                                    href="#apply"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         document.querySelector("textarea")?.focus();
                                     }}
-                                    className="flex min-h-12 w-full items-center justify-center rounded-full bg-copper px-5 text-sm font-semibold text-white no-underline transition hover:bg-copper-deep"
+                                    className="flex min-h-12 w-full items-center justify-center rounded-full bg-copper px-6 text-sm font-semibold text-white no-underline transition hover:bg-copper-deep shadow-md"
                                 >
-                                    Write an application
+                                    Write proposal application
                                 </a>
                             )}
                         </div>
                     </section>
 
-                    {/* Share panel */}
-                    <section className="rounded-card border border-line bg-cream p-6 shadow-sm">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-copper-deep">
-                            Pass it on
+                    {/* Share Panel */}
+                    <section className="rounded-[2rem] border border-line bg-cream p-7 shadow-sm">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-copper">
+                            NETWORKING
                         </p>
-                        <h2 className="mt-2 font-display text-xl text-ink">
-                            Know someone?
+                        <h2 className="mt-1 font-display text-xl text-ink">
+                            Share this project
                         </h2>
-                        <p className="mt-2 text-sm leading-6 text-muted">
-                            Share this job with someone who might be interested.
+                        <p className="mt-1 text-sm leading-relaxed text-muted">
+                            Broadcast this job listing to colleagues or professional networks.
                         </p>
 
                         <div className="mt-4">
