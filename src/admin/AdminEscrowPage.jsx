@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ShieldCheck, AlertTriangle, RefreshCw, Lock, DollarSign, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, AlertTriangle, RefreshCw, Lock, DollarSign, CheckCircle2, X, Eye } from "lucide-react";
 import { useAdminSession } from "./AdminSession";
 
 const API_BASE = "https://craftad-lite-2.onrender.com";
@@ -11,6 +11,9 @@ export function AdminEscrowPage() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [actionId, setActionId] = useState("");
+
+    // Dispute Modal State
+    const [modalEscrow, setModalEscrow] = useState(null);
 
     async function fetchEscrows() {
         setLoading(true);
@@ -51,7 +54,8 @@ export function AdminEscrowPage() {
             if (!res.ok || !data.success) {
                 throw new Error(data.message || `Failed to ${actionType} escrow`);
             }
-            setSuccess(data.message || `Escrow successfully ${actionType}d.`);
+            setSuccess(data.message || `Escrow action completed successfully.`);
+            setModalEscrow(null);
             await fetchEscrows();
         } catch (err) {
             setError(err.message);
@@ -60,17 +64,17 @@ export function AdminEscrowPage() {
         }
     }
 
-    // Calculate aggregate metrics
+    // Metrics calculations
     const totalLocked = escrows
-        .filter(e => e.status === "funded")
+        .filter(e => e.escrowStatus === "HELD")
         .reduce((sum, e) => sum + (e.amount || 0), 0);
 
     const totalFeesEarned = escrows
-        .filter(e => ["funded", "released", "completed"].includes(e.status))
+        .filter(e => ["HELD", "RELEASED", "FORCED_RELEASED"].includes(e.escrowStatus))
         .reduce((sum, e) => sum + (e.platformFee || 0), 0);
 
-    const activeCount = escrows.filter(e => e.status === "funded").length;
-    const disputedCount = escrows.filter(e => e.status === "disputed").length;
+    const activeCount = escrows.filter(e => e.escrowStatus === "HELD").length;
+    const disputedCount = escrows.filter(e => e.escrowStatus === "DISPUTED").length;
 
     return (
         <div className="space-y-8 pb-12">
@@ -78,7 +82,7 @@ export function AdminEscrowPage() {
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-copper">ADMINISTRATION</p>
                     <h1 className="mt-1 font-display text-3xl tracking-tight text-ink">Escrow & Platform Revenue</h1>
-                    <p className="mt-1 text-sm text-muted">Monitor locked project funds, platform fee collections, and resolve payment disputes.</p>
+                    <p className="mt-1 text-sm text-muted">Monitor locked project vaults, platform fee earnings, and resolve payment disputes.</p>
                 </div>
                 <button
                     onClick={fetchEscrows}
@@ -104,7 +108,7 @@ export function AdminEscrowPage() {
                 </div>
             )}
 
-            {/* Metrics Overview */}
+            {/* Metrics Overview Cards */}
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-3xl border border-line bg-cream p-6 shadow-sm">
                     <div className="flex items-center justify-between text-muted">
@@ -112,7 +116,7 @@ export function AdminEscrowPage() {
                         <Lock size={18} className="text-copper" />
                     </div>
                     <p className="mt-3 font-display text-3xl font-semibold">₦{totalLocked.toLocaleString()}</p>
-                    <p className="mt-1 text-xs text-muted">Currently held in escrow</p>
+                    <p className="mt-1 text-xs text-muted">Currently held in vault (HELD)</p>
                 </div>
 
                 <div className="rounded-3xl border border-line bg-cream p-6 shadow-sm">
@@ -121,7 +125,7 @@ export function AdminEscrowPage() {
                         <DollarSign size={18} className="text-emerald-600" />
                     </div>
                     <p className="mt-3 font-display text-3xl font-semibold text-emerald-700">₦{totalFeesEarned.toLocaleString()}</p>
-                    <p className="mt-1 text-xs text-muted">Total 5% commission revenue</p>
+                    <p className="mt-1 text-xs text-muted">Total platform commission revenue</p>
                 </div>
 
                 <div className="rounded-3xl border border-line bg-cream p-6 shadow-sm">
@@ -130,7 +134,7 @@ export function AdminEscrowPage() {
                         <ShieldCheck size={18} className="text-ink" />
                     </div>
                     <p className="mt-3 font-display text-3xl font-semibold">{activeCount}</p>
-                    <p className="mt-1 text-xs text-muted">Jobs in progress</p>
+                    <p className="mt-1 text-xs text-muted">Active job contracts</p>
                 </div>
 
                 <div className="rounded-3xl border border-line bg-cream p-6 shadow-sm">
@@ -143,14 +147,14 @@ export function AdminEscrowPage() {
                 </div>
             </div>
 
-            {/* Escrow Table */}
+            {/* Escrow Records Table */}
             <div className="overflow-hidden rounded-[2rem] border border-line bg-cream shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                         <tr className="border-b border-line bg-paper/50 text-xs font-semibold uppercase tracking-wider text-muted">
                             <th className="px-6 py-4">Reference / Job</th>
-                            <th className="px-6 py-4">Customer & Artisan</th>
+                            <th className="px-6 py-4">Client & Artisan</th>
                             <th className="px-6 py-4">Amount & Fee</th>
                             <th className="px-6 py-4">Status</th>
                             <th className="px-6 py-4 text-right">Admin Actions</th>
@@ -172,8 +176,8 @@ export function AdminEscrowPage() {
                         ) : (
                             escrows.map((escrow) => {
                                 const isBusy = actionId === escrow._id;
-                                const isFunded = escrow.status === "funded";
-                                const isDisputed = escrow.status === "disputed";
+                                const isHeld = escrow.escrowStatus === "HELD";
+                                const isDisputed = escrow.escrowStatus === "DISPUTED";
 
                                 return (
                                     <tr key={escrow._id} className="transition-colors hover:bg-paper/40">
@@ -183,10 +187,10 @@ export function AdminEscrowPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="text-xs">
-                                                <span className="font-medium text-ink">Cust:</span> {escrow.customer?.name || "Client"}
+                                                <span className="font-medium text-ink">Client:</span> {escrow.client?.name || escrow.client?.fullName || "Client"}
                                             </div>
                                             <div className="text-xs mt-0.5">
-                                                <span className="font-medium text-ink">Art:</span> {escrow.artisan?.name || "Artisan"}
+                                                <span className="font-medium text-ink">Art:</span> {escrow.artisan?.name || escrow.artisan?.fullName || "Artisan"}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -195,16 +199,16 @@ export function AdminEscrowPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                                 <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${
-                                                    isFunded ? "bg-emerald-500/10 text-emerald-700" :
+                                                    isHeld ? "bg-emerald-500/10 text-emerald-700" :
                                                         isDisputed ? "bg-rose-500/10 text-rose-700" :
                                                             "bg-paper text-muted"
                                                 }`}>
-                                                    {escrow.status}
+                                                    {escrow.escrowStatus}
                                                 </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                {isFunded && (
+                                                {isHeld && (
                                                     <button
                                                         disabled={isBusy}
                                                         onClick={() => handleAdminAction(escrow._id, "force-release")}
@@ -213,13 +217,22 @@ export function AdminEscrowPage() {
                                                         {isBusy ? "Processing..." : "Force Release"}
                                                     </button>
                                                 )}
-                                                {(isFunded || isDisputed) && (
+                                                {isDisputed && (
+                                                    <button
+                                                        onClick={() => setModalEscrow(escrow)}
+                                                        className="inline-flex items-center gap-1.5 rounded-full bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700 shadow-sm"
+                                                    >
+                                                        <Eye size={14} />
+                                                        <span>Resolve Dispute</span>
+                                                    </button>
+                                                )}
+                                                {isHeld && (
                                                     <button
                                                         disabled={isBusy}
                                                         onClick={() => handleAdminAction(escrow._id, "refund")}
                                                         className="rounded-full border border-rose-500/30 bg-rose-500/5 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-500/10 disabled:opacity-50"
                                                     >
-                                                        {isBusy ? "Processing..." : "Refund Customer"}
+                                                        {isBusy ? "Processing..." : "Refund Client"}
                                                     </button>
                                                 )}
                                             </div>
@@ -232,6 +245,69 @@ export function AdminEscrowPage() {
                     </table>
                 </div>
             </div>
+
+            {/* Dispute Resolution Modal */}
+            {modalEscrow && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-lg rounded-[2rem] border border-line bg-cream p-6 shadow-2xl space-y-6">
+                        <div className="flex items-center justify-between border-b border-line pb-4">
+                            <div>
+                                <span className="text-xs font-semibold uppercase tracking-wider text-rose-600">Dispute Resolution</span>
+                                <h2 className="font-display text-xl font-semibold text-ink mt-0.5">{modalEscrow.job?.title || "Escrow Contract"}</h2>
+                            </div>
+                            <button
+                                onClick={() => setModalEscrow(null)}
+                                className="rounded-full p-2 text-muted hover:bg-paper hover:text-ink transition"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4 text-sm">
+                            <div className="rounded-2xl bg-paper p-4 border border-line space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-muted">Reference:</span>
+                                    <span className="font-mono font-medium text-ink">{modalEscrow.reference}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted">Locked Amount:</span>
+                                    <span className="font-display font-bold text-ink">₦{(modalEscrow.amount || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-muted">Client vs Artisan:</span>
+                                    <span className="font-medium text-ink">
+                                        {modalEscrow.client?.name || "Client"} &harr; {modalEscrow.artisan?.name || "Artisan"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4 space-y-1.5">
+                                <p className="text-xs font-semibold uppercase tracking-wider text-rose-700">Client Dispute Reason</p>
+                                <p className="text-ink italic bg-cream/80 p-3 rounded-xl border border-rose-500/10">
+                                    &ldquo;{modalEscrow.disputeReason || "No detailed reason provided by client."}&rdquo;
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                            <button
+                                disabled={actionId === modalEscrow._id}
+                                onClick={() => handleAdminAction(modalEscrow._id, "refund")}
+                                className="rounded-full border border-rose-500/30 bg-rose-500/5 px-5 py-2.5 text-sm font-semibold text-rose-700 hover:bg-rose-500/10 disabled:opacity-50 transition"
+                            >
+                                Rule for Client (Refund ₦{modalEscrow.amount?.toLocaleString()})
+                            </button>
+                            <button
+                                disabled={actionId === modalEscrow._id}
+                                onClick={() => handleAdminAction(modalEscrow._id, "force-release")}
+                                className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream hover:opacity-90 disabled:opacity-50 transition"
+                            >
+                                Rule for Artisan (Force Release Payout)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

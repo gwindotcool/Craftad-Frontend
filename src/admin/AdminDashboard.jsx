@@ -1,122 +1,138 @@
-
 import { useEffect, useState } from "react";
+import { TrendingUp, ShieldCheck, Users, DollarSign, RefreshCw } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useAdminSession } from "./AdminSession";
 
 const API_BASE = "https://craftad-lite-2.onrender.com";
 
 export function AdminDashboard() {
-    const { token, admin } = useAdminSession();
-
-    const [users, setUsers] = useState([]);
+    const { token } = useAdminSession();
+    const [stats, setStats] = useState({
+        totalUsers: 0,
+        activeEscrowsCount: 0,
+        totalVolume: 0,
+        totalFees: 0,
+        chartData: []
+    });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+
+    async function fetchDashboardStats() {
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/dashboard-stats`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setStats(data.stats);
+            }
+        } catch (err) {
+            console.error("Failed to load dashboard stats", err);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
-        async function loadUsers() {
-            try {
-                setLoading(true);
-                setError("");
-
-                const response = await fetch(`${API_BASE}/api/admin/users`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                const data = await response.json().catch(() => ({}));
-
-                if (!response.ok) {
-                    throw new Error(data.message || "Could not load platform users");
-                }
-
-                setUsers(Array.isArray(data.users) ? data.users : []);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Something went wrong");
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        if (token) {
-            loadUsers();
-        }
+        if (token) fetchDashboardStats();
     }, [token]);
 
-    const totalUsers = users.length;
-    const customers = users.filter((user) => user.role === "customer").length;
-    const artisans = users.filter((user) => user.role === "artisan").length;
-    const activeUsers = users.filter((user) => user.isActive === true).length;
-    const suspendedUsers = users.filter((user) => user.isActive === false).length;
-    const verifiedArtisans = users.filter(
-        (user) => user.role === "artisan" && user.isVerified === true
-    ).length;
-
-    const stats = [
-        { label: "Total users", value: totalUsers },
-        { label: "Customers", value: customers },
-        { label: "Artisans", value: artisans },
-        { label: "Active users", value: activeUsers },
-        { label: "Suspended users", value: suspendedUsers },
-        { label: "Verified artisans", value: verifiedArtisans },
-    ];
-
     return (
-        <div>
-            <div className="mb-8">
-                <p className="text-sm font-medium uppercase tracking-[0.15em] text-copper">
-                    Platform overview
-                </p>
-
-                <h1 className="mt-2 font-display text-3xl sm:text-4xl">
-                    Welcome back{admin?.name ? `, ${admin.name}` : ""}
-                </h1>
-
-                <p className="mt-2 text-sm text-muted">
-                    Here's an overview of the customers and artisans on Craftad.
-                </p>
+        <div className="space-y-8 pb-12">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-copper">ADMINISTRATION</p>
+                    <h1 className="mt-1 font-display text-3xl tracking-tight text-ink">Dashboard Overview</h1>
+                    <p className="mt-1 text-sm text-muted">Real-time telemetry of Craftad marketplace activity, escrow vaults, and revenue.</p>
+                </div>
+                <button
+                    onClick={fetchDashboardStats}
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 self-start rounded-full border border-line bg-cream px-5 py-2.5 text-sm font-medium text-ink transition hover:border-copper disabled:opacity-50 shadow-sm"
+                >
+                    <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+                    <span>Refresh Stats</span>
+                </button>
             </div>
 
-            {error && (
-                <div
-                    role="alert"
-                    className="mb-6 rounded-2xl border border-line bg-cream p-4 text-sm text-copper-deep"
-                >
-                    {error}
+            {/* Top Metric Cards */}
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-3xl border border-line bg-cream p-6 shadow-sm">
+                    <div className="flex items-center justify-between text-muted">
+                        <span className="text-xs font-semibold uppercase tracking-wider">Total Users</span>
+                        <Users size={18} className="text-copper" />
+                    </div>
+                    <p className="mt-3 font-display text-3xl font-semibold">{stats.totalUsers || 0}</p>
+                    <p className="mt-1 text-xs text-muted">Registered clients & artisans</p>
                 </div>
-            )}
 
-            {loading ? (
-                <p className="text-sm text-muted">Loading platform overview...</p>
-            ) : (
-                <>
-                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                        {stats.map((stat) => (
-                            <div
-                                key={stat.label}
-                                className="rounded-3xl border border-line bg-cream p-6"
-                            >
-                                <p className="text-sm text-muted">{stat.label}</p>
-                                <p className="mt-3 font-display text-4xl font-semibold">
-                                    {stat.value}
-                                </p>
-                            </div>
-                        ))}
+                <div className="rounded-3xl border border-line bg-cream p-6 shadow-sm">
+                    <div className="flex items-center justify-between text-muted">
+                        <span className="text-xs font-semibold uppercase tracking-wider">Active Escrows</span>
+                        <ShieldCheck size={18} className="text-ink" />
                     </div>
+                    <p className="mt-3 font-display text-3xl font-semibold">{stats.activeEscrowsCount || 0}</p>
+                    <p className="mt-1 text-xs text-muted">Funds currently locked in vault</p>
+                </div>
 
-                    <div className="mt-8 rounded-3xl border border-line bg-cream p-6">
-                        <h2 className="font-display text-xl">Marketplace summary</h2>
-
-                        <p className="mt-2 text-sm leading-6 text-muted">
-                            Craftad currently has {customers} customer
-                            {customers === 1 ? "" : "s"} and {artisans} artisan
-                            {artisans === 1 ? "" : "s"} registered.
-                            {artisans > 0
-                                ? ` ${verifiedArtisans} artisan${verifiedArtisans === 1 ? " is" : "s are"} verified.`
-                                : " No artisans have registered yet."}
-                        </p>
+                <div className="rounded-3xl border border-line bg-cream p-6 shadow-sm">
+                    <div className="flex items-center justify-between text-muted">
+                        <span className="text-xs font-semibold uppercase tracking-wider">Escrow Volume</span>
+                        <TrendingUp size={18} className="text-copper" />
                     </div>
-                </>
-            )}
+                    <p className="mt-3 font-display text-3xl font-semibold">₦{(stats.totalVolume || 0).toLocaleString()}</p>
+                    <p className="mt-1 text-xs text-muted">Total platform project value</p>
+                </div>
+
+                <div className="rounded-3xl border border-line bg-cream p-6 shadow-sm">
+                    <div className="flex items-center justify-between text-muted">
+                        <span className="text-xs font-semibold uppercase tracking-wider">Commission Revenue</span>
+                        <DollarSign size={18} className="text-emerald-600" />
+                    </div>
+                    <p className="mt-3 font-display text-3xl font-semibold text-emerald-700">₦{(stats.totalFees || 0).toLocaleString()}</p>
+                    <p className="mt-1 text-xs text-muted">5% platform fee earnings</p>
+                </div>
+            </div>
+
+            {/* Advanced Recharts Area Chart with Live MongoDB Aggregation */}
+            <div className="rounded-[2rem] border border-line bg-cream p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 className="font-display text-xl font-semibold text-ink">Platform Financial Inflows</h2>
+                        <p className="text-xs text-muted">Live MongoDB aggregation of escrow volume and commission revenue over time.</p>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs font-semibold">
+                        <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-copper inline-block"></span> Escrow Volume</span>
+                        <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-emerald-600 inline-block"></span> Commission Fees</span>
+                    </div>
+                </div>
+
+                <div className="h-72 w-full pt-4">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={stats.chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#b45309" stopOpacity={0.4}/>
+                                    <stop offset="95%" stopColor="#b45309" stopOpacity={0.0}/>
+                                </linearGradient>
+                                <linearGradient id="colorFees" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#059669" stopOpacity={0.4}/>
+                                    <stop offset="95%" stopColor="#059669" stopOpacity={0.0}/>
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                            <XAxis dataKey="month" stroke="#6b7280" fontSize={12} tickLine={false} />
+                            <YAxis stroke="#6b7280" fontSize={12} tickLine={false} axisLine={false} />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: "#1c1917", borderRadius: "1rem", color: "#f5f5f4", border: "none" }}
+                                formatter={(value) => [`₦${value.toLocaleString()}`, ""]}
+                            />
+                            <Area type="monotone" dataKey="volume" name="Escrow Volume" stroke="#b45309" strokeWidth={3} fillOpacity={1} fill="url(#colorVolume)" />
+                            <Area type="monotone" dataKey="fees" name="Commission Fees" stroke="#059669" strokeWidth={3} fillOpacity={1} fill="url(#colorFees)" />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
         </div>
     );
 }
