@@ -37,23 +37,23 @@ export function Dashboard() {
 
     return (
         <div className="space-y-10 pb-12">
-            {/* Hero Welcome Banner */}
-            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-ink via-ink/95 to-copper-deep p-8 text-cream shadow-xl sm:p-10">
-                <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border border-cream/10 bg-white/5 blur-2xl" />
+            {/* Premium Hero Welcome Banner */}
+            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#1a1714] via-[#241d17] to-copper-deep p-8 text-[#f4efe6] shadow-xl sm:p-10">
+                <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border border-white/10 bg-white/5 blur-2xl" />
                 <div className="absolute -left-12 -bottom-16 h-48 w-48 rounded-full border border-copper/20 bg-copper/10 blur-xl" />
 
                 <div className="relative z-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
                     <div className="space-y-3">
-                        <div className="inline-flex items-center gap-2 rounded-full bg-cream/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-copper backdrop-blur-md">
+                        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-copper backdrop-blur-md">
                             <span className="h-1.5 w-1.5 rounded-full bg-copper animate-pulse" />
                             {user?.role} Workspace
                         </div>
 
-                        <h1 className="font-display text-3xl tracking-tight sm:text-5xl">
+                        <h1 className="font-display text-3xl tracking-tight sm:text-5xl text-white">
                             Welcome back, {user?.fullName?.split(" ")[0] || "there"}.
                         </h1>
 
-                        <p className="max-w-xl text-sm leading-relaxed text-cream/75">
+                        <p className="max-w-xl text-sm leading-relaxed text-[#f4efe6]/80">
                             {user?.role === "artisan"
                                 ? "Your next high-value project is waiting. Explore open opportunities and manage your deliverables seamlessly."
                                 : "Monitor active escrow projects, track your wallet liquidity, and collaborate with verified professionals."}
@@ -64,7 +64,7 @@ export function Dashboard() {
                         {user?.role === "customer" && (
                             <Link
                                 to="/jobs/new"
-                                className="inline-flex min-h-12 items-center rounded-full bg-copper px-6 text-sm font-semibold text-cream shadow-lg shadow-copper/25 transition-all hover:bg-copper-deep hover:shadow-xl hover:-translate-y-0.5 no-underline"
+                                className="inline-flex min-h-12 items-center rounded-full bg-copper px-6 text-sm font-semibold text-white shadow-lg shadow-copper/25 transition-all hover:bg-copper-deep hover:shadow-xl hover:-translate-y-0.5 no-underline"
                             >
                                 + Post a new job
                             </Link>
@@ -104,7 +104,7 @@ export function Dashboard() {
             )}
 
             {/* Action Toolbar */}
-            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-line/80 bg-cream/60 p-4 backdrop-blur-sm">
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-cream p-4 backdrop-blur-sm transition-colors duration-200">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted px-2">Quick filters:</span>
 
                 <Link
@@ -184,7 +184,7 @@ export function Dashboard() {
                             value={skills}
                             onChange={(e) => setSkills(e.target.value)}
                             placeholder="Skills (e.g. Carpentry, Plumbing, UI Design)"
-                            className="min-h-12 rounded-xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
+                            className="min-h-12 rounded-xl border border-line bg-paper text-ink placeholder:text-muted px-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
                             required
                         />
 
@@ -194,7 +194,7 @@ export function Dashboard() {
                             value={years}
                             onChange={(e) => setYears(e.target.value)}
                             placeholder="Years of experience"
-                            className="min-h-12 rounded-xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
+                            className="min-h-12 rounded-xl border border-line bg-paper text-ink placeholder:text-muted px-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
                             required
                         />
                     </div>
@@ -204,11 +204,11 @@ export function Dashboard() {
                         onChange={(e) => setBio(e.target.value)}
                         rows={3}
                         placeholder="Write a compelling professional summary..."
-                        className="rounded-xl border border-line bg-paper p-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
+                        className="rounded-xl border border-line bg-paper text-ink placeholder:text-muted p-4 text-sm outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
                     />
 
                     <div className="flex items-center gap-4">
-                        <button className="min-h-11 rounded-full bg-ink px-7 text-sm font-semibold text-cream transition-all hover:bg-copper hover:shadow-md">
+                        <button className="min-h-11 rounded-full bg-copper text-white px-7 text-sm font-semibold transition-all hover:bg-copper-deep hover:shadow-md">
                             Save changes
                         </button>
                         {profileNote && (
@@ -219,7 +219,7 @@ export function Dashboard() {
             )}
 
             {/* Social Links Modular Card */}
-            <div className="grid gap-6 rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10">
+            <div className="grid gap-6 rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10 transition-colors duration-200">
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-copper">
                         NETWORKING CHANNELS

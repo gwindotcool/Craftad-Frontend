@@ -88,6 +88,12 @@ export const craftad = {
     releaseEscrow: (token, id) => request(`/api/escrow/${id}/release`, { method: "PATCH" }, token),
     disputeEscrow: (token, id, reason) => request(`/api/escrow/${id}/dispute`, { method: "PATCH", body: JSON.stringify({ reason }) }, token),
     resolveEscrow: (token, id, body) => request(`/api/escrow/${id}/resolve`, { method: "PATCH", body: JSON.stringify(body) }, token),
+
+    // Admin Endpoints
+    adminGetUsers: (token, query = "") => request(`/api/admin/users${query}`, {}, token),
+    adminUpdateUserStatus: (token, userId, isActive) => request(`/api/admin/users/${userId}/status`, { method: "PATCH", body: JSON.stringify({ isActive }) }, token),
+    adminVerifyArtisan: (token, userId, isVerified) => request(`/api/admin/users/${userId}/verify`, { method: "PATCH", body: JSON.stringify({ isVerified }) }, token),
+    adminStats: (token) => request("/api/admin/stats", {}, token),
 };
 
 export function listOf(payload, keys) {

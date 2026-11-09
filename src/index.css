@@ -1,53 +1,66 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 1. Define dynamic CSS variable values for Light and Dark modes */
+:root {
+    --color-paper: #f4efe6;
+    --color-cream: #fffdf8;
+    --color-ink: #1a1714;
+    --color-muted: #6e655c;
+    --color-line: #e4dcd0;
+    --color-copper: #b4532a;
+    --color-copper-deep: #8c3d1c;
+    --color-pine: #24362d;
+}
+
+.dark {
+    --color-paper: #0f0d0b;
+    --color-cream: #181512;
+    --color-line: #2a241f;
+    --color-ink: #f4efe6;
+    --color-muted: #9e9387;
+}
+
+/* 2. Bind Tailwind utility classes (bg-paper, bg-cream, text-ink) to variables */
 @theme {
-  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
+    --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Fraunces", ui-serif, Georgia, serif;
 
-  --color-paper: #f4efe6;
-  --color-cream: #fffdf8;
-  --color-ink: #1a1714;
-  --color-muted: #6e655c;
-  --color-line: #e4dcd0;
-  --color-copper: #b4532a;
-  --color-copper-deep: #8c3d1c;
-  --color-pine: #24362d;
+    --color-paper: var(--color-paper);
+    --color-cream: var(--color-cream);
+    --color-ink: var(--color-ink);
+    --color-muted: var(--color-muted);
+    --color-line: var(--color-line);
+    --color-copper: var(--color-copper);
+    --color-copper-deep: var(--color-copper-deep);
+    --color-pine: var(--color-pine);
 
-  --radius-card: 1.25rem;
+    --radius-card: 1.25rem;
 }
 
 @layer base {
-  html {
-    font-family: var(--font-sans);
-    background: var(--color-paper);
-    color: var(--color-ink);
-  }
+    html, body {
+        margin: 0;
+        min-height: 100vh;
+        background-color: var(--color-paper) !important;
+        color: var(--color-ink) !important;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: var(--color-paper);
-    color: var(--color-ink);
-  }
+    button:not(:disabled),
+    [role="button"]:not(:disabled) {
+        cursor: pointer;
+    }
 
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
-
-  h1,
-  h2,
-  h3,
-  .font-display {
-    font-family: var(--font-display);
-  }
+    h1, h2, h3, .font-display {
+        font-family: var(--font-display);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }

@@ -12,7 +12,7 @@ import { AdminLayout } from "./admin/AdminLayout";
 import { AdminDashboard } from "./admin/AdminDashboard";
 import { AdminUsers } from "./admin/AdminUsers";
 import { AdminTransactionsPage } from "./admin/AdminTransactionsPage.jsx";
-import { AdminEscrowPage } from "./admin/AdminEscrowPage.jsx"; // Added
+import { AdminEscrowPage } from "./admin/AdminEscrowPage.jsx";
 
 import { Auth } from "./pages/Auth";
 import { Chat } from "./pages/Chat";
@@ -24,119 +24,125 @@ import { Jobs } from "./pages/Jobs";
 import { NewJob } from "./pages/NewJob";
 import { Notifications } from "./pages/Notifications";
 import { WalletPage } from "./pages/WalletPage";
+import { FloatingThemeToggle } from "./components/FloatingThemeToggle";
 
 export default function App() {
     return (
         <SessionProvider>
             <AdminSessionProvider>
-                <Toaster position="top-right" />
+                <div className="min-h-screen bg-paper text-ink transition-colors duration-200">
+                    <Toaster position="top-right" />
 
-                <Routes>
-                    {/* Public pages */}
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Auth mode="login" />} />
-                    <Route path="/register" element={<Auth mode="register" />} />
+                    <Routes>
+                        {/* Public pages */}
+                        <Route path="/" element={<Home />} />
+                        <Route path="/login" element={<Auth mode="login" />} />
+                        <Route path="/register" element={<Auth mode="register" />} />
 
-                    {/* Customer and artisan pages */}
-                    <Route
-                        path="/dashboard"
-                        element={
-                            <RequireAuth>
-                                <Dashboard />
-                            </RequireAuth>
-                        }
-                    />
-
-                    <Route
-                        path="/jobs"
-                        element={
-                            <RequireAuth>
-                                <Jobs />
-                            </RequireAuth>
-                        }
-                    />
-
-                    <Route
-                        path="/jobs/new"
-                        element={
-                            <RequireAuth>
-                                <NewJob />
-                            </RequireAuth>
-                        }
-                    />
-
-                    <Route
-                        path="/jobs/:jobId"
-                        element={
-                            <RequireAuth>
-                                <JobDetail />
-                            </RequireAuth>
-                        }
-                    />
-
-                    <Route
-                        path="/chat"
-                        element={
-                            <RequireAuth>
-                                <ChatInbox />
-                            </RequireAuth>
-                        }
-                    />
-
-                    <Route
-                        path="/chat/:jobId"
-                        element={
-                            <RequireAuth>
-                                <Chat />
-                            </RequireAuth>
-                        }
-                    />
-
-                    <Route
-                        path="/wallet"
-                        element={
-                            <RequireAuth>
-                                <WalletPage />
-                            </RequireAuth>
-                        }
-                    />
-
-                    <Route
-                        path="/notifications"
-                        element={
-                            <RequireAuth>
-                                <Notifications />
-                            </RequireAuth>
-                        }
-                    />
-
-                    {/* Administrator login */}
-                    <Route path="/admin/login" element={<AdminLogin />} />
-
-                    {/* Protected administrator pages */}
-                    <Route
-                        path="/admin"
-                        element={
-                            <RequireAdmin>
-                                <AdminLayout />
-                            </RequireAdmin>
-                        }
-                    >
+                        {/* Customer and artisan pages */}
                         <Route
-                            index
-                            element={<Navigate to="/admin/dashboard" replace />}
+                            path="/dashboard"
+                            element={
+                                <RequireAuth>
+                                    <Dashboard />
+                                </RequireAuth>
+                            }
                         />
 
-                        <Route path="dashboard" element={<AdminDashboard />} />
-                        <Route path="users" element={<AdminUsers />} />
-                        <Route path="transactions" element={<AdminTransactionsPage />} />
-                        <Route path="escrows" element={<AdminEscrowPage />} />
-                        <Route path="register" element={<AdminRegister />} />
-                    </Route>
+                        <Route
+                            path="/jobs"
+                            element={
+                                <RequireAuth>
+                                    <Jobs />
+                                </RequireAuth>
+                            }
+                        />
 
-                    {/* Unknown routes */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
+                        <Route
+                            path="/jobs/new"
+                            element={
+                                <RequireAuth>
+                                    <NewJob />
+                                </RequireAuth>
+                            }
+                        />
+
+                        <Route
+                            path="/jobs/:jobId"
+                            element={
+                                <RequireAuth>
+                                    <JobDetail />
+                                </RequireAuth>
+                            }
+                        />
+
+                        <Route
+                            path="/chat"
+                            element={
+                                <RequireAuth>
+                                    <ChatInbox />
+                                </RequireAuth>
+                            }
+                        />
+
+                        <Route
+                            path="/chat/:jobId"
+                            element={
+                                <RequireAuth>
+                                    <Chat />
+                                </RequireAuth>
+                            }
+                        />
+
+                        <Route
+                            path="/wallet"
+                            element={
+                                <RequireAuth>
+                                    <WalletPage />
+                                </RequireAuth>
+                            }
+                        />
+
+                        <Route
+                            path="/notifications"
+                            element={
+                                <RequireAuth>
+                                    <Notifications />
+                                </RequireAuth>
+                            }
+                        />
+
+                        {/* Administrator login */}
+                        <Route path="/admin/login" element={<AdminLogin />} />
+
+                        {/* Protected administrator pages */}
+                        <Route
+                            path="/admin"
+                            element={
+                                <RequireAdmin>
+                                    <AdminLayout />
+                                </RequireAdmin>
+                            }
+                        >
+                            <Route
+                                index
+                                element={<Navigate to="/admin/dashboard" replace />}
+                            />
+
+                            <Route path="dashboard" element={<AdminDashboard />} />
+                            <Route path="users" element={<AdminUsers />} />
+                            <Route path="transactions" element={<AdminTransactionsPage />} />
+                            <Route path="escrows" element={<AdminEscrowPage />} />
+                            <Route path="register" element={<AdminRegister />} />
+                        </Route>
+
+                        {/* Unknown routes */}
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+
+                    {/* Global floating theme switch button */}
+                    <FloatingThemeToggle />
+                </div>
             </AdminSessionProvider>
         </SessionProvider>
     );

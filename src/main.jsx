@@ -1,12 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-// 1. Import React Query
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "./theme";
 import App from "./App.jsx";
 import "./index.css";
 
-// 2. Initialize the Query Client with global defaults
+// Initialize the React Query Client with global defaults
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
@@ -18,11 +18,12 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>
-        {/* 3. Wrap your router and app with the Provider */}
-        <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
-        </QueryClientProvider>
+        <ThemeProvider>
+            <QueryClientProvider client={queryClient}>
+                <BrowserRouter>
+                    <App />
+                </BrowserRouter>
+            </QueryClientProvider>
+        </ThemeProvider>
     </StrictMode>,
 );

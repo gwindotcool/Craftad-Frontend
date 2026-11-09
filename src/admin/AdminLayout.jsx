@@ -30,10 +30,10 @@ export function AdminLayout() {
     }
 
     return (
-        <div className="min-h-screen bg-paper text-ink md:flex">
+        <div className="min-h-screen bg-paper text-ink md:flex transition-colors duration-200">
             <aside className="border-b border-line bg-cream p-5 md:min-h-screen md:w-64 md:border-b-0 md:border-r">
                 <div className="mb-8">
-                    <p className="font-display text-2xl font-semibold">
+                    <p className="font-display text-2xl font-semibold text-ink">
                         Craftad<span className="text-copper">.</span>
                     </p>
                     <p className="mt-1 text-xs uppercase tracking-[0.18em] text-muted">
@@ -50,7 +50,7 @@ export function AdminLayout() {
                             className={({ isActive }) =>
                                 `rounded-xl px-4 py-3 text-sm font-medium transition ${
                                     isActive
-                                        ? "bg-ink text-cream"
+                                        ? "bg-copper text-white shadow-sm"
                                         : "text-muted hover:bg-paper hover:text-ink"
                                 }`
                             }
@@ -62,7 +62,7 @@ export function AdminLayout() {
 
                 <div className="mt-8 border-t border-line pt-5 md:mt-12">
                     <p className="text-xs text-muted">Signed in as</p>
-                    <p className="mt-1 break-words text-sm font-semibold">
+                    <p className="mt-1 break-words text-sm font-semibold text-ink">
                         {admin?.name || admin?.email || "Administrator"}
                     </p>
                     <p className="mt-1 text-xs capitalize text-muted">
@@ -72,14 +72,14 @@ export function AdminLayout() {
                     <button
                         type="button"
                         onClick={handleSignOut}
-                        className="mt-5 w-full rounded-full border border-line px-4 py-2.5 text-sm font-medium hover:bg-paper"
+                        className="mt-5 w-full rounded-full border border-line bg-cream px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-paper"
                     >
                         Sign out
                     </button>
                 </div>
             </aside>
 
-            <main className="min-w-0 flex-1 p-5 sm:p-8">
+            <main className="min-w-0 flex-1 p-5 sm:p-8 bg-paper text-ink transition-colors duration-200">
                 <Outlet />
             </main>
         </div>

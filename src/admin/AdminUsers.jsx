@@ -1,8 +1,7 @@
-
 import { useCallback, useEffect, useState } from "react";
+import { craftad, listOf } from "../api";
 import { useAdminSession } from "./AdminSession";
-
-const API_BASE = "https://craftad-lite-2.onrender.com";
+import { AdminStatsHeader } from "./AdminStatsHeader.jsx";
 
 export function AdminUsers() {
     const { token } = useAdminSession();
@@ -23,29 +22,17 @@ export function AdminUsers() {
             setError("");
 
             const params = new URLSearchParams();
-
             if (search.trim()) params.set("search", search.trim());
             if (role) params.set("role", role);
             if (status) params.set("status", status);
 
-            const query = params.toString();
-            const url = `${API_BASE}/api/admin/users${query ? `?${query}` : ""}`;
+            const queryStr = params.toString();
+            const queryString = queryStr ? `?${queryStr}` : "";
 
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const data = await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                throw new Error(data.message || "Could not load users");
-            }
-
-            setUsers(Array.isArray(data.users) ? data.users : []);
+            const res = await craftad.adminGetUsers(token, queryString);
+            setUsers(listOf(res, ["users", "data", "results"]));
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Something went wrong");
+            setError(err instanceof Error ? err.message : "Could not load users");
         } finally {
             setLoading(false);
         }
@@ -63,36 +50,17 @@ export function AdminUsers() {
             setError("");
             setSuccess("");
 
-            const endpoint =
-                action === "status"
-                    ? `/api/admin/users/${userId}/status`
-                    : `/api/admin/users/${userId}/verify`;
-
-            const body =
-                action === "status"
-                    ? { isActive: value }
-                    : { isVerified: value };
-
-            const response = await fetch(`${API_BASE}${endpoint}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(body),
-            });
-
-            const data = await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                throw new Error(data.message || "Could not update this account");
+            let res;
+            if (action === "status") {
+                res = await craftad.adminUpdateUserStatus(token, userId, value);
+            } else {
+                res = await craftad.adminVerifyArtisan(token, userId, value);
             }
 
-            setSuccess(data.message || "Account updated successfully");
-
+            setSuccess(res.message || "Account updated successfully");
             await loadUsers();
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Something went wrong");
+            setError(err instanceof Error ? err.message : "Could not update this account");
         } finally {
             setUpdatingId("");
         }
@@ -105,35 +73,37 @@ export function AdminUsers() {
                     Administration
                 </p>
 
-                <h1 className="mt-2 font-display text-3xl sm:text-4xl">
+                <h1 className="mt-2 font-display text-3xl sm:text-4xl text-ink">
                     User management
                 </h1>
 
                 <p className="mt-2 text-sm text-muted">
-                    Search customer and artisan accounts, manage account status, and
-                    verify artisans.
+                    Search customer and artisan accounts, manage account status, and verify artisans.
                 </p>
             </div>
+
+            {/* Platform Analytics Summary Header */}
+            <AdminStatsHeader />
 
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
                     loadUsers();
                 }}
-                className="mb-6 grid gap-3 rounded-3xl border border-line bg-cream p-4 sm:grid-cols-2 xl:grid-cols-4"
+                className="mb-6 grid gap-3 rounded-3xl border border-line bg-cream p-4 sm:grid-cols-2 xl:grid-cols-4 transition-colors duration-200"
             >
                 <input
                     type="search"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search name or email"
-                    className="min-h-11 rounded-xl border border-line bg-white px-3 text-sm outline-none focus:border-copper"
+                    className="min-h-11 rounded-xl border border-line bg-paper text-ink px-3 text-sm outline-none focus:border-copper placeholder:text-muted"
                 />
 
                 <select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="min-h-11 rounded-xl border border-line bg-white px-3 text-sm outline-none focus:border-copper"
+                    className="min-h-11 rounded-xl border border-line bg-paper text-ink px-3 text-sm outline-none focus:border-copper"
                 >
                     <option value="">All roles</option>
                     <option value="customer">Customers</option>
@@ -143,7 +113,7 @@ export function AdminUsers() {
                 <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="min-h-11 rounded-xl border border-line bg-white px-3 text-sm outline-none focus:border-copper"
+                    className="min-h-11 rounded-xl border border-line bg-paper text-ink px-3 text-sm outline-none focus:border-copper"
                 >
                     <option value="">All account statuses</option>
                     <option value="active">Active</option>
@@ -153,36 +123,30 @@ export function AdminUsers() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="min-h-11 rounded-full bg-ink px-5 text-sm font-semibold text-cream disabled:opacity-60"
+                    className="min-h-11 rounded-full bg-copper text-white hover:bg-copper-deep px-5 text-sm font-semibold transition disabled:opacity-60"
                 >
                     {loading ? "Loading..." : "Apply filters"}
                 </button>
             </form>
 
             {error && (
-                <div
-                    role="alert"
-                    className="mb-4 rounded-2xl border border-line bg-cream p-4 text-sm text-copper-deep"
-                >
+                <div role="alert" className="mb-4 rounded-2xl border border-line bg-cream p-4 text-sm text-copper-deep">
                     {error}
                 </div>
             )}
 
             {success && (
-                <div
-                    role="status"
-                    className="mb-4 rounded-2xl border border-line bg-cream p-4 text-sm text-ink"
-                >
+                <div role="status" className="mb-4 rounded-2xl border border-line bg-cream p-4 text-sm text-ink">
                     {success}
                 </div>
             )}
 
-            <div className="overflow-hidden rounded-3xl border border-line bg-cream">
+            <div className="overflow-hidden rounded-3xl border border-line bg-cream transition-colors duration-200">
                 <div className="flex items-center justify-between border-b border-line px-5 py-4">
-                    <h2 className="font-display text-xl">Platform users</h2>
+                    <h2 className="font-display text-xl text-ink">Platform users</h2>
                     <span className="text-sm text-muted">
-            {loading ? "Loading..." : `${users.length} found`}
-          </span>
+                        {loading ? "Loading..." : `${users.length} found`}
+                    </span>
                 </div>
 
                 {loading ? (
@@ -198,12 +162,9 @@ export function AdminUsers() {
                             const isUpdating = updatingId === userId;
 
                             return (
-                                <div
-                                    key={userId}
-                                    className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between"
-                                >
+                                <div key={userId} className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
                                     <div className="min-w-0">
-                                        <p className="break-words font-semibold">
+                                        <p className="break-words font-semibold text-ink">
                                             {user.fullName || "Unnamed user"}
                                         </p>
 
@@ -212,24 +173,22 @@ export function AdminUsers() {
                                         </p>
 
                                         <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                      <span className="rounded-full bg-paper px-3 py-1 capitalize">
-                        {user.role || "Unknown role"}
-                      </span>
+                                            <span className="rounded-full bg-paper border border-line text-ink px-3 py-1 capitalize">
+                                                {user.role || "Unknown role"}
+                                            </span>
 
-                                            <span
-                                                className={`rounded-full px-3 py-1 ${
-                                                    user.isActive
-                                                        ? "bg-emerald-50 text-emerald-800"
-                                                        : "bg-red-50 text-red-800"
-                                                }`}
-                                            >
-                        {user.isActive ? "Active" : "Suspended"}
-                      </span>
+                                            <span className={`rounded-full px-3 py-1 font-medium ${
+                                                user.isActive
+                                                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
+                                                    : "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20"
+                                            }`}>
+                                                {user.isActive ? "Active" : "Suspended"}
+                                            </span>
 
                                             {user.role === "artisan" && (
-                                                <span className="rounded-full bg-paper px-3 py-1">
-                          {user.isVerified ? "Verified" : "Not verified"}
-                        </span>
+                                                <span className="rounded-full bg-paper border border-line text-ink px-3 py-1">
+                                                    {user.isVerified ? "Verified" : "Not verified"}
+                                                </span>
                                             )}
                                         </div>
                                     </div>
@@ -239,40 +198,24 @@ export function AdminUsers() {
                                             <button
                                                 type="button"
                                                 disabled={isUpdating}
-                                                onClick={() =>
-                                                    updateUser(
-                                                        userId,
-                                                        "verify",
-                                                        !user.isVerified
-                                                    )
-                                                }
-                                                className="rounded-full border border-line px-4 py-2 text-xs font-semibold hover:bg-paper disabled:opacity-50"
+                                                onClick={() => updateUser(userId, "verify", !user.isVerified)}
+                                                className="rounded-full border border-line bg-paper text-ink px-4 py-2 text-xs font-semibold hover:border-copper disabled:opacity-50 transition"
                                             >
-                                                {isUpdating
-                                                    ? "Updating..."
-                                                    : user.isVerified
-                                                        ? "Remove verification"
-                                                        : "Verify artisan"}
+                                                {isUpdating ? "Updating..." : user.isVerified ? "Remove verification" : "Verify artisan"}
                                             </button>
                                         )}
 
                                         <button
                                             type="button"
                                             disabled={isUpdating}
-                                            onClick={() =>
-                                                updateUser(userId, "status", !user.isActive)
-                                            }
-                                            className={`rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50 ${
+                                            onClick={() => updateUser(userId, "status", !user.isActive)}
+                                            className={`rounded-full px-4 py-2 text-xs font-semibold transition disabled:opacity-50 ${
                                                 user.isActive
-                                                    ? "bg-red-50 text-red-800 hover:bg-red-100"
-                                                    : "bg-ink text-cream hover:opacity-90"
+                                                    ? "border border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
+                                                    : "bg-copper text-white hover:bg-copper-deep"
                                             }`}
                                         >
-                                            {isUpdating
-                                                ? "Updating..."
-                                                : user.isActive
-                                                    ? "Suspend account"
-                                                    : "Reactivate account"}
+                                            {isUpdating ? "Updating..." : user.isActive ? "Suspend account" : "Reactivate account"}
                                         </button>
                                     </div>
                                 </div>
