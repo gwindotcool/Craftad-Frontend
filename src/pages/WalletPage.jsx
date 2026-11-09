@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Wallet, ArrowDownRight, ArrowUpRight, Building2, CheckCircle2 } from "lucide-react";
-import { craftad } from "../api";
+import { craftad, listOf } from "../api";
 import { useSession } from "../session";
 
 export function WalletPage() {
@@ -18,8 +18,8 @@ export function WalletPage() {
     async function load() {
         const wallet = await craftad.wallet(token);
         setBalance(wallet.wallet?.balance ?? 0);
-        const history = await craftad.transactions(token).catch(() => craftad.myTransactions(token).catch(() => ({ transactions: [] })));
-        setTxs(history.transactions || []);
+        const history = await craftad.transactions(token).catch(() => craftad.myTransactions(token).catch(() => ([])));
+        setTxs(listOf(history, ["transactions", "data", "results"]));
     }
 
     useEffect(() => {

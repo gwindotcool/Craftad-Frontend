@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Bell, CheckCheck, Check, Info } from "lucide-react";
-import { craftad } from "../api";
+import { craftad, listOf } from "../api";
 import { useSession } from "../session";
 
 export function Notifications() {
@@ -13,7 +13,7 @@ export function Notifications() {
         if (!token) return;
         setLoading(true);
         craftad.notifications(token)
-            .then((data) => setItems(data.notifications || []))
+            .then((data) => setItems(listOf(data, ["notifications", "data", "results"])))
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, [token]);
