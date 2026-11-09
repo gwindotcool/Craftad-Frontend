@@ -1,5 +1,5 @@
 import { Link, Navigate } from "react-router-dom";
-import { ArrowRight, MessageSquare, ShieldCheck, Star, Wallet, CheckCircle2 } from "lucide-react";
+import { ArrowRight, MessageSquare, ShieldCheck, Star, Wallet } from "lucide-react";
 import { SiteMark } from "../components/SiteMark";
 import { ShareBar } from "../components/ShareBar";
 import { useSession } from "../session";
@@ -21,7 +21,7 @@ export function Home() {
     if (token) return <Navigate to="/dashboard" replace />;
 
     return (
-        <div className="min-h-screen bg-paper text-ink">
+        <div className="min-h-screen bg-paper text-ink transition-colors duration-200">
 
             {/* Top Header Navigation */}
             <header className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
@@ -31,7 +31,7 @@ export function Home() {
                 <nav className="flex items-center gap-4 text-sm font-medium">
                     <a href="#how" className="hidden min-h-11 items-center px-3 text-muted no-underline sm:inline-flex hover:text-ink transition-colors">How it works</a>
                     <Link to="/login" className="inline-flex min-h-11 items-center px-4 font-medium text-ink no-underline hover:text-copper transition-colors">Sign in</Link>
-                    <Link to="/register" className="inline-flex min-h-11 items-center rounded-full bg-ink px-5 font-semibold text-cream no-underline transition-all hover:bg-copper shadow-sm">Get started</Link>
+                    <Link to="/register" className="inline-flex min-h-11 items-center rounded-full bg-copper px-5 font-semibold text-white no-underline transition-all hover:bg-copper-deep shadow-sm">Get started</Link>
                 </nav>
             </header>
 
@@ -42,7 +42,7 @@ export function Home() {
                         <span>Verified artisan marketplace</span>
                     </div>
 
-                    <h1 className="max-w-xl font-display text-4xl leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">
+                    <h1 className="max-w-xl font-display text-4xl leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl text-ink">
                         Real trades. Clear prices.
                     </h1>
 
@@ -51,7 +51,7 @@ export function Home() {
                     </p>
 
                     <div className="flex flex-wrap gap-4 pt-2">
-                        <Link to="/register" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-copper px-7 font-semibold text-cream no-underline transition-all hover:bg-copper-deep shadow-md">
+                        <Link to="/register" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-copper px-7 font-semibold text-white no-underline transition-all hover:bg-copper-deep shadow-md">
                             <span>I need work done</span> <ArrowRight size={18} />
                         </Link>
                         <Link to="/register" className="inline-flex min-h-12 items-center rounded-full border border-line bg-cream px-7 font-semibold text-ink no-underline transition-all hover:border-copper hover:bg-paper shadow-sm">
@@ -60,7 +60,7 @@ export function Home() {
                     </div>
                 </div>
 
-                <figure className="relative isolate overflow-hidden rounded-[2.5rem] border border-line bg-ink shadow-2xl">
+                <figure className="relative isolate overflow-hidden rounded-[2.5rem] border border-line bg-cream shadow-2xl">
                     <video
                         className="aspect-[4/3] w-full object-cover motion-reduce:hidden"
                         autoPlay
@@ -79,19 +79,19 @@ export function Home() {
                         className="hidden aspect-[4/3] w-full object-cover motion-reduce:block"
                     />
 
-                    <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent px-6 pb-6 pt-16 text-sm text-cream">
-            <span className="font-medium">
-              On the job, not a directory listing
-            </span>
-                        <span className="shrink-0 rounded-full border border-cream/40 bg-ink/30 px-3.5 py-1.5 text-xs backdrop-blur-md">
-              Customer’s home
-            </span>
+                    <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-[#0f0d0b]/90 via-[#0f0d0b]/40 to-transparent px-6 pb-6 pt-16 text-sm text-[#f4efe6]">
+                        <span className="font-medium">
+                            On the job, not a directory listing
+                        </span>
+                        <span className="shrink-0 rounded-full border border-white/20 bg-black/40 px-3.5 py-1.5 text-xs backdrop-blur-md text-white">
+                            Customer’s home
+                        </span>
                     </figcaption>
                 </figure>
             </section>
 
             {/* Trust Badges Bar */}
-            <section className="border-y border-line bg-cream">
+            <section className="border-y border-line bg-cream transition-colors duration-200">
                 <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-3 sm:px-6 lg:px-8">
                     {[
                         { icon: ShieldCheck, title: "Escrow, not a handshake", copy: "Money is held securely until the customer confirms the work is finished." },
@@ -99,9 +99,9 @@ export function Home() {
                         { icon: Star, title: "Reviews after the work", copy: "Completed jobs can be rated so the next hire is completely transparent." },
                     ].map(({ icon: Icon, title, copy }) => (
                         <div key={title} className="flex gap-4">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-paper text-copper border border-line shadow-sm">
-                <Icon size={22} />
-              </span>
+                            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-paper text-copper border border-line shadow-sm">
+                                <Icon size={22} />
+                            </span>
                             <div>
                                 <h2 className="font-display text-lg text-ink">{title}</h2>
                                 <p className="mt-1 text-sm leading-relaxed text-muted">{copy}</p>
@@ -134,12 +134,12 @@ export function Home() {
                             className="group relative overflow-hidden rounded-[2rem] border border-line bg-cream p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                         >
                             <div className="flex items-center justify-between">
-                <span className="font-display text-5xl text-copper/25">
-                  {step.n}
-                </span>
-                                <span className="grid h-10 w-10 place-items-center rounded-full border border-line text-xs font-bold text-muted transition-colors group-hover:border-copper group-hover:bg-copper group-hover:text-cream">
-                  {index + 1}
-                </span>
+                                <span className="font-display text-5xl text-copper/30">
+                                    {step.n}
+                                </span>
+                                <span className="grid h-10 w-10 place-items-center rounded-full border border-line text-xs font-bold text-muted transition-colors group-hover:border-copper group-hover:bg-copper group-hover:text-white">
+                                    {index + 1}
+                                </span>
                             </div>
 
                             <div className="mt-8 h-1 w-12 rounded-full bg-copper transition-all duration-300 group-hover:w-20" />
@@ -210,27 +210,27 @@ export function Home() {
             <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
                 <div className="grid gap-6 md:grid-cols-2">
 
-                    {/* Customer Card */}
-                    <div className="group relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-ink via-ink/95 to-copper-deep p-8 text-cream sm:p-10 shadow-xl">
-                        <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full border border-cream/10 bg-white/5 blur-2xl" />
-                        <div className="absolute -right-5 -top-5 h-32 w-32 rounded-full border border-cream/10" />
+                    {/* Customer Card (Static Dark Accent Banner) */}
+                    <div className="group relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#1a1714] via-[#241d17] to-copper-deep p-8 text-[#f4efe6] sm:p-10 shadow-xl">
+                        <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full border border-white/10 bg-white/5 blur-2xl" />
+                        <div className="absolute -right-5 -top-5 h-32 w-32 rounded-full border border-white/10" />
 
                         <div className="relative">
                             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-copper">
                                 For customers
                             </p>
 
-                            <h2 className="mt-4 max-w-md font-display text-3xl leading-tight sm:text-4xl">
+                            <h2 className="mt-4 max-w-md font-display text-3xl leading-tight sm:text-4xl text-white">
                                 Post once. Compare offers. Stay in the loop.
                             </h2>
 
-                            <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/75">
+                            <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#f4efe6]/80">
                                 Describe what needs fixing, evaluate artisan applications, and choose the right verified professional for your project.
                             </p>
 
                             <Link
                                 to="/register"
-                                className="mt-8 inline-flex min-h-12 items-center rounded-full bg-cream px-7 text-sm font-semibold text-ink no-underline transition-all hover:bg-copper hover:text-cream shadow-md"
+                                className="mt-8 inline-flex min-h-12 items-center rounded-full bg-white px-7 text-sm font-semibold text-ink no-underline transition-all hover:bg-copper hover:text-white shadow-md"
                             >
                                 Create a customer account
                             </Link>
@@ -238,7 +238,7 @@ export function Home() {
                     </div>
 
                     {/* Artisan Card */}
-                    <div className="group relative overflow-hidden rounded-[2rem] border border-line bg-cream p-8 sm:p-10 shadow-sm">
+                    <div className="group relative overflow-hidden rounded-[2rem] border border-line bg-cream p-8 sm:p-10 shadow-sm transition-colors duration-200">
                         <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full border border-copper/10 bg-copper/5 blur-xl" />
 
                         <div className="relative">
@@ -257,7 +257,7 @@ export function Home() {
 
                             <Link
                                 to="/register"
-                                className="mt-8 inline-flex min-h-12 items-center rounded-full bg-copper px-7 text-sm font-semibold text-cream no-underline transition-all hover:bg-copper-deep shadow-md"
+                                className="mt-8 inline-flex min-h-12 items-center rounded-full bg-copper px-7 text-sm font-semibold text-white no-underline transition-all hover:bg-copper-deep shadow-md"
                             >
                                 Join as an artisan
                             </Link>
@@ -268,7 +268,7 @@ export function Home() {
 
             {/* Share Section */}
             <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
-                <div className="relative overflow-hidden rounded-[2rem] border border-line bg-[#eee5d8] p-8 sm:p-12 shadow-sm">
+                <div className="relative overflow-hidden rounded-[2rem] border border-line bg-cream p-8 sm:p-12 shadow-sm transition-colors duration-200">
                     <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full border border-copper/10" />
                     <div className="absolute -right-8 -top-12 h-48 w-48 rounded-full border border-copper/10" />
 
@@ -287,7 +287,7 @@ export function Home() {
                             </p>
                         </div>
 
-                        <div className="relative rounded-2xl border border-white/70 bg-cream p-6 shadow-sm">
+                        <div className="relative rounded-2xl border border-line bg-paper p-6 shadow-sm">
                             <ShareBar
                                 title="Share on social"
                                 text="Find a trusted artisan on Craftad. Post a job, compare quotes, and pay safely when work is finished."
