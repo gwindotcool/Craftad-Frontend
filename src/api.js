@@ -73,7 +73,7 @@ export const craftad = {
     wallet: (token) => request("/api/wallet/me", {}, token),
     transactions: (token) => request("/api/transactions/my", {}, token),
     myTransactions: (token) => request("/api/transactions/my", {}, token),
-    fund: (token, amount) => request("/api/wallet/deposit", { method: "POST", body: JSON.stringify({ amount }) }, token),
+    fund: (token, amount, reference) => request("/api/wallet/deposit", { method: "POST", body: JSON.stringify({ amount, reference }) }, token),
     withdraw: (token, amount) => request("/api/wallet/withdrawals", { method: "POST", body: JSON.stringify({ amount }) }, token),
     resolveBank: (token, accountNumber, bankCode) => request(`/api/wallet/banks/resolve?accountNumber=${encodeURIComponent(accountNumber)}&bankCode=${encodeURIComponent(bankCode)}`, {}, token),
     addBank: (token, body) => request("/api/wallet/banks", { method: "POST", body: JSON.stringify(body) }, token),

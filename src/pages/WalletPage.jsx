@@ -75,8 +75,8 @@ export function WalletPage() {
 
                         (async () => {
                             try {
-                                console.log("Calling craftad.fund with amount:", value);
-                                const res = await craftad.fund(token, { amount: value });
+                                console.log("Calling craftad.fund with amount and reference:", value, response.reference);
+                                const res = await craftad.fund(token, value, response.reference);
                                 console.log("Fund response from server:", res);
                             } catch (err) {
                                 console.error("Fund error details:", err);
