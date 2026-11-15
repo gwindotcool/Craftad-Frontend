@@ -62,7 +62,7 @@ export function AppShell({ children }) {
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFBF7] text-ink">
+        <div className="min-h-screen bg-paper text-ink transition-colors duration-200">
             {/* Top Navigation Header Bar */}
             <header className="sticky top-0 z-30 border-b border-line bg-cream/80 backdrop-blur-md">
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -107,7 +107,7 @@ export function AppShell({ children }) {
                                     onClick={toggleTheme}
                                     aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                                     title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition hover:bg-[#F3EEE5]"
+                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition-colors hover:bg-line/50"
                                 >
                                     {darkMode ? <Sun size={20} /> : <Moon size={20} />}
                                 </button>
@@ -120,7 +120,7 @@ export function AppShell({ children }) {
                                             : "Open messages"
                                     }
                                     title="Messages"
-                                    className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition hover:bg-[#F3EEE5]"
+                                    className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition-colors hover:bg-line/50"
                                 >
                                     <Mail size={21} />
 

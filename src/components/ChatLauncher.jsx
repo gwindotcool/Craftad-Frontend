@@ -284,15 +284,15 @@ export function ChatLauncher({ fullPage = false }) {
                     }
                     className={
                         fullPage
-                            ? "relative z-0 flex h-[min(760px,calc(100dvh-10rem))] w-full flex-col overflow-hidden rounded-3xl border border-line bg-paper shadow-sm"
-                            : `fixed z-[90] flex h-[min(600px,calc(100dvh-6rem))] w-[min(480px,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-line bg-paper shadow-2xl ${
-                                  panelPosition ? "" : "bottom-24 right-5"
-                              } max-sm:inset-0 max-sm:h-[100dvh] max-sm:w-full max-sm:rounded-none`
+                            ? "relative z-0 flex h-[min(760px,calc(100dvh-10rem))] w-full flex-col overflow-hidden rounded-[1.75rem] border border-line bg-cream shadow-sm"
+                            : `fixed z-[90] flex h-[min(640px,calc(100dvh-6rem))] w-[min(500px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.75rem] border border-line bg-cream shadow-[0_24px_80px_rgba(33,27,23,0.20)] ${
+                                panelPosition ? "" : "bottom-24 right-5"
+                            } max-sm:inset-0 max-sm:h-[100dvh] max-sm:w-full max-sm:rounded-none`
                     }
                 >
 
                     {/* Main inbox header */}
-                    <header className="flex shrink-0 items-center justify-between gap-4 bg-ink px-5 py-4 text-cream sm:px-6">
+                    <header className="relative flex shrink-0 items-center justify-between gap-4 overflow-hidden bg-ink px-5 py-5 text-cream sm:px-6">
                         <div
                             className="flex min-w-0 items-center gap-3 cursor-move select-none"
                             onPointerDown={(event) => startDrag("panel", event)}
@@ -302,16 +302,16 @@ export function ChatLauncher({ fullPage = false }) {
                             onLostPointerCapture={endDrag}
                             title="Drag to move messages"
                         >
-                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-copper text-white">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-copper text-white shadow-lg shadow-black/20">
                                 <MessageCircle size={22} />
                             </div>
 
                             <div className="min-w-0">
-                                <h2 className="font-display text-xl font-bold">
+                                <h2 className="font-display text-2xl font-semibold tracking-tight">
                                     Messages
                                 </h2>
-                                <p className="text-xs text-cream/70">
-                                    Your Craftad conversations
+                                <p className="mt-1 text-xs tracking-wide text-cream/65">
+                                    Your private Craftad conversations
                                 </p>
                             </div>
                         </div>
@@ -321,7 +321,7 @@ export function ChatLauncher({ fullPage = false }) {
                                 type="button"
                                 onClick={closeInbox}
                                 aria-label="Close messages"
-                                className="rounded-full p-2 transition hover:bg-white/10"
+                                className="rounded-xl border border-white/10 p-2.5 text-cream/80 transition-colors hover:bg-white/10 hover:text-white"
                             >
                                 <X size={22} />
                             </button>
@@ -341,7 +341,7 @@ export function ChatLauncher({ fullPage = false }) {
                         >
                             {/* Search */}
                             <div className="border-b border-line p-4">
-                                <div className="flex items-center gap-3 rounded-full bg-cream px-4 py-3">
+                                <div className="flex items-center gap-3 rounded-2xl border border-line bg-paper px-4 py-3 transition-colors focus-within:border-copper focus-within:ring-2 focus-within:ring-copper/10">
                                     <Search
                                         size={18}
                                         className="shrink-0 text-muted"
@@ -363,10 +363,10 @@ export function ChatLauncher({ fullPage = false }) {
                                     <button
                                         type="button"
                                         onClick={() => setFilter("all")}
-                                        className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
+                                        className={`rounded-xl px-4 py-2.5 text-xs font-semibold transition-colors ${
                                             filter === "all"
-                                                ? "bg-copper text-white"
-                                                : "bg-cream text-muted hover:text-ink"
+                                                ? "bg-ink text-cream shadow-sm"
+                                                : "border border-line bg-paper text-muted hover:border-copper/40 hover:text-ink"
                                         }`}
                                     >
                                         All messages
@@ -375,10 +375,10 @@ export function ChatLauncher({ fullPage = false }) {
                                     <button
                                         type="button"
                                         onClick={() => setFilter("active")}
-                                        className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
+                                        cclassName={`rounded-xl px-4 py-2.5 text-xs font-semibold transition-colors ${
                                             filter === "active"
-                                                ? "bg-copper text-white"
-                                                : "bg-cream text-muted hover:text-ink"
+                                                ? "bg-ink text-cream shadow-sm"
+                                                : "border border-line bg-paper text-muted hover:border-copper/40 hover:text-ink"
                                         }`}
                                     >
                                         Active
@@ -453,14 +453,14 @@ export function ChatLauncher({ fullPage = false }) {
                                                                     conversation
                                                                 )
                                                             }
-                                                            className={`flex w-full items-center gap-3 px-4 py-4 text-left transition hover:bg-cream ${
+                                                            className={`group flex w-full items-center gap-3 border-b border-line/70 px-4 py-4 text-left transition-colors hover:bg-cream ${
                                                                 isSelected
-                                                                    ? "bg-cream"
-                                                                    : ""
+                                                                    ? "bg-cream shadow-[inset_3px_0_0_0_var(--brand-copper)]"
+                                                                    : "bg-paper"
                                                             }`}
                                                         >
                                                             {/* Participant avatar */}
-                                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-copper/10 text-sm font-bold text-copper">
+                                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-copper/15 bg-copper/10 text-sm font-semibold text-copper transition-transform group-hover:scale-[1.03]">
                                                                 {getInitials(
                                                                     participantName
                                                                 )}
@@ -480,7 +480,7 @@ export function ChatLauncher({ fullPage = false }) {
                                                                     </span>
                                                                 </div>
 
-                                                                <p className="mt-1 truncate text-xs font-medium text-copper-deep">
+                                                                <p className="mt-1 truncate text-xs font-semibold tracking-wide text-copper">
                                                                     {job?.title ||
                                                                         "Job conversation"}
                                                                 </p>
@@ -516,7 +516,7 @@ export function ChatLauncher({ fullPage = false }) {
                                 )}
                             </div>
 
-                            <footer className="shrink-0 border-t border-line bg-cream px-4 py-3">
+                            <footer className="shrink-0 border-t border-line bg-cream/80 px-4 py-3">
                                 <p className="text-center text-xs text-muted">
                                     Private customer and artisan conversations
                                 </p>
@@ -614,11 +614,11 @@ export function ChatLauncher({ fullPage = false }) {
                     }
                     aria-label="Open messages"
                     title="Drag to move messages button"
-                    className={`fixed z-[85] flex h-14 w-14 items-center justify-center rounded-full bg-copper text-white shadow-xl transition hover:bg-copper-deep ${
+                    className={`fixed z-[85] flex h-16 w-16 items-center justify-center rounded-[1.35rem] border border-white/15 bg-copper text-white shadow-[0_12px_32px_rgba(168,79,43,0.35)] transition-all duration-200 hover:-translate-y-1 hover:bg-copper-deep hover:shadow-[0_16px_38px_rgba(168,79,43,0.42)] active:translate-y-0 ${
                         launcherPosition ? "" : "bottom-5 right-5 max-sm:bottom-4 max-sm:right-4"
                     }`}
                 >
-                    <MessageCircle size={25} />
+                    <MessageCircle size={27} strokeWidth={2.2} />
                 </button>
             )}
         </>

@@ -2,50 +2,104 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* 1. Define dynamic CSS variable values for Light and Dark modes */
+/* =========================================
+   CRAFTAD DESIGN SYSTEM
+   ========================================= */
+
 :root {
-    --color-paper: #f4efe6;
-    --color-cream: #fffdf8;
-    --color-ink: #1a1714;
-    --color-muted: #6e655c;
-    --color-line: #e4dcd0;
-    --color-copper: #b4532a;
-    --color-copper-deep: #8c3d1c;
-    --color-pine: #24362d;
+    color-scheme: light;
+
+    /* Brand */
+    --brand-copper: #A84F2B;
+    --brand-copper-deep: #853C22;
+    --brand-pine: #243D32;
+
+    /* Surfaces */
+    --surface-page: #F5F0E8;
+    --surface-card: #FFFCF6;
+    --surface-raised: #FFFFFF;
+
+    /* Typography */
+    --text-primary: #211B17;
+    --text-secondary: #70665D;
+
+    /* Borders */
+    --border-default: #E5DACE;
+    --border-strong: #D2C4B4;
+
+    --focus-ring: rgba(168, 79, 43, 0.25);
 }
 
 .dark {
-    --color-paper: #0f0d0b;
-    --color-cream: #181512;
-    --color-line: #2a241f;
-    --color-ink: #f4efe6;
-    --color-muted: #9e9387;
+    color-scheme: dark;
+
+    --brand-copper: #A84F2B;
+    --brand-copper-deep: #853C22;
+    --brand-pine: #243D32;
+
+    --surface-page: #14110F;
+    --surface-card: #201B17;
+    --surface-raised: #29221D;
+
+    --text-primary: #F5EFE7;
+    --text-secondary: #B4A89C;
+
+    --border-default: #39312B;
+    --border-strong: #51453B;
+
+    --focus-ring: rgba(205, 133, 96, 0.3);
 }
 
-/* 2. Bind Tailwind utility classes (bg-paper, bg-cream, text-ink) to variables */
+/* Tailwind utility mappings */
 @theme {
     --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
     --font-display: "Fraunces", ui-serif, Georgia, serif;
 
-    --color-paper: var(--color-paper);
-    --color-cream: var(--color-cream);
-    --color-ink: var(--color-ink);
-    --color-muted: var(--color-muted);
-    --color-line: var(--color-line);
-    --color-copper: var(--color-copper);
-    --color-copper-deep: var(--color-copper-deep);
-    --color-pine: var(--color-pine);
+    --color-paper: var(--surface-page);
+    --color-cream: var(--surface-card);
+    --color-ink: var(--text-primary);
+    --color-muted: var(--text-secondary);
+    --color-line: var(--border-default);
+    --color-copper: var(--brand-copper);
+    --color-copper-deep: var(--brand-copper-deep);
+    --color-pine: var(--brand-pine);
 
     --radius-card: 1.25rem;
 }
 
+/* Global styles */
 @layer base {
-    html, body {
-        margin: 0;
-        min-height: 100vh;
-        background-color: var(--color-paper) !important;
-        color: var(--color-ink) !important;
+    html {
+        min-height: 100%;
+        background: var(--surface-page);
+        color: var(--text-primary);
+        font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
         transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        background: var(--surface-page);
+        color: var(--text-primary);
+        font-family: inherit;
+    }
+
+    #root {
+        min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5, h6, .font-display {
+        font-family: "Fraunces", ui-serif, Georgia, serif;
+        color: inherit;
+        text-wrap: balance;
+    }
+
+    p {
+        text-wrap: pretty;
     }
 
     button:not(:disabled),
@@ -53,14 +107,34 @@
         cursor: pointer;
     }
 
-    h1, h2, h3, .font-display {
-        font-family: var(--font-display);
+    input, textarea, select {
+        font: inherit;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: var(--text-secondary);
+        opacity: 0.8;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--brand-copper);
+        outline-offset: 3px;
+    }
+
+    ::selection {
+        background: rgba(168, 79, 43, 0.2);
+        color: var(--text-primary);
     }
 }
 
+/* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

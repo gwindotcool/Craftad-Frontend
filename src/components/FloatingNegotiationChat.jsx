@@ -386,7 +386,7 @@ export function FloatingNegotiationChat({
         ) : (
             <Check
                 size={14}
-                className="text-gray-400"
+                className="text-cream/50"
                 aria-label="Sent"
                 title="Sent"
             />
@@ -554,17 +554,17 @@ export function FloatingNegotiationChat({
                             : "mb-3 flex h-[min(680px,78vh)] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-line bg-paper shadow-2xl max-sm:mb-0 max-sm:h-[85dvh] max-sm:w-full max-sm:rounded-b-none max-sm:rounded-t-3xl"
                     }
                 >
-                    <header className="flex items-center justify-between gap-3 bg-ink px-5 py-4 text-cream">
+                    <header className="relative flex shrink-0 items-center justify-between gap-3 overflow-hidden border-b border-white/10 bg-ink px-5 py-5 text-cream">
                         <div className="min-w-0">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-copper">
-                                CRAFTAD NEGOTIATION
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-copper">
+                                CRAFTAD <span className="text-cream/50">/</span> PRIVATE NEGOTIATION
                             </p>
 
-                            <h3 className="mt-1 truncate font-display text-lg">
+                            <h3 className="mt-2 truncate font-display text-xl font-semibold tracking-tight">
                                 {job?.title || "Private conversation"}
                             </h3>
 
-                            <p className="mt-1 text-xs leading-relaxed text-cream/80">
+                            <p className="mt-2 text-xs leading-relaxed text-cream/75">
                                 Customer:{" "}
                                 {customerParticipant?.fullName ||
                                     "Loading name"}
@@ -580,12 +580,12 @@ export function FloatingNegotiationChat({
                                 {artisanParticipant?.role || "artisan"}
                             </p>
 
-                            <p className="mt-2 flex items-center gap-2 text-xs text-cream/80">
+                            <p className="mt-3 flex items-center gap-2 text-xs font-medium text-cream/80">
                                 <span
-                                    className={`h-2 w-2 rounded-full ${
+                                    className={`h-2.5 w-2.5 rounded-full ring-2 ring-white/10 ${
                                         presence?.isOnline
                                             ? "bg-emerald-400"
-                                            : "bg-gray-400"
+                                            : "bg-muted"
                                     }`}
                                 />
 
@@ -608,7 +608,7 @@ export function FloatingNegotiationChat({
                                 type="button"
                                 onClick={handleCloseChat}
                                 aria-label="Minimize chat"
-                                className="rounded-full p-2 text-cream/80 transition hover:bg-white/10 hover:text-white"
+                                className="rounded-xl border border-white/10 p-2.5 text-cream/75 transition-colors hover:bg-white/10 hover:text-white"
                             >
                                 <Minus size={18} />
                             </button>
@@ -617,7 +617,7 @@ export function FloatingNegotiationChat({
                                 type="button"
                                 onClick={handleCloseChat}
                                 aria-label="Close chat"
-                                className="rounded-full p-2 text-cream/80 transition hover:bg-white/10 hover:text-white"
+                                className="rounded-xl border border-white/10 p-2.5 text-cream/75 transition-colors hover:bg-white/10 hover:text-white"
                             >
                                 <X size={18} />
                             </button>
@@ -632,7 +632,7 @@ export function FloatingNegotiationChat({
                         </p>
                     </div>
 
-                    <div className="flex-1 space-y-3 overflow-y-auto p-4">
+                    <div className="flex-1 space-y-4 overflow-y-auto bg-paper p-4 sm:p-5">
                         {loading && messages.length === 0 && (
                             <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted">
                                 <LoaderCircle
@@ -674,14 +674,14 @@ export function FloatingNegotiationChat({
                             return (
                                 <div
                                     key={item._id}
-                                    className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                                    className={`max-w-[88%] rounded-2xl px-4 py-3.5 text-sm leading-7 shadow-sm ${
                                         mine
-                                            ? "ml-auto rounded-br-md bg-ink text-cream"
+                                            ? "ml-auto rounded-br-md border border-ink bg-ink text-cream"
                                             : "mr-auto rounded-bl-md border border-line bg-cream text-ink"
                                     }`}
                                 >
                                     <p
-                                        className={`mb-1 text-[10px] font-semibold ${
+                                        className={`mb-1.5 text-[10px] font-semibold uppercase tracking-wide ${
                                             mine
                                                 ? "text-cream/70"
                                                 : "text-copper-deep"
@@ -704,7 +704,7 @@ export function FloatingNegotiationChat({
 
                                     <div className="mt-1.5 flex items-center justify-end gap-1">
                                         <span
-                                            className={`text-[10px] ${
+                                            className={`text-[10px] tracking-wide ${
                                                 mine
                                                     ? "text-cream/50"
                                                     : "text-muted"
@@ -730,12 +730,13 @@ export function FloatingNegotiationChat({
                         })}
 
                         {latestOffer && (
-                            <div className="rounded-2xl border border-copper/30 bg-copper/5 p-4">
-                                <p className="text-xs font-bold uppercase tracking-wider text-copper-deep">
+                            <div className="rounded-2xl border border-copper/25 bg-cream p-5 shadow-sm">
+                                <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-copper">
+                                    <HandCoins size={15} />
                                     Current pending offer
                                 </p>
 
-                                <p className="mt-1 font-display text-2xl font-bold text-ink">
+                                <p className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink">
                                     {formatMoney(latestOffer.amount)}
                                 </p>
 
@@ -744,7 +745,7 @@ export function FloatingNegotiationChat({
                                         type="button"
                                         onClick={handleAcceptOffer}
                                         disabled={accepting}
-                                        className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-copper px-4 text-sm font-semibold text-white transition hover:bg-copper-deep disabled:opacity-60"
+                                        className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-pine px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-pine/90 disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         {accepting ? (
                                             <LoaderCircle
@@ -770,7 +771,7 @@ export function FloatingNegotiationChat({
                     </div>
 
                     {error && (
-                        <div className="mx-4 mb-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
                             {error}
                         </div>
                     )}
@@ -778,7 +779,7 @@ export function FloatingNegotiationChat({
                     {!isClosed && isMyTurn && (
                         <form
                             onSubmit={handleSubmitOffer}
-                            className="border-t border-line bg-cream p-3"
+                            className="border-t border-line bg-cream/80 p-4"
                         >
                             <label className="mb-1.5 block text-xs font-semibold text-ink">
                                 {latestOffer
@@ -797,13 +798,13 @@ export function FloatingNegotiationChat({
                                         setOfferAmount(event.target.value)
                                     }
                                     placeholder="Minimum ₦5,000"
-                                    className="min-w-0 flex-1 rounded-xl border border-line bg-paper px-3 py-3 text-sm text-ink outline-none focus:border-copper"
+                                    className="min-w-0 flex-1 rounded-xl border border-line bg-paper px-4 py-3 text-sm text-ink outline-none transition-shadow focus:border-copper focus:ring-2 focus:ring-copper/10"
                                 />
 
                                 <button
                                     type="submit"
                                     disabled={sending}
-                                    className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-copper px-4 text-xs font-semibold text-white transition hover:bg-copper-deep disabled:opacity-60"
+                                    className="flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-copper px-5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-copper-deep disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     {sending ? "Sending…" : "Offer"}
                                 </button>
@@ -813,7 +814,7 @@ export function FloatingNegotiationChat({
 
                     <form
                         onSubmit={handleSendMessage}
-                        className="flex items-end gap-2 border-t border-line bg-paper p-3"
+                        className="flex shrink-0 items-end gap-3 border-t border-line bg-cream/80 p-4"
                     >
                         <textarea
                             rows={1}
@@ -823,14 +824,14 @@ export function FloatingNegotiationChat({
                                 setMessageText(event.target.value)
                             }
                             placeholder="Write a message…"
-                            className="max-h-28 min-h-11 min-w-0 flex-1 resize-y rounded-xl border border-line bg-cream px-3 py-3 text-sm text-ink outline-none focus:border-copper"
+                            className="max-h-32 min-h-12 min-w-0 flex-1 resize-y rounded-2xl border border-line bg-paper px-4 py-3.5 text-sm leading-relaxed text-ink outline-none transition-shadow focus:border-copper focus:ring-2 focus:ring-copper/10"
                         />
 
                         <button
                             type="submit"
                             disabled={sending || !messageText.trim()}
                             aria-label="Send message"
-                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink text-cream transition hover:bg-copper disabled:opacity-40"
+                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-copper text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-copper-deep disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
                         >
                             <Send size={17} />
                         </button>
