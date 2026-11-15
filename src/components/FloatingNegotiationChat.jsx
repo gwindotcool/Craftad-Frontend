@@ -29,18 +29,18 @@ function getErrorMessage(error) {
 }
 
 export function FloatingNegotiationChat({
-                                            token,
-                                            user,
-                                            application,
-                                            job,
-                                            onAccepted,
-                                            initialConversation = null,
-                                            initiallyOpen = true,
-                                            openSignal = 0,
-                                            showLauncher = true,
-                                            embedded = false,
-                                            onClose,
-                                        }) {
+    token,
+    user,
+    application,
+    job,
+    onAccepted,
+    initialConversation = null,
+    initiallyOpen = true,
+    openSignal = 0,
+    showLauncher = true,
+    embedded = false,
+    onClose,
+}) {
     // Socket and component state
     const socket = useSocket();
     const [presence, setPresence] = useState(null);
@@ -484,9 +484,21 @@ export function FloatingNegotiationChat({
     }
 
     // Render a price offer as a chat message.
+
     function renderOffer(message) {
         const offerId = getId(message.priceOffer);
-        const offer = offerById.get(offerId);
+
+        // Prefer the populated offer returned with the message.
+        const populatedOffer =
+            message.priceOffer &&
+            typeof message.priceOffer === "object" &&
+            message.priceOffer.amount != null
+                ? message.priceOffer
+                : null;
+
+        // Fall back to the separately fetched offers if needed.
+        const offer = populatedOffer || offerById.get(offerId);
+
         const senderId = getId(message.sender);
         const mine = senderId === currentUserId;
 
@@ -519,22 +531,23 @@ export function FloatingNegotiationChat({
                 )}
 
                 <div className="mt-2 flex items-center justify-end gap-1">
-                    <span className="text-[10px] text-muted">
-                        {message.createdAt
-                            ? new Date(
-                                message.createdAt
-                            ).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            })
-                            : ""}
-                    </span>
+                <span className="text-[10px] text-muted">
+                    {message.createdAt
+                        ? new Date(
+                            message.createdAt
+                        ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })
+                        : ""}
+                </span>
 
                     {renderReadReceipt(message, mine)}
                 </div>
             </div>
         );
     }
+
 
     if (!applicationId) return null;
 
