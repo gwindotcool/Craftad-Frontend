@@ -24,12 +24,13 @@ import { Jobs } from "./pages/Jobs";
 import { NewJob } from "./pages/NewJob";
 import { Notifications } from "./pages/Notifications";
 import { WalletPage } from "./pages/WalletPage";
-import { FloatingThemeToggle } from "./components/FloatingThemeToggle";
+import { SocketProvider } from "./socket";
 
 export default function App() {
     return (
         <SessionProvider>
-            <AdminSessionProvider>
+            <SocketProvider>
+                <AdminSessionProvider>
                 <div className="min-h-screen bg-paper text-ink transition-colors duration-200">
                     <Toaster position="top-right" />
 
@@ -86,7 +87,7 @@ export default function App() {
                         />
 
                         <Route
-                            path="/chat/:jobId"
+                            path="/chat/:applicationId"
                             element={
                                 <RequireAuth>
                                     <Chat />
@@ -140,10 +141,9 @@ export default function App() {
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
 
-                    {/* Global floating theme switch button */}
-                    <FloatingThemeToggle />
                 </div>
-            </AdminSessionProvider>
+                </AdminSessionProvider>
+            </SocketProvider>
         </SessionProvider>
     );
 }

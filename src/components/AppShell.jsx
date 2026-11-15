@@ -1,11 +1,49 @@
-import { useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useSession } from '../session';
 import { SiteMark } from './SiteMark';
+import { Mail, Moon, Sun } from 'lucide-react';
+import { useTheme } from '../theme';
+import { ChatLauncher } from './ChatLauncher';
+import { craftad } from '../api';
 
 export function AppShell({ children }) {
     const navigate = useNavigate();
-    const { user, signOut } = useSession();
+    const location = useLocation();
+    const { user, token, signOut } = useSession();
+    const { darkMode, toggleTheme } = useTheme();
+
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        if (!token) {
+            setUnreadCount(0);
+            return;
+        }
+
+        let active = true;
+
+        const fetchUnreadCount = async () => {
+            try {
+                const response = await craftad.unreadCount(token);
+
+                if (active) {
+                    setUnreadCount(Number(response.unreadCount) || 0);
+                }
+            } catch (error) {
+                // Keep the previous count if a temporary request fails.
+            }
+        };
+
+        fetchUnreadCount();
+
+        const intervalId = window.setInterval(fetchUnreadCount, 30000);
+
+        return () => {
+            active = false;
+            window.clearInterval(intervalId);
+        };
+    }, [token, location.pathname]);
 
     useEffect(() => {
         const handleUnauthorized = () => {
@@ -42,9 +80,6 @@ export function AppShell({ children }) {
                                 <Link to="/jobs" className="transition-colors hover:text-ink no-underline">
                                     Jobs
                                 </Link>
-                                <Link to="/chat" className="transition-colors hover:text-ink no-underline">
-                                    Chat
-                                </Link>
                                 <Link to="/wallet" className="transition-colors hover:text-ink no-underline">
                                     Wallet
                                 </Link>
@@ -68,11 +103,40 @@ export function AppShell({ children }) {
                                     </p>
                                 </div>
                                 <button
+                                    type="button"
+                                    onClick={toggleTheme}
+                                    aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                                    title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition hover:bg-[#F3EEE5]"
+                                >
+                                    {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/chat')}
+                                    aria-label={
+                                        unreadCount > 0
+                                            ? `Open messages, ${unreadCount} unread`
+                                            : "Open messages"
+                                    }
+                                    title="Messages"
+                                    className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition hover:bg-[#F3EEE5]"
+                                >
+                                    <Mail size={21} />
+
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
+            {unreadCount > 99 ? "99+" : unreadCount}
+        </span>
+                                    )}
+                                </button>
+                                <button
                                     onClick={handleSignOut}
                                     className="inline-flex items-center rounded-full border border-line bg-paper px-4 py-2 text-sm font-medium text-ink transition-colors hover:border-copper hover:text-copper"
                                 >
                                     Sign out
                                 </button>
+
                             </div>
                         ) : (
                             <Link
@@ -90,6 +154,7 @@ export function AppShell({ children }) {
             <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {children}
             </main>
+            {!location.pathname.startsWith("/chat") && <ChatLauncher />}
         </div>
     );
 }

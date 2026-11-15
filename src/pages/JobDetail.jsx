@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { CheckCircle2, MapPin, Clock, ArrowLeft, Star, MessageSquare, Send } from "lucide-react";
 import { craftad, listOf } from "../api";
 import { ShareBar } from "../components/ShareBar";
+import { FloatingNegotiationChat } from "../components/FloatingNegotiationChat";
 import { useSession } from "../session";
 
 const stages = [
@@ -59,28 +60,53 @@ export function JobDetail() {
 
     const [job, setJob] = useState(null);
     const [apps, setApps] = useState([]);
+    const [myApplication, setMyApplication] = useState(null);
     const [message, setMessage] = useState("");
-    const [price, setPrice] = useState("");
+    const [selectedApplication, setSelectedApplication] = useState(null);
+    const [negotiationOpenSignal, setNegotiationOpenSignal] = useState(0);
     const [note, setNote] = useState("");
     const [rating, setRating] = useState("5");
     const [comment, setComment] = useState("");
     const [error, setError] = useState("");
 
-    async function load() {
-        const [mine, open] = await Promise.allSettled([
-            craftad.myJobs(token),
-            craftad.openJobs(token),
-        ]);
 
-        const all = [
-            ...(mine.status === "fulfilled" ? listOf(mine.value, ["jobs"]) : []),
-            ...(open.status === "fulfilled" ? listOf(open.value, ["jobs"]) : []),
-        ];
+    async function load() {
+        let all = [];
+
+        if (user?.role === "customer") {
+            try {
+                const mine = await craftad.myJobs(token);
+                all = listOf(mine, ["jobs"]);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : "Could not load your jobs.");
+                return;
+            }
+        }
+
+        if (user?.role === "artisan") {
+            const [mine, open] = await Promise.allSettled([
+                craftad.myJobs(token),
+                craftad.openJobs(token),
+            ]);
+
+            all = [
+                ...(mine.status === "fulfilled" ? listOf(mine.value, ["jobs"]) : []),
+                ...(open.status === "fulfilled" ? listOf(open.value, ["jobs"]) : []),
+            ];
+        }
 
         const found = all.find((item) => item._id === jobId) || null;
         setJob(found);
 
-        if (found && user?.role === "customer") {
+        if (!found) {
+            setApps([]);
+            setMyApplication(null);
+            return;
+        }
+
+        if (user?.role === "customer") {
+            setMyApplication(null);
+
             try {
                 const data = await craftad.applications(token, jobId);
                 setApps(listOf(data, ["applications"]));
@@ -88,6 +114,20 @@ export function JobDetail() {
                 setApps([]);
                 setError(
                     err instanceof Error ? err.message : "Could not load applications"
+                );
+            }
+        }
+
+        if (user?.role === "artisan") {
+            setApps([]);
+
+            try {
+                const data = await craftad.myJobApplication(token, jobId);
+                setMyApplication(data?.application || data?.data?.application || null);
+            } catch (err) {
+                setMyApplication(null);
+                setError(
+                    err instanceof Error ? err.message : "Could not load your application"
                 );
             }
         }
@@ -135,6 +175,16 @@ export function JobDetail() {
     const stageIndex = getStageIndex(job.status);
     const isCustomer = user?.role === "customer";
     const isArtisan = user?.role === "artisan";
+    const assignedArtisanId =
+        job.assignedArtisan?._id || job.assignedArtisan;
+
+    const projectApplication = isCustomer
+        ? apps.find(
+            (app) =>
+                String(app.artisan?._id || app.artisan) ===
+                String(assignedArtisanId)
+        )
+        : myApplication;
     const canReview =
         isCustomer &&
         (job.status === "customer_confirmed" || job.status === "paid");
@@ -240,6 +290,82 @@ export function JobDetail() {
                         </div>
                     </section>
 
+                    {/* Customer-uploaded job photos and videos */}
+                    {Array.isArray(job.media) && job.media.length > 0 && (
+                        <section className="rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10">
+                            <SectionHeading
+                                eyebrow="JOB ATTACHMENTS"
+                                title="Photos and videos"
+                                description="View the photos and videos uploaded by the customer to understand the work required."
+                            />
+
+                            <div className="grid gap-5 sm:grid-cols-2">
+                                {job.media.map((media) => {
+                                    const mediaType = media.mimeType || "";
+                                    const mediaUrl = media.url || "";
+                                    const isVideo = mediaType.startsWith("video/");
+                                    const isImage = mediaType.startsWith("image/");
+                                    const mediaKey = media._id || media.key || mediaUrl;
+
+                                    return (
+                                        <div
+                                            key={mediaKey}
+                                            className="overflow-hidden rounded-2xl border border-line bg-paper"
+                                        >
+                                            {isImage && (
+                                                <a
+                                                    href={mediaUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="block"
+                                                >
+                                                    <img
+                                                        src={mediaUrl}
+                                                        alt={media.originalName || "Customer-uploaded job photo"}
+                                                        loading="lazy"
+                                                        className="h-64 w-full object-cover transition duration-300 hover:scale-[1.02]"
+                                                    />
+                                                </a>
+                                            )}
+
+                                            {isVideo && (
+                                                <video
+                                                    controls
+                                                    preload="metadata"
+                                                    playsInline
+                                                    className="w-full max-h-80 bg-black"
+                                                >
+                                                    <source
+                                                        src={mediaUrl}
+                                                        type={mediaType}
+                                                    />
+                                                    Your browser does not support video playback.
+                                                </video>
+                                            )}
+
+                                            {!isImage && !isVideo && (
+                                                <div className="p-5">
+                                                    <a
+                                                        href={mediaUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-sm font-semibold text-copper underline"
+                                                    >
+                                                        Open uploaded file
+                                                    </a>
+                                                </div>
+                                            )}
+
+                                            <p className="truncate px-4 py-3 text-xs font-medium text-muted">
+                                                {media.originalName || "Job attachment"}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    )}
+
                     {/* Job Progress Tracker */}
                     <section className="rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10">
                         <SectionHeading
@@ -312,7 +438,7 @@ export function JobDetail() {
                             <SectionHeading
                                 eyebrow="APPLICATIONS"
                                 title="Artisan applicants"
-                                description="Review proposed quotes and background credentials to select the best professional."
+                                description="Review each artisan's introduction, then discuss the work and agree on a price in a private negotiation chat."
                             />
 
                             {apps.length === 0 ? (
@@ -360,10 +486,10 @@ export function JobDetail() {
 
                                                     <div className="sm:text-right">
                                                         <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
-                                                            Proposed price
+                                                            Pricing
                                                         </p>
-                                                        <p className="mt-0.5 font-display text-2xl font-bold text-copper-deep">
-                                                            {formatMoney(app.proposedPrice)}
+                                                        <p className="mt-0.5 text-sm font-semibold text-copper-deep">
+                                                            Discuss in chat
                                                         </p>
                                                     </div>
                                                 </div>
@@ -377,33 +503,34 @@ export function JobDetail() {
                                                     </p>
                                                 </div>
 
-                                                {pending && (
+                                                {!["rejected", "withdrawn"].includes(app.status) && (
                                                     <div className="mt-5 flex flex-wrap gap-3">
                                                         <button
                                                             type="button"
-                                                            className="min-h-11 rounded-full bg-ink px-6 text-xs font-semibold text-cream transition hover:bg-copper shadow-sm"
-                                                            onClick={() =>
-                                                                run(
-                                                                    () => craftad.acceptApplication(token, appId),
-                                                                    "Application accepted successfully."
-                                                                )
-                                                            }
+                                                            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-6 text-xs font-semibold text-cream transition hover:bg-copper shadow-sm"
+                                                            onClick={() => {
+                                                                setSelectedApplication(app);
+                                                                setNegotiationOpenSignal((current) => current + 1);
+                                                            }}
                                                         >
-                                                            Accept application
+                                                            <MessageSquare size={15} />
+                                                            Chat with artisan
                                                         </button>
 
-                                                        <button
-                                                            type="button"
-                                                            className="min-h-11 rounded-full border border-line bg-cream px-6 text-xs font-semibold text-copper-deep transition hover:border-copper"
-                                                            onClick={() =>
-                                                                run(
-                                                                    () => craftad.rejectApplication(token, appId),
-                                                                    "Application rejected."
-                                                                )
-                                                            }
-                                                        >
-                                                            Reject
-                                                        </button>
+                                                        {pending && (
+                                                            <button
+                                                                type="button"
+                                                                className="min-h-11 rounded-full border border-line bg-cream px-6 text-xs font-semibold text-copper-deep transition hover:border-copper"
+                                                                onClick={() =>
+                                                                    run(
+                                                                        () => craftad.rejectApplication(token, appId),
+                                                                        "Application rejected."
+                                                                    )
+                                                                }
+                                                            >
+                                                                Reject application
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 )}
                                             </article>
@@ -417,23 +544,46 @@ export function JobDetail() {
                     {/* Artisan Application Form */}
                     {isArtisan && job.status === "open" && (
                         <form
+                            id="apply"
                             className="rounded-[2rem] border border-line bg-cream p-8 shadow-sm sm:p-10"
-                            onSubmit={(e) => {
+                            onSubmit={async (e) => {
                                 e.preventDefault();
-                                run(
-                                    () =>
-                                        craftad.apply(token, jobId, {
-                                            message,
-                                            proposedPrice: Number(price),
-                                        }),
-                                    "Application sent successfully."
-                                );
+                                setError("");
+
+                                try {
+                                    const response = await craftad.apply(token, jobId, {
+                                        message,
+                                    });
+
+                                    const createdApplication =
+                                        response?.application ||
+                                        response?.data?.application ||
+                                        response?.data;
+
+                                    if (!createdApplication?._id) {
+                                        throw new Error(
+                                            "Your application was sent, but its conversation could not be opened. Please refresh the page."
+                                        );
+                                    }
+
+                                    setSelectedApplication(createdApplication);
+                                    setNegotiationOpenSignal((current) => current + 1);
+                                    setMessage("");
+                                    setNote("Application sent. You can now discuss the job and price with the customer.");
+                                    await load();
+                                } catch (err) {
+                                    setError(
+                                        err instanceof Error
+                                            ? err.message
+                                            : "Could not submit your application."
+                                    );
+                                }
                             }}
                         >
                             <SectionHeading
                                 eyebrow="SUBMIT PROPOSAL"
                                 title="Apply for this job"
-                                description="Introduce your expertise and let the customer know how you plan to execute the work."
+                                description="Introduce your expertise. Once the customer reviews your application, you can discuss the work and propose your price in the private chat."
                             />
 
                             <label className="mt-6 block text-sm font-semibold text-ink">
@@ -448,24 +598,11 @@ export function JobDetail() {
                                 />
                             </label>
 
-                            <label className="mt-5 block text-sm font-semibold text-ink">
-                                Proposed price (₦)
-                                <input
-                                    required
-                                    type="number"
-                                    min={0}
-                                    value={price}
-                                    onChange={(e) => setPrice(e.target.value)}
-                                    className="mt-2 min-h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/10"
-                                    placeholder="Enter quote in Naira"
-                                />
-                            </label>
-
                             <button
                                 type="submit"
                                 className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-copper px-8 text-sm font-semibold text-white transition hover:bg-copper-deep shadow-md"
                             >
-                                <span>Send application proposal</span>
+                                <span>Send application and open chat</span>
                                 <Send size={16} />
                             </button>
                         </form>
@@ -594,7 +731,7 @@ export function JobDetail() {
 
                         <p className="mt-2 text-sm leading-relaxed text-muted">
                             {isArtisan && job.status === "open"
-                                ? "Submit an application with your proposed fee to secure this contract."
+                                ? "Introduce yourself first. You will propose your price privately after the customer reviews your application."
                                 : isArtisan && job.status === "assigned"
                                     ? "Initiate work when you are ready to start the project timeline."
                                     : isArtisan && job.status === "in_progress"
@@ -605,14 +742,19 @@ export function JobDetail() {
                         </p>
 
                         <div className="mt-6 space-y-3.5">
-                            {job.status !== "open" && (
-                                <Link
-                                    to={`/chat/${jobId}`}
-                                    className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-cream no-underline transition hover:bg-copper shadow-sm"
+
+                            {isArtisan && myApplication?._id && (
+                                <button
+                                    type="button"
+                                    className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-copper bg-paper px-6 text-sm font-semibold text-copper-deep transition hover:bg-copper hover:text-white"
+                                    onClick={() => {
+                                        setSelectedApplication(myApplication);
+                                        setNegotiationOpenSignal((current) => current + 1);
+                                    }}
                                 >
                                     <MessageSquare size={16} />
-                                    <span>Open project chat</span>
-                                </Link>
+                                    <span>Chat with customer</span>
+                                </button>
                             )}
 
                             {isArtisan && job.status === "assigned" && (
@@ -708,6 +850,23 @@ export function JobDetail() {
                     </section>
                 </aside>
             </div>
+
+            {(selectedApplication || (isArtisan ? myApplication : null)) && (
+                <FloatingNegotiationChat
+                    token={token}
+                    openSignal={negotiationOpenSignal}
+                    user={user}
+                    showLauncher={false}
+                    application={selectedApplication || myApplication}
+                    job={job}
+                    onAccepted={async () => {
+                        setSelectedApplication(null);
+                        setNote("Offer accepted. The agreed amount has been locked in escrow.");
+                        await load();
+                    }}
+                />
+            )}
+
         </div>
     );
 }

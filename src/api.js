@@ -13,7 +13,11 @@ async function request(path, init = {}, token) {
     const headers = new Headers(init.headers);
     const method = init.method || "GET";
 
-    if (init.body && !headers.has("Content-Type")) {
+    const isFormData =
+        typeof FormData !== "undefined" &&
+        init.body instanceof FormData;
+
+    if (init.body && !isFormData && !headers.has("Content-Type")) {
         headers.set("Content-Type", "application/json");
     }
 
@@ -58,15 +62,24 @@ export const craftad = {
     profile: (token) => request("/api/auth/profile", {}, token),
     myJobs: (token) => request("/api/job/my-jobs?limit=50", {}, token),
     openJobs: (token) => request("/api/job/open-jobs?limit=50", {}, token),
-    createJob: (token, body) => request("/api/job/create-job", { method: "POST", body: JSON.stringify(body) }, token),
+    createJob: (token, formData) => request("/api/job/create-job", {method: "POST", body: formData}, token),
     startJob: (token, id) => request(`/api/job/${id}/start`, { method: "PATCH" }, token),
     rejectJob: (token, id) => request(`/api/job/${id}/reject`, { method: "PATCH" }, token),
     completeJob: (token, id) => request(`/api/job/${id}/complete`, { method: "PATCH" }, token),
     confirmJob: (token, id) => request(`/api/job/${id}/confirm`, { method: "PATCH" }, token),
     apply: (token, id, body) => request(`/api/applications/apply/${id}`, { method: "POST", body: JSON.stringify(body) }, token),
     applications: (token, id) => request(`/api/applications/job/${id}`, {}, token),
+    myJobApplication: (token, jobId) => request(`/api/applications/my/${jobId}`, {}, token),
     acceptApplication: (token, id) => request(`/api/applications/accept/${id}`, { method: "PATCH" }, token),
     rejectApplication: (token, id) => request(`/api/applications/${id}/reject`, { method: "PATCH" }, token),
+    // Application-specific negotiation conversations
+    conversations: (token) => request("/api/chat/conversations", {}, token),
+    unreadCount: (token) => request("/api/chat/unread-count", {}, token),
+    getOrCreateConversation: (token, applicationId) => request("/api/chat/conversations", {method: "POST", body: JSON.stringify({ applicationId }),}, token),
+    conversationMessages: (token, conversationId) => request(`/api/chat/conversations/${conversationId}/messages?limit=100`, {}, token),
+    sendConversationMessage: (token, conversationId, text) => request(`/api/chat/conversations/${conversationId}/messages`, {method: "POST", body: JSON.stringify({ text }),}, token),
+    priceOffers: (token, applicationId) => request(`/api/applications/${applicationId}/offers`, {}, token),
+    submitPriceOffer: (token, applicationId, amount) => request(`/api/applications/${applicationId}/offers`, {method: "POST", body: JSON.stringify({ amount }),}, token),
     review: (token, jobId, body) => request(`/api/reviews/${jobId}`, { method: "POST", body: JSON.stringify(body) }, token),
     chat: (token, id) => request(`/api/chat/${id}`, {}, token),
     sendMessage: (token, id, text) => request(`/api/chat/${id}`, { method: "POST", body: JSON.stringify({ text }) }, token),
