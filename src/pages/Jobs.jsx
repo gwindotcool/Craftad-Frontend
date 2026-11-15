@@ -14,6 +14,18 @@ export function Jobs() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
 
+    function getJobAmountLabel(job) {
+        if (job.agreedPrice != null) {
+            return `₦${Number(job.agreedPrice).toLocaleString("en-NG")}`;
+        }
+
+        if (job.budget != null) {
+            return `₦${Number(job.budget).toLocaleString("en-NG")}`;
+        }
+
+        return "Open budget";
+    }
+
     useEffect(() => {
         if (!token || !user) return;
         setLoading(true);
@@ -153,8 +165,8 @@ export function Jobs() {
                                         {job.location || "Location not specified"}
                   </span>
                                     <span className="ml-auto font-display text-base font-bold text-ink">
-                    ₦{(job.budget || 0).toLocaleString()}
-                  </span>
+    {getJobAmountLabel(job)}
+</span>
                                 </div>
                             </Link>
 

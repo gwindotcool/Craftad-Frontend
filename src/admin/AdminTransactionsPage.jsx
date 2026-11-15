@@ -2,6 +2,25 @@ import { useEffect, useState } from "react";
 import { RefreshCw, ArrowUpRight, ArrowDownLeft, Search, Filter, AlertTriangle } from "lucide-react";
 import { useAdminSession } from "./AdminSession";
 
+function formatTransactionDate(date) {
+    if (!date) return "Date unavailable";
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "Date unavailable";
+    }
+
+    return parsedDate.toLocaleString("en-NG", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+    });
+}
+
 const API_BASE = "https://craftad-lite-2.onrender.com";
 
 export function AdminTransactionsPage() {
@@ -167,13 +186,7 @@ export function AdminTransactionsPage() {
                                             ₦{(tx.amount || 0).toLocaleString()}
                                         </td>
                                         <td className="px-6 py-4 text-right text-xs text-muted">
-                                            {new Date(tx.createdAt).toLocaleDateString("en-US", {
-                                                month: "short",
-                                                day: "numeric",
-                                                year: "numeric",
-                                                hour: "2-digit",
-                                                minute: "2-digit"
-                                            })}
+                                            {formatTransactionDate(tx.createdAt)}
                                         </td>
                                     </tr>
                                 );

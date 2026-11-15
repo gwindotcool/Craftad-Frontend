@@ -4,6 +4,18 @@ import { craftad, listOf } from "../api";
 import { useSession } from "../session";
 import { SocialLinksForm } from "../components/SocialLinksForm";
 
+function getJobAmountLabel(job) {
+    if (job.agreedPrice != null) {
+        return `₦${Number(job.agreedPrice).toLocaleString("en-NG")}`;
+    }
+
+    if (job.budget != null) {
+        return `₦${Number(job.budget).toLocaleString("en-NG")}`;
+    }
+
+    return "Open budget";
+}
+
 export function Dashboard() {
     const { token, user } = useSession();
 
@@ -274,7 +286,7 @@ export function Dashboard() {
                             <div className="flex items-center gap-6">
                                 <div className="text-left sm:text-right">
                                     <p className="font-display text-lg font-bold text-ink">
-                                        ₦{(job.budget || 0).toLocaleString()}
+                                        {getJobAmountLabel(job)}
                                     </p>
                                     <p className="text-xs capitalize text-copper font-medium">
                                         {job.status?.replaceAll("_", " ")}

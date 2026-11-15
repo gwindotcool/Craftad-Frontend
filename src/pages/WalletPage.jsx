@@ -2,6 +2,24 @@ import { useEffect, useState } from "react";
 import { Wallet, ArrowDownRight, ArrowUpRight, Building2, CheckCircle2 } from "lucide-react";
 import { craftad, listOf } from "../api";
 import { useSession } from "../session";
+function formatTransactionDate(date) {
+    if (!date) return "Date unavailable";
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "Date unavailable";
+    }
+
+    return parsedDate.toLocaleString("en-NG", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+    });
+}
 
 export function WalletPage() {
     const { token, user } = useSession();
@@ -263,7 +281,13 @@ export function WalletPage() {
                                     </div>
                                     <div>
                                         <span className="capitalize font-semibold text-ink block">{tx.type} transaction</span>
-                                        <span className="text-xs capitalize text-muted">Status: {tx.status || "Completed"}</span>
+                                        <span className="text-xs capitalize text-muted block">
+    Status: {tx.status || "Pending"}
+</span>
+
+                                        <span className="mt-1 block text-xs text-muted">
+    {formatTransactionDate(tx.createdAt)}
+</span>
                                     </div>
                                 </div>
 

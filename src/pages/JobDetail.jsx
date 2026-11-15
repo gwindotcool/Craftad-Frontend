@@ -683,10 +683,12 @@ export function JobDetail() {
                         <div className="space-y-6 p-7">
                             <div>
                                 <p className="text-xs font-medium text-muted">
-                                    Customer budget ceiling
+                                    {job.budget != null ? "Customer budget ceiling" : "Customer budget preference"}
                                 </p>
                                 <p className="mt-1 font-display text-3xl font-bold text-ink">
-                                    {formatMoney(job.budget)}
+                                    {job.budget != null
+                                        ? formatMoney(job.budget)
+                                        : "Open budget"}
                                 </p>
                             </div>
 
@@ -695,7 +697,7 @@ export function JobDetail() {
                                     Agreed milestone price
                                 </p>
                                 <p className="mt-1 font-display text-3xl font-bold text-copper-deep">
-                                    {job.agreedPrice
+                                    {job.agreedPrice != null
                                         ? formatMoney(job.agreedPrice)
                                         : "Not set yet"}
                                 </p>

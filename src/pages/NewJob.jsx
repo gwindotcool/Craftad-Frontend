@@ -45,6 +45,7 @@ export function NewJob() {
         title: "",
         description: "",
         category: "plumber",
+        budgetType: "open",
         budget: "",
         location: ""
     });
@@ -145,10 +146,14 @@ export function NewJob() {
         }
 
         if (
-            form.budget.trim() !== "" &&
-            (!Number.isFinite(Number(form.budget)) || Number(form.budget) < 5000)
+            form.budgetType === "capped" &&
+            (
+                form.budget.trim() === "" ||
+                !Number.isFinite(Number(form.budget)) ||
+                Number(form.budget) < 5000
+            )
         ) {
-            setError("If provided, your budget must be at least ₦5,000.");
+            setError("Please enter a capped budget of at least ₦5,000.");
             return;
         }
 
@@ -159,8 +164,8 @@ export function NewJob() {
         formData.append("category", form.category);
         formData.append("location", form.location.trim());
 
-        // Budget is optional. The artisan will propose the initial price.
-        if (form.budget.trim() !== "") {
+        // Only send a budget when the customer chooses a capped budget.
+        if (form.budgetType === "capped") {
             formData.append("budget", form.budget);
         }
 
@@ -274,24 +279,82 @@ export function NewJob() {
                         </select>
                     </label>
 
-                    <label className="block text-sm font-semibold text-ink">
-                        Your budget (₦)
+                    <div className="space-y-4">
+                        <div>
+                            <p className="text-sm font-semibold text-ink">
+                                How would you like to set your budget?
+                            </p>
+                            <p className="mt-1 text-xs text-muted">
+                                You can set a spending limit or let the artisan assess the work and propose a price.
+                            </p>
+                        </div>
 
-                        <input
-                            type="number"
-                            name="budget"
-                            min={5000}
-                            step="1"
-                            value={form.budget}
-                            onChange={updateField}
-                            placeholder="Optional"
-                            className={field}
-                        />
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <label className={`cursor-pointer rounded-2xl border p-4 transition ${
+                                form.budgetType === "capped"
+                                    ? "border-copper bg-copper/5"
+                                    : "border-line bg-paper"
+                            }`}>
+                                <input
+                                    type="radio"
+                                    name="budgetType"
+                                    value="capped"
+                                    checked={form.budgetType === "capped"}
+                                    onChange={updateField}
+                                    className="mr-2 accent-current"
+                                />
+                                <span className="font-semibold text-ink">
+                Capped budget
+            </span>
+                                <span className="mt-2 block text-xs font-normal leading-relaxed text-muted">
+                Set the maximum amount you are willing to spend.
+            </span>
+                            </label>
 
-                        <span className="mt-1 block text-xs font-normal text-muted">
-                            Optional guidance. Artisans propose the initial price.
-                        </span>
-                    </label>
+                            <label className={`cursor-pointer rounded-2xl border p-4 transition ${
+                                form.budgetType === "open"
+                                    ? "border-copper bg-copper/5"
+                                    : "border-line bg-paper"
+                            }`}>
+                                <input
+                                    type="radio"
+                                    name="budgetType"
+                                    value="open"
+                                    checked={form.budgetType === "open"}
+                                    onChange={updateField}
+                                    className="mr-2 accent-current"
+                                />
+                                <span className="font-semibold text-ink">
+                Open budget
+            </span>
+                                <span className="mt-2 block text-xs font-normal leading-relaxed text-muted">
+                Let the artisan assess the job and propose a price.
+            </span>
+                            </label>
+                        </div>
+
+                        {form.budgetType === "capped" && (
+                            <label className="block text-sm font-semibold text-ink">
+                                Your maximum budget (₦)
+
+                                <input
+                                    type="number"
+                                    name="budget"
+                                    min={5000}
+                                    step="1"
+                                    required
+                                    value={form.budget}
+                                    onChange={updateField}
+                                    placeholder="e.g. 50000"
+                                    className={field}
+                                />
+
+                                <span className="mt-1 block text-xs font-normal text-muted">
+                Minimum capped budget: ₦5,000. The final price is agreed through negotiation.
+            </span>
+                            </label>
+                        )}
+                    </div>
                 </div>
 
                 <label className="block text-sm font-semibold text-ink">

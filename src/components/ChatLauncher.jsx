@@ -285,7 +285,7 @@ export function ChatLauncher({ fullPage = false }) {
                     className={
                         fullPage
                             ? "relative z-0 flex h-[min(760px,calc(100dvh-10rem))] w-full flex-col overflow-hidden rounded-3xl border border-line bg-paper shadow-sm"
-                            : `fixed z-[90] flex h-[min(480px,calc(100dvh-6rem))] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-line bg-paper shadow-2xl ${
+                            : `fixed z-[90] flex h-[min(600px,calc(100dvh-6rem))] w-[min(480px,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-line bg-paper shadow-2xl ${
                                   panelPosition ? "" : "bottom-24 right-5"
                               } max-sm:inset-0 max-sm:h-[100dvh] max-sm:w-full max-sm:rounded-none`
                     }
