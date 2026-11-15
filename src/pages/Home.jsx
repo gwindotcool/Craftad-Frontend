@@ -3,6 +3,7 @@ import { ArrowRight, MessageSquare, ShieldCheck, Star, Wallet } from "lucide-rea
 import { SiteMark } from "../components/SiteMark";
 import { ShareBar } from "../components/ShareBar";
 import { useSession } from "../session";
+import { FloatingThemeToggle } from "../components/FloatingThemeToggle";
 
 const trades = [
     { name: "Electrical", copy: "Wiring, fittings, and repairs done by people who know the code.", img: "/photos/electrician.jpg" },
@@ -296,7 +297,7 @@ export function Home() {
                     </div>
                 </div>
             </section>
-
+            <FloatingThemeToggle />
         </div>
     );
 }

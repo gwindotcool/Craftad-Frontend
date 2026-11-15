@@ -4,6 +4,7 @@ import { SiteMark } from "../components/SiteMark";
 import { craftad } from "../api";
 import { useSession } from "../session";
 import { ArrowRight, Lock, Mail, User, ShieldCheck } from "lucide-react";
+import { FloatingThemeToggle } from "../components/FloatingThemeToggle";
 
 export function Auth({ mode }) {
     const navigate = useNavigate();
@@ -196,6 +197,7 @@ export function Auth({ mode }) {
 
                 </div>
             </div>
+            <FloatingThemeToggle />
         </div>
     );
 }
