@@ -1,12 +1,11 @@
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+    ArrowLeft,
+    LoaderCircle,
     MessageCircle,
     MessageSquare,
     Search,
     X,
-    ArrowLeft,
-    LoaderCircle,
 } from "lucide-react";
 
 import { craftad, listOf } from "../api";
@@ -44,11 +43,9 @@ function formatTime(value) {
     if (!value) return "";
 
     const date = new Date(value);
-
     if (Number.isNaN(date.getTime())) return "";
 
     const today = new Date();
-
     if (date.toDateString() === today.toDateString()) {
         return date.toLocaleTimeString([], {
             hour: "2-digit",
@@ -81,6 +78,7 @@ export function ChatLauncher({ fullPage = false }) {
     const [filter, setFilter] = useState("all");
     const [panelPosition, setPanelPosition] = useState(null);
     const [launcherPosition, setLauncherPosition] = useState(null);
+
     const panelRef = useRef(null);
     const dragState = useRef(null);
     const suppressLauncherClick = useRef(false);
@@ -133,7 +131,6 @@ export function ChatLauncher({ fullPage = false }) {
 
     function moveDrag(event) {
         const drag = dragState.current;
-
         if (!drag || drag.pointerId !== event.pointerId) return;
 
         if (
@@ -149,12 +146,12 @@ export function ChatLauncher({ fullPage = false }) {
 
         const x = Math.min(
             maxX,
-            Math.max(8, drag.originX + event.clientX - drag.startX)
+            Math.max(8, drag.originX + (event.clientX - drag.startX))
         );
 
         const y = Math.min(
             maxY,
-            Math.max(8, drag.originY + event.clientY - drag.startY)
+            Math.max(8, drag.originY + (event.clientY - drag.startY))
         );
 
         if (drag.kind === "panel") {
@@ -173,7 +170,7 @@ export function ChatLauncher({ fullPage = false }) {
         }
     }
 
-    // If the viewport becomes mobile-sized, restore the mobile layout.
+    // Restore mobile layout if the viewport shrinks below sm breakpoint.
     useEffect(() => {
         function handleResize() {
             if (window.innerWidth < 640) {
@@ -205,9 +202,7 @@ export function ChatLauncher({ fullPage = false }) {
                 }
             } catch (err) {
                 if (!cancelled) {
-                    setError(
-                        err.message || "Could not load conversations."
-                    );
+                    setError(err.message || "Could not load conversations.");
                 }
             } finally {
                 if (!cancelled) {
@@ -235,16 +230,18 @@ export function ChatLauncher({ fullPage = false }) {
     }
 
     const filteredConversations = useMemo(() => {
+        const needle = search.trim().toLowerCase();
+
         return conversations.filter((conversation) => {
             const applicationStatus =
                 conversation.application?.status || "pending";
 
             const isActive = !CLOSED_STATUSES.includes(applicationStatus);
-
             if (filter === "active" && !isActive) return false;
 
-            const participant = getOtherParticipant(conversation);
+            if (!needle) return true;
 
+            const participant = getOtherParticipant(conversation);
             const searchText = [
                 participant?.fullName,
                 conversation.job?.title,
@@ -254,7 +251,7 @@ export function ChatLauncher({ fullPage = false }) {
                 .join(" ")
                 .toLowerCase();
 
-            return searchText.includes(search.trim().toLowerCase());
+            return searchText.includes(needle);
         });
     }, [conversations, filter, search, user]);
 
@@ -277,40 +274,41 @@ export function ChatLauncher({ fullPage = false }) {
                     style={
                         panelPosition
                             ? {
-                                  left: `${panelPosition.x}px`,
-                                  top: `${panelPosition.y}px`,
-                              }
+                                left: `${panelPosition.x}px`,
+                                top: `${panelPosition.y}px`,
+                            }
                             : undefined
                     }
                     className={
                         fullPage
-                            ? "relative z-0 flex h-[min(760px,calc(100dvh-10rem))] w-full flex-col overflow-hidden rounded-[1.75rem] border border-line bg-cream shadow-sm"
-                            : `fixed z-[90] flex h-[min(640px,calc(100dvh-6rem))] w-[min(500px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.75rem] border border-line bg-cream shadow-[0_24px_80px_rgba(33,27,23,0.20)] ${
+                            ? "relative z-0 flex h-[min(760px,calc(100dvh-10rem))] w-full flex-col overflow-hidden rounded-[1.75rem] border border-line bg-cream shadow-card"
+                            : `fixed z-[90] flex h-[min(640px,calc(100dvh-6rem))] w-[min(500px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.75rem] border border-line bg-cream shadow-raised ${
                                 panelPosition ? "" : "bottom-24 right-5"
                             } max-sm:inset-0 max-sm:h-[100dvh] max-sm:w-full max-sm:rounded-none`
                     }
                 >
-
-                    {/* Main inbox header */}
-                    <header className="relative flex shrink-0 items-center justify-between gap-4 overflow-hidden bg-ink px-5 py-5 text-cream sm:px-6">
+                    {/* Main inbox header (explicit dark espresso palette so dark mode tokens don't invert it) */}
+                    <header className="relative flex shrink-0 items-center justify-between gap-4 overflow-hidden bg-[#1A1715] px-5 py-4 text-[#FAF6EF] sm:px-6 sm:py-5">
                         <div
-                            className="flex min-w-0 items-center gap-3 cursor-move select-none"
+                            className={`flex min-w-0 items-center gap-3 select-none ${
+                                fullPage ? "" : "sm:cursor-move"
+                            }`}
                             onPointerDown={(event) => startDrag("panel", event)}
                             onPointerMove={moveDrag}
                             onPointerUp={endDrag}
                             onPointerCancel={endDrag}
                             onLostPointerCapture={endDrag}
-                            title="Drag to move messages"
+                            title={fullPage ? undefined : "Drag to move messages"}
                         >
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-copper text-white shadow-lg shadow-black/20">
-                                <MessageCircle size={22} />
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-copper text-white shadow-sm">
+                                <MessageCircle size={20} />
                             </div>
 
                             <div className="min-w-0">
-                                <h2 className="font-display text-2xl font-semibold tracking-tight">
+                                <h2 className="font-display text-xl font-semibold tracking-tight text-white sm:text-2xl">
                                     Messages
                                 </h2>
-                                <p className="mt-1 text-xs tracking-wide text-cream/65">
+                                <p className="mt-0.5 text-xs tracking-wide text-[#FAF6EF]/65">
                                     Your private Craftad conversations
                                 </p>
                             </div>
@@ -321,52 +319,55 @@ export function ChatLauncher({ fullPage = false }) {
                                 type="button"
                                 onClick={closeInbox}
                                 aria-label="Close messages"
-                                className="rounded-xl border border-white/10 p-2.5 text-cream/80 transition-colors hover:bg-white/10 hover:text-white"
+                                className="rounded-xl border border-white/10 p-2.5 text-[#FAF6EF]/80 transition-colors hover:bg-white/10 hover:text-white"
                             >
-                                <X size={22} />
+                                <X size={20} />
                             </button>
                         )}
                     </header>
 
                     {/* Inbox and negotiation area */}
                     <div className="flex min-h-0 flex-1">
-
                         {/* Conversation sidebar */}
                         <aside
                             className={`flex w-full shrink-0 flex-col border-r border-line bg-paper ${
                                 fullPage ? "md:w-[320px]" : "md:w-full"
-                            } ${
-                                selectedConversation && !fullPage ? "hidden" : ""
-                            }`}
+                            } ${selectedConversation && !fullPage ? "hidden" : ""}`}
                         >
-                            {/* Search */}
+                            {/* Search & Filter Controls */}
                             <div className="border-b border-line p-4">
-                                <div className="flex items-center gap-3 rounded-2xl border border-line bg-paper px-4 py-3 transition-colors focus-within:border-copper focus-within:ring-2 focus-within:ring-copper/10">
-                                    <Search
-                                        size={18}
-                                        className="shrink-0 text-muted"
-                                    />
+                                <div className="flex items-center gap-3 rounded-2xl border border-line bg-cream px-4 py-2.5 transition-colors focus-within:border-copper focus-within:ring-2 focus-within:ring-copper/15">
+                                    <Search size={17} className="shrink-0 text-muted" />
 
                                     <input
                                         type="search"
                                         value={search}
-                                        onChange={(event) =>
-                                            setSearch(event.target.value)
-                                        }
+                                        onChange={(event) => setSearch(event.target.value)}
                                         placeholder="Search conversations..."
-                                        className="min-w-0 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-muted"
+                                        className="min-w-0 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-muted/70"
                                     />
+
+                                    {search && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setSearch("")}
+                                            aria-label="Clear conversation search"
+                                            className="rounded-full p-1 text-muted hover:bg-subtle hover:text-ink"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Filters */}
-                                <div className="mt-4 flex gap-2">
+                                <div className="mt-3 flex gap-2">
                                     <button
                                         type="button"
                                         onClick={() => setFilter("all")}
-                                        className={`rounded-xl px-4 py-2.5 text-xs font-semibold transition-colors ${
+                                        className={`rounded-xl px-4 py-2 text-xs font-semibold transition-colors ${
                                             filter === "all"
-                                                ? "bg-ink text-cream shadow-sm"
-                                                : "border border-line bg-paper text-muted hover:border-copper/40 hover:text-ink"
+                                                ? "bg-ink text-paper shadow-sm"
+                                                : "border border-line bg-cream text-muted hover:border-line-strong hover:text-ink"
                                         }`}
                                     >
                                         All messages
@@ -375,10 +376,10 @@ export function ChatLauncher({ fullPage = false }) {
                                     <button
                                         type="button"
                                         onClick={() => setFilter("active")}
-                                        cclassName={`rounded-xl px-4 py-2.5 text-xs font-semibold transition-colors ${
+                                        className={`rounded-xl px-4 py-2 text-xs font-semibold transition-colors ${
                                             filter === "active"
-                                                ? "bg-ink text-cream shadow-sm"
-                                                : "border border-line bg-paper text-muted hover:border-copper/40 hover:text-ink"
+                                                ? "bg-ink text-paper shadow-sm"
+                                                : "border border-line bg-cream text-muted hover:border-line-strong hover:text-ink"
                                         }`}
                                     >
                                         Active
@@ -390,15 +391,15 @@ export function ChatLauncher({ fullPage = false }) {
                             <div className="min-h-0 flex-1 overflow-y-auto">
                                 {loading ? (
                                     <div className="flex items-center justify-center gap-2 p-10 text-sm text-muted">
-                                        <LoaderCircle
-                                            size={18}
-                                            className="animate-spin"
-                                        />
-                                        Loading conversations...
+                                        <LoaderCircle size={18} className="animate-spin text-copper" />
+                                        <span>Loading conversations...</span>
                                     </div>
                                 ) : error ? (
                                     <div className="p-5">
-                                        <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                                        <p
+                                            role="alert"
+                                            className="rounded-xl border border-danger/30 bg-danger-soft p-3.5 text-sm font-medium text-danger"
+                                        >
                                             {error}
                                         </p>
                                     </div>
@@ -423,95 +424,69 @@ export function ChatLauncher({ fullPage = false }) {
                                     </div>
                                 ) : (
                                     <ul className="divide-y divide-line">
-                                        {filteredConversations.map(
-                                            (conversation) => {
-                                                const participant =
-                                                    getOtherParticipant(
-                                                        conversation
-                                                    );
+                                        {filteredConversations.map((conversation) => {
+                                            const participant = getOtherParticipant(conversation);
+                                            const application = conversation.application;
+                                            const job = conversation.job;
+                                            const participantName =
+                                                participant?.fullName || "Conversation participant";
+                                            const isSelected =
+                                                getId(selectedConversation) === getId(conversation);
 
-                                                const application =
-                                                    conversation.application;
+                                            return (
+                                                <li key={conversation._id}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setSelectedConversation(conversation)
+                                                        }
+                                                        className={`group flex w-full items-center gap-3 border-b border-line/70 px-4 py-4 text-left transition-colors hover:bg-cream ${
+                                                            isSelected
+                                                                ? "bg-cream shadow-[inset_3px_0_0_0_var(--brand-copper)]"
+                                                                : "bg-paper"
+                                                        }`}
+                                                    >
+                                                        {/* Participant avatar */}
+                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-copper/15 bg-copper/10 text-sm font-semibold text-copper transition-transform group-hover:scale-[1.03]">
+                                                            {getInitials(participantName)}
+                                                        </div>
 
-                                                const job = conversation.job;
+                                                        {/* Conversation details */}
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center justify-between gap-2">
+                                                                <p className="truncate text-sm font-semibold text-ink">
+                                                                    {participantName}
+                                                                </p>
 
-                                                const participantName =
-                                                    participant?.fullName ||
-                                                    "Conversation participant";
+                                                                <span className="shrink-0 text-[10px] text-muted">
+                                  {formatTime(conversation.lastMessageAt)}
+                                </span>
+                                                            </div>
 
-                                                const isSelected =
-                                                    getId(
-                                                        selectedConversation
-                                                    ) === getId(conversation);
+                                                            <p className="mt-1 truncate text-xs font-semibold tracking-wide text-copper">
+                                                                {job?.title || "Job conversation"}
+                                                            </p>
 
-                                                return (
-                                                    <li key={conversation._id}>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                setSelectedConversation(
-                                                                    conversation
-                                                                )
-                                                            }
-                                                            className={`group flex w-full items-center gap-3 border-b border-line/70 px-4 py-4 text-left transition-colors hover:bg-cream ${
-                                                                isSelected
-                                                                    ? "bg-cream shadow-[inset_3px_0_0_0_var(--brand-copper)]"
-                                                                    : "bg-paper"
+                                                            <p className="mt-1 truncate text-xs text-muted">
+                                                                {getLastMessage(conversation)}
+                                                            </p>
+                                                        </div>
+
+                                                        <span
+                                                            className={`h-2 w-2 shrink-0 rounded-full ${
+                                                                CLOSED_STATUSES.includes(application?.status)
+                                                                    ? "bg-line-strong"
+                                                                    : "bg-copper"
                                                             }`}
-                                                        >
-                                                            {/* Participant avatar */}
-                                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-copper/15 bg-copper/10 text-sm font-semibold text-copper transition-transform group-hover:scale-[1.03]">
-                                                                {getInitials(
-                                                                    participantName
-                                                                )}
-                                                            </div>
-
-                                                            {/* Conversation details */}
-                                                            <div className="min-w-0 flex-1">
-                                                                <div className="flex items-center justify-between gap-2">
-                                                                    <p className="truncate text-sm font-semibold text-ink">
-                                                                        {participantName}
-                                                                    </p>
-
-                                                                    <span className="shrink-0 text-[10px] text-muted">
-                                                                        {formatTime(
-                                                                            conversation.lastMessageAt
-                                                                        )}
-                                                                    </span>
-                                                                </div>
-
-                                                                <p className="mt-1 truncate text-xs font-semibold tracking-wide text-copper">
-                                                                    {job?.title ||
-                                                                        "Job conversation"}
-                                                                </p>
-
-                                                                <p className="mt-1 truncate text-xs text-muted">
-                                                                    {getLastMessage(
-                                                                        conversation
-                                                                    )}
-                                                                </p>
-                                                            </div>
-
-                                                            <span
-                                                                className={`h-2 w-2 shrink-0 rounded-full ${
-                                                                    CLOSED_STATUSES.includes(
-                                                                        application?.status
-                                                                    )
-                                                                        ? "bg-line"
-                                                                        : "bg-copper"
-                                                                }`}
-                                                                title={
-                                                                    application?.status?.replaceAll(
-                                                                        "_",
-                                                                        " "
-                                                                    ) || "Pending"
-                                                                }
-                                                            />
-                                                        </button>
-                                                    </li>
-                                                );
-                                            }
-                                        )}
+                                                            title={
+                                                                application?.status?.replaceAll("_", " ") ||
+                                                                "Pending"
+                                                            }
+                                                        />
+                                                    </button>
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 )}
                             </div>
@@ -529,35 +504,31 @@ export function ChatLauncher({ fullPage = false }) {
                                 selectedConversation
                                     ? "flex"
                                     : fullPage
-                                      ? "hidden md:flex"
-                                      : "hidden"
+                                        ? "hidden md:flex"
+                                        : "hidden"
                             }`}
                         >
                             {selectedConversation ? (
                                 <>
-                                    {/* Return to the list in compact and mobile layouts */}
+                                    {/* Return to list in compact and mobile layouts */}
                                     <button
                                         type="button"
                                         onClick={returnToInbox}
-                                        className={`flex shrink-0 items-center gap-2 border-b border-line bg-cream px-4 py-3 text-sm font-semibold text-ink ${
+                                        className={`flex shrink-0 items-center gap-2 border-b border-line bg-cream px-4 py-3 text-sm font-semibold text-ink transition hover:text-copper ${
                                             fullPage ? "md:hidden" : ""
                                         }`}
                                     >
                                         <ArrowLeft size={18} />
-                                        All messages
+                                        <span>All messages</span>
                                     </button>
 
                                     <div className="min-h-0 flex-1">
                                         <FloatingNegotiationChat
                                             token={token}
                                             user={user}
-                                            application={
-                                                selectedConversation.application
-                                            }
+                                            application={selectedConversation.application}
                                             job={selectedConversation.job}
-                                            initialConversation={
-                                                selectedConversation
-                                            }
+                                            initialConversation={selectedConversation}
                                             initiallyOpen={true}
                                             showLauncher={false}
                                             embedded={true}
@@ -576,9 +547,8 @@ export function ChatLauncher({ fullPage = false }) {
                                     </h3>
 
                                     <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted">
-                                        Select a conversation to discuss a job,
-                                        exchange messages and negotiate a fair
-                                        price.
+                                        Select a conversation to discuss a job, exchange messages
+                                        and negotiate a fair price.
                                     </p>
                                 </div>
                             )}
@@ -596,7 +566,6 @@ export function ChatLauncher({ fullPage = false }) {
                             suppressLauncherClick.current = false;
                             return;
                         }
-
                         setOpen(true);
                     }}
                     onPointerDown={(event) => startDrag("launcher", event)}
@@ -607,18 +576,20 @@ export function ChatLauncher({ fullPage = false }) {
                     style={
                         launcherPosition
                             ? {
-                                  left: `${launcherPosition.x}px`,
-                                  top: `${launcherPosition.y}px`,
-                              }
+                                left: `${launcherPosition.x}px`,
+                                top: `${launcherPosition.y}px`,
+                            }
                             : undefined
                     }
                     aria-label="Open messages"
                     title="Drag to move messages button"
-                    className={`fixed z-[85] flex h-16 w-16 items-center justify-center rounded-[1.35rem] border border-white/15 bg-copper text-white shadow-[0_12px_32px_rgba(168,79,43,0.35)] transition-all duration-200 hover:-translate-y-1 hover:bg-copper-deep hover:shadow-[0_16px_38px_rgba(168,79,43,0.42)] active:translate-y-0 ${
-                        launcherPosition ? "" : "bottom-5 right-5 max-sm:bottom-4 max-sm:right-4"
+                    className={`fixed z-[85] flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-copper text-white shadow-[0_12px_32px_rgba(168,79,43,0.35)] transition-all duration-200 hover:-translate-y-1 hover:bg-copper-deep active:translate-y-0 sm:h-16 sm:w-16 sm:rounded-[1.35rem] ${
+                        launcherPosition
+                            ? ""
+                            : "bottom-20 right-4 sm:bottom-5 sm:right-5"
                     }`}
                 >
-                    <MessageCircle size={27} strokeWidth={2.2} />
+                    <MessageCircle size={25} strokeWidth={2.2} />
                 </button>
             )}
         </>

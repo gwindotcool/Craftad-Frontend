@@ -6,12 +6,16 @@ import { ThemeProvider } from "./theme";
 import App from "./App.jsx";
 import "./index.css";
 
-// Initialize the React Query Client with global defaults
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            staleTime: 1000 * 60 * 5, // Cache data for 5 minutes before refetching
-            retry: 1, // Only retry failed requests once to avoid spamming the backend
+            staleTime: 1000 * 30, // 30s default so bids, job status, and wallet balances stay fresh
+            gcTime: 1000 * 60 * 10, // Keep unused cache in memory for 10 mins
+            refetchOnWindowFocus: true, // Revalidate immediately when user returns from Paystack/bank tab
+            retry: 1,
+        },
+        mutations: {
+            retry: 0, // Never auto-retry writes (prevents duplicate bids or double payouts)
         },
     },
 });
@@ -25,5 +29,5 @@ createRoot(document.getElementById("root")).render(
                 </BrowserRouter>
             </QueryClientProvider>
         </ThemeProvider>
-    </StrictMode>,
+    </StrictMode>
 );

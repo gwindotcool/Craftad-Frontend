@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* =========================================
-   CRAFTAD DESIGN SYSTEM
+   CRAFTAD DESIGN SYSTEM (TAILWIND V4)
    ========================================= */
 
 :root {
@@ -14,66 +14,114 @@
     --brand-copper-deep: #853C22;
     --brand-pine: #243D32;
 
-    /* Surfaces */
+    /* Surfaces (4-tier elevation) */
     --surface-page: #F5F0E8;
+    --surface-subtle: #ECE4D7;
     --surface-card: #FFFCF6;
     --surface-raised: #FFFFFF;
 
     /* Typography */
     --text-primary: #211B17;
-    --text-secondary: #70665D;
+    --text-secondary: #685E55;
 
     /* Borders */
     --border-default: #E5DACE;
-    --border-strong: #D2C4B4;
+    --border-strong: #CEBFA9;
 
-    --focus-ring: rgba(168, 79, 43, 0.25);
+    /* Harmonized Marketplace Semantics */
+    --status-success: #256849;
+    --status-success-bg: #E5F1EB;
+    --status-warning: #B0651A;
+    --status-warning-bg: #F9EFE0;
+    --status-danger: #B53830;
+    --status-danger-bg: #FAEBE9;
+
+    /* Warm Elevation Shadows */
+    --shadow-card: 0 1px 2px rgba(33, 27, 23, 0.04), 0 6px 16px -4px rgba(33, 27, 23, 0.06);
+    --shadow-raised: 0 4px 12px -2px rgba(33, 27, 23, 0.08), 0 16px 32px -8px rgba(33, 27, 23, 0.12);
+
+    --focus-ring: rgba(168, 79, 43, 0.28);
 }
 
 .dark {
     color-scheme: dark;
 
-    --brand-copper: #A84F2B;
-    --brand-copper-deep: #853C22;
-    --brand-pine: #243D32;
+    /* Refined Luminous Copper & Pine (Luxurious contrast) */
+    --brand-copper: #E08A63;
+    --brand-copper-deep: #F0A07B;
+    --brand-pine: #7CB89D;
 
-    --surface-page: #14110F;
-    --surface-card: #201B17;
-    --surface-raised: #29221D;
+    /* Surfaces: Layered Obsidian & Rich Espresso for tactile depth */
+    --surface-page: #0E0C0A;          /* Deep obsidian base */
+    --surface-subtle: #181512;         /* Input & secondary fills */
+    --surface-card: #161311;           /* Card background */
+    --surface-raised: #221D1A;         /* Elevated cards, modals & active states */
 
-    --text-primary: #F5EFE7;
-    --text-secondary: #B4A89C;
+    /* Typography: Warm editorial off-white (never blinding #FFF) */
+    --text-primary: #F7F3EE;
+    --text-secondary: #A89C90;
 
-    --border-default: #39312B;
-    --border-strong: #51453B;
+    /* Borders: Crisp architectural lines that define every card */
+    --border-default: #2E2722;
+    --border-strong: #453B34;
 
-    --focus-ring: rgba(205, 133, 96, 0.3);
+    /* Dark Semantics (Vibrant, high-contrast badges) */
+    --status-success: #4ADE80;
+    --status-success-bg: rgba(74, 222, 128, 0.12);
+    --status-warning: #FBBF24;
+    --status-warning-bg: rgba(251, 191, 36, 0.12);
+    --status-danger: #F87171;
+    --status-danger-bg: rgba(248, 113, 113, 0.12);
+
+    /* Dark Elevation (Crisp shadow + subtle rim border light) */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 10px 24px -6px rgba(0, 0, 0, 0.4);
+    --shadow-raised: 0 12px 36px -4px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.06);
+
+    --focus-ring: rgba(224, 138, 99, 0.35);
 }
 
-/* Tailwind utility mappings */
-@theme {
+/* @theme inline ensures runtime CSS variables work cleanly with opacity modifiers (e.g. bg-copper/15) */
+@theme inline {
     --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
     --font-display: "Fraunces", ui-serif, Georgia, serif;
 
+    /* Surfaces */
     --color-paper: var(--surface-page);
+    --color-subtle: var(--surface-subtle);
     --color-cream: var(--surface-card);
+    --color-raised: var(--surface-raised);
+
+    /* Text & Lines */
     --color-ink: var(--text-primary);
     --color-muted: var(--text-secondary);
     --color-line: var(--border-default);
+    --color-line-strong: var(--border-strong);
+
+    /* Brand */
     --color-copper: var(--brand-copper);
     --color-copper-deep: var(--brand-copper-deep);
     --color-pine: var(--brand-pine);
 
+    /* Semantics */
+    --color-success: var(--status-success);
+    --color-success-soft: var(--status-success-bg);
+    --color-warning: var(--status-warning);
+    --color-warning-soft: var(--status-warning-bg);
+    --color-danger: var(--status-danger);
+    --color-danger-soft: var(--status-danger-bg);
+
+    /* Shadows & Radii */
+    --shadow-card: var(--shadow-card);
+    --shadow-raised: var(--shadow-raised);
     --radius-card: 1.25rem;
 }
 
-/* Global styles */
 @layer base {
     html {
         min-height: 100%;
-        background: var(--surface-page);
+        background-color: var(--surface-page);
         color: var(--text-primary);
-        font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
+        font-family: var(--font-sans);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
@@ -83,18 +131,25 @@
     body {
         min-height: 100vh;
         margin: 0;
-        background: var(--surface-page);
+        background-color: var(--surface-page);
         color: var(--text-primary);
-        font-family: inherit;
     }
 
     #root {
         min-height: 100vh;
     }
 
-    h1, h2, h3, h4, h5, h6, .font-display {
-        font-family: "Fraunces", ui-serif, Georgia, serif;
-        color: inherit;
+    /* Reserve Fraunces for major display headings; keep h3-h6 crisp in Outfit */
+    h1, h2, .font-display {
+        font-family: var(--font-display);
+        font-variation-settings: "SOFT" 50, "WONK" 0;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+    }
+
+    h3, h4, h5, h6 {
+        font-family: var(--font-sans);
+        letter-spacing: -0.015em;
         text-wrap: balance;
     }
 
@@ -114,21 +169,20 @@
     input::placeholder,
     textarea::placeholder {
         color: var(--text-secondary);
-        opacity: 0.8;
+        opacity: 0.75;
     }
 
     :focus-visible {
         outline: 2px solid var(--brand-copper);
-        outline-offset: 3px;
+        outline-offset: 2px;
     }
 
     ::selection {
-        background: rgba(168, 79, 43, 0.2);
+        background: color-mix(in srgb, var(--brand-copper) 25%, transparent);
         color: var(--text-primary);
     }
 }
 
-/* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

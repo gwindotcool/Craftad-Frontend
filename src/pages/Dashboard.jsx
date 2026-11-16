@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
     ArrowRight,
     ArrowUpRight,
     BriefcaseBusiness,
+    CheckCircle2,
     Eye,
     EyeOff,
     MapPin,
     Plus,
-    ShieldCheck,
+    RefreshCw,
+    UserCheck,
     Wallet,
 } from "lucide-react";
 
@@ -17,12 +19,11 @@ import { useSession } from "../session";
 import { SocialLinksForm } from "../components/SocialLinksForm";
 
 const ACTIVE_JOB_STATUSES = ["open", "assigned", "in_progress"];
+const COMPLETED_JOB_STATUSES = ["completed", "customer_confirmed", "paid"];
 
 function formatNaira(amount) {
     const value = Number(amount);
-
     if (!Number.isFinite(value)) return "—";
-
     return `₦${value.toLocaleString("en-NG", {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
@@ -30,21 +31,30 @@ function formatNaira(amount) {
 }
 
 function getJobAmountLabel(job) {
-    if (job.agreedPrice != null) {
-        return formatNaira(job.agreedPrice);
-    }
+    const agreed = Number(job.agreedPrice);
+    if (Number.isFinite(agreed) && agreed > 0) return formatNaira(agreed);
 
-    if (job.budget != null) {
-        return formatNaira(job.budget);
-    }
+    const budget = Number(job.budget);
+    if (Number.isFinite(budget) && budget > 0) return formatNaira(budget);
 
     return "Open budget";
 }
 
-function formatJobStatus(status) {
-    if (!status) return "Status unavailable";
-
-    return status.replaceAll("_", " ");
+function getStatusBadgeStyle(status) {
+    switch (status) {
+        case "completed":
+        case "customer_confirmed":
+        case "paid":
+            return "bg-success-soft text-success";
+        case "in_progress":
+        case "assigned":
+            return "bg-warning-soft text-warning";
+        case "disputed":
+        case "cancelled":
+            return "bg-danger-soft text-danger";
+        default:
+            return "bg-copper/12 text-copper";
+    }
 }
 
 export function Dashboard() {
@@ -54,21 +64,42 @@ export function Dashboard() {
     const [balance, setBalance] = useState(null);
     const [note, setNote] = useState("");
     const [jobsLoading, setJobsLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     const [skills, setSkills] = useState("");
     const [years, setYears] = useState("1");
     const [bio, setBio] = useState("");
-    const [profileNote, setProfileNote] = useState("");
+    const [profileNote, setProfileNote] = useState({ type: "", text: "" });
     const [profileSaving, setProfileSaving] = useState(false);
     const [balanceVisible, setBalanceVisible] = useState(true);
 
+    const isArtisan = user?.role === "artisan";
+
+    // Hydrate artisan profile fields if already present on user/profile payload
     useEffect(() => {
-        if (!token || !user) return;
+        if (!user || user.role !== "artisan") return;
+        const profile = user.artisanProfile || user.artisan || user;
+        if (Array.isArray(profile.skills) && profile.skills.length > 0) {
+            setSkills(profile.skills.join(", "));
+        } else if (typeof profile.skills === "string" && profile.skills.trim()) {
+            setSkills(profile.skills);
+        }
+        if (profile.yearsOfExperience != null) {
+            setYears(String(profile.yearsOfExperience));
+        }
+        if (typeof profile.bio === "string" && profile.bio.trim()) {
+            setBio(profile.bio);
+        }
+    }, [user]);
 
-        let cancelled = false;
-
-        async function loadDashboard() {
-            setJobsLoading(true);
+    const loadDashboard = useCallback(
+        async (isManual = false) => {
+            if (!token || !user) return;
+            if (isManual) {
+                setRefreshing(true);
+            } else {
+                setJobsLoading(true);
+            }
             setNote("");
 
             const jobsRequest =
@@ -76,12 +107,13 @@ export function Dashboard() {
                     ? craftad.openJobs(token)
                     : craftad.myJobs(token);
 
-            const [jobsResult, walletResult] = await Promise.allSettled([
-                jobsRequest,
-                craftad.wallet(token),
-            ]);
+            const requests = [jobsRequest, craftad.wallet(token)];
+            if (user.role === "artisan" && typeof craftad.profile === "function") {
+                requests.push(craftad.profile(token));
+            }
 
-            if (cancelled) return;
+            const [jobsResult, walletResult, profileResult] =
+                await Promise.allSettled(requests);
 
             if (jobsResult.status === "fulfilled") {
                 setJobs(listOf(jobsResult.value, ["jobs"]));
@@ -94,43 +126,75 @@ export function Dashboard() {
             }
 
             if (walletResult.status === "fulfilled") {
-                setBalance(
-                    walletResult.value?.wallet?.balance ?? null
-                );
+                setBalance(walletResult.value?.wallet?.balance ?? null);
             } else {
                 setBalance(null);
             }
 
+            if (profileResult?.status === "fulfilled") {
+                const fetchedUser =
+                    profileResult.value?.user || profileResult.value?.data?.user;
+                const artisanData =
+                    profileResult.value?.artisan ||
+                    fetchedUser?.artisanProfile ||
+                    fetchedUser;
+                if (artisanData) {
+                    if (
+                        Array.isArray(artisanData.skills) &&
+                        artisanData.skills.length > 0
+                    ) {
+                        setSkills(artisanData.skills.join(", "));
+                    }
+                    if (artisanData.yearsOfExperience != null) {
+                        setYears(String(artisanData.yearsOfExperience));
+                    }
+                    if (typeof artisanData.bio === "string" && artisanData.bio.trim()) {
+                        setBio(artisanData.bio);
+                    }
+                }
+            }
+
             setJobsLoading(false);
-        }
+            setRefreshing(false);
+        },
+        [token, user]
+    );
 
-        loadDashboard();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [token, user]);
-
-    const isArtisan = user?.role === "artisan";
+    useEffect(() => {
+        loadDashboard(false);
+    }, [loadDashboard]);
 
     const activeJobs = isArtisan
         ? jobs.filter((job) => job.status === "open")
-        : jobs.filter((job) =>
-            ACTIVE_JOB_STATUSES.includes(job.status)
-        );
+        : jobs.filter((job) => ACTIVE_JOB_STATUSES.includes(job.status));
+
+    const completedJobsCount = jobs.filter((job) =>
+        COMPLETED_JOB_STATUSES.includes(job.status)
+    ).length;
 
     async function handleProfileSubmit(event) {
         event.preventDefault();
-        setProfileNote("");
+        setProfileNote({ type: "", text: "" });
         setProfileSaving(true);
 
+        const parsedSkills = skills
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean);
+
+        if (parsedSkills.length === 0) {
+            setProfileNote({
+                type: "error",
+                text: "Please enter at least one trade skill.",
+            });
+            setProfileSaving(false);
+            return;
+        }
+
         const body = {
-            skills: skills
-                .split(",")
-                .map((item) => item.trim())
-                .filter(Boolean),
-            yearsOfExperience: Number(years),
-            bio,
+            skills: parsedSkills,
+            yearsOfExperience: Number(years) || 0,
+            bio: bio.trim(),
             location: {
                 type: "Point",
                 coordinates: [3.3792, 6.5244],
@@ -143,14 +207,18 @@ export function Dashboard() {
             } catch {
                 await craftad.createArtisan(token, body);
             }
-
-            setProfileNote("Artisan profile saved successfully.");
+            setProfileNote({
+                type: "success",
+                text: "Artisan profile saved successfully.",
+            });
         } catch (error) {
-            setProfileNote(
-                error instanceof Error
-                    ? error.message
-                    : "Could not save your profile."
-            );
+            setProfileNote({
+                type: "error",
+                text:
+                    error instanceof Error
+                        ? error.message
+                        : "Could not save your profile.",
+            });
         } finally {
             setProfileSaving(false);
         }
@@ -158,497 +226,444 @@ export function Dashboard() {
 
     return (
         <div className="space-y-8 pb-12 sm:space-y-10">
-
-            {/* Welcome Banner */}
-            <section className="relative isolate overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#1a1714] via-[#241d17] to-copper-deep p-6 text-[#f4efe6] shadow-xl sm:p-9 lg:p-10">
-
+            {/* Welcome Banner (Role-tinted: Pine for Artisans, Espresso/Copper for Customers) */}
+            <section
+                className={`relative isolate overflow-hidden rounded-3xl p-6 text-[#F5EFE7] shadow-raised sm:p-9 lg:p-10 ${
+                    isArtisan
+                        ? "bg-gradient-to-br from-[#192B23] via-[#243D32] to-[#1D3229]"
+                        : "bg-gradient-to-br from-[#1D1815] via-[#2A201A] to-[#853C22]"
+                }`}
+            >
                 <div
                     aria-hidden="true"
                     className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full border border-white/10 bg-white/5 blur-2xl"
                 />
 
-                <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full border border-copper/20 bg-copper/10 blur-2xl"
-                />
-
                 <div className="relative z-10 flex flex-col justify-between gap-7 sm:flex-row sm:items-center">
-
-                    <div className="max-w-2xl space-y-4">
-
-                        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-copper backdrop-blur-md">
-                            <span className="h-1.5 w-1.5 rounded-full bg-copper" />
+                    <div className="max-w-2xl space-y-3.5">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#F5EFE7] backdrop-blur-md">
+              <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                      isArtisan ? "bg-[#7AC7A4]" : "bg-[#F29C77]"
+                  }`}
+              />
                             {isArtisan ? "Artisan Workspace" : "Customer Workspace"}
                         </div>
 
                         <div className="space-y-2">
-                            <h1 className="font-display text-3xl tracking-tight text-white sm:text-4xl lg:text-5xl">
-                                Welcome back,{" "}
-                                {user?.fullName?.split(" ")[0] || "there"}.
+                            <h1 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                                Welcome back, {user?.fullName?.split(" ")[0] || "there"}.
                             </h1>
 
-                            <p className="max-w-xl text-sm leading-relaxed text-[#f4efe6]/75 sm:text-base">
+                            <p className="max-w-xl text-sm leading-relaxed text-[#F5EFE7]/80 sm:text-base">
                                 {isArtisan
-                                    ? "Discover new opportunities, manage your applications, and keep your projects moving."
-                                    : "Manage your projects, follow job progress, and stay on top of your Craftad activity."}
+                                    ? "Browse open local jobs, submit competitive quotes, and track your escrow payouts."
+                                    : "Post new jobs, compare artisan quotes, and monitor active milestones in one place."}
                             </p>
                         </div>
                     </div>
 
-                    {user?.role === "customer" && (
-                        <Link
-                            to="/jobs/new"
-                            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-copper px-6 text-sm font-semibold text-white no-underline shadow-lg shadow-copper/20 transition-all hover:-translate-y-0.5 hover:bg-copper-deep hover:shadow-xl"
+                    <div className="flex shrink-0 items-center gap-2.5">
+                        <button
+                            type="button"
+                            onClick={() => loadDashboard(true)}
+                            disabled={jobsLoading || refreshing}
+                            aria-label="Refresh workspace"
+                            title="Refresh workspace"
+                            className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 disabled:opacity-50"
                         >
-                            <Plus size={17} />
-                            Post a Job
-                        </Link>
-                    )}
+                            <RefreshCw
+                                size={17}
+                                className={refreshing ? "animate-spin" : ""}
+                            />
+                        </button>
 
-                    {isArtisan && (
-                        <Link
-                            to="/jobs?view=all"
-                            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-copper px-6 text-sm font-semibold text-white no-underline shadow-lg shadow-copper/20 transition-all hover:-translate-y-0.5 hover:bg-copper-deep hover:shadow-xl"
-                        >
-                            Explore Jobs
-                            <ArrowUpRight size={17} />
-                        </Link>
-                    )}
+                        {isArtisan ? (
+                            <Link
+                                to="/jobs?view=all"
+                                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[#FFFCF6] px-6 text-sm font-semibold text-[#211B17] no-underline shadow-md transition-all hover:-translate-y-0.5 hover:bg-white"
+                            >
+                                <span>Explore Open Jobs</span>
+                                <ArrowUpRight size={17} />
+                            </Link>
+                        ) : (
+                            <Link
+                                to="/jobs/new"
+                                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[#FFFCF6] px-6 text-sm font-semibold text-[#211B17] no-underline shadow-md transition-all hover:-translate-y-0.5 hover:bg-white"
+                            >
+                                <Plus size={17} />
+                                <span>Post a Job</span>
+                            </Link>
+                        )}
+                    </div>
                 </div>
             </section>
 
-            {/* Account Overview */}
-            <section className="space-y-5">
-
-                <div className="flex flex-col gap-1">
-                    <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-                        Account Overview
-                    </h2>
-
-                    <p className="text-sm text-muted">
-                        A quick look at your jobs, wallet, and account.
-                    </p>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-
-                    <StatCard
-                        label={isArtisan ? "Open Opportunities" : "Active Jobs"}
-                        value={
-                            jobsLoading
-                                ? "..."
-                                : String(activeJobs.length)
-                        }
-                        description={
-                            isArtisan
-                                ? "Available jobs you can explore"
-                                : "Jobs that are open or currently in progress"
-                        }
-                        icon={BriefcaseBusiness}
-                    />
-
-
-                    <StatCard
-                        label="Wallet Balance"
-                        value={
-                            balance === null
-                                ? "—"
-                                : balanceVisible
-                                    ? formatNaira(balance)
-                                    : "₦ ••••••"
-                        }
-                        description="Current wallet balance"
-                        icon={Wallet}
-                        action={
-                            balance !== null && (
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setBalanceVisible((visible) => !visible)
-                                    }
-                                    aria-label={
-                                        balanceVisible
-                                            ? "Hide wallet balance"
-                                            : "Show wallet balance"
-                                    }
-                                    title={
-                                        balanceVisible
-                                            ? "Hide balance"
-                                            : "Show balance"
-                                    }
-                                    className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-copper/10 hover:text-copper focus:outline-none focus:ring-2 focus:ring-copper/30"
-                                >
-                                    {balanceVisible ? (
-                                        <EyeOff size={17} />
-                                    ) : (
-                                        <Eye size={17} />
-                                    )}
-                                </button>
-                            )
-                        }
-                    />
-
-                    <StatCard
-                        label="Account Status"
-                        value="Active"
-                        description="Your Craftad account is currently accessible"
-                        icon={ShieldCheck}
-                        status
-                    />
-
-
-                </div>
-            </section>
-
-            {/* Dashboard Error */}
+            {/* Error Alert */}
             {note && (
                 <div
                     role="alert"
-                    className="rounded-xl border border-red-500/20 bg-red-500/5 px-5 py-4 text-sm text-red-600"
+                    className="rounded-2xl border border-danger/25 bg-danger-soft px-5 py-4 text-sm font-medium text-danger"
                 >
                     {note}
                 </div>
             )}
 
-            {/* Quick Navigation */}
-            <section className="rounded-2xl border border-line bg-cream p-4 sm:p-5">
+            {/* Key Metrics */}
+            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <StatCard
+                    label={isArtisan ? "Open Opportunities" : "Active Jobs"}
+                    value={jobsLoading ? "—" : String(activeJobs.length)}
+                    description={
+                        isArtisan
+                            ? "Live jobs accepting applications"
+                            : "Jobs currently open or in progress"
+                    }
+                    icon={BriefcaseBusiness}
+                />
 
-                <div className="mb-4 flex items-center justify-between gap-3">
-                    <div>
-                        <h2 className="text-sm font-semibold text-ink">
-                            Quick Access
-                        </h2>
-                        <p className="mt-1 text-xs text-muted">
-                            Jump straight to what you need.
-                        </p>
-                    </div>
-
-                    <ArrowUpRight size={18} className="text-muted" />
-                </div>
-
-                <div className="flex flex-wrap gap-2.5">
-
-                    <QuickLink to="/jobs?view=all">
-                        Browse Marketplace
-                    </QuickLink>
-
-                    <QuickLink to="/jobs?view=assigned">
-                        Assigned Jobs
-                    </QuickLink>
-
-                    <Link
-                        to="/wallet"
-                        className="inline-flex min-h-10 items-center gap-2 rounded-full bg-copper px-4 text-xs font-semibold text-white no-underline transition-colors hover:bg-copper-deep sm:ml-auto"
-                    >
-                        View Wallet
-                        <ArrowRight size={14} />
-                    </Link>
-
-                </div>
-            </section>
-
-            {/* Artisan Profile */}
-            {isArtisan && (
-                <section className="rounded-[1.75rem] border border-line bg-cream p-6 shadow-sm sm:p-8">
-
-                    <div className="mb-6">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-copper">
-                            PROFESSIONAL PROFILE
-                        </p>
-
-                        <h2 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">
-                            Your Artisan Profile
-                        </h2>
-
-                        <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-                            Share your experience and professional skills
-                            so customers can better understand your services.
-                        </p>
-                    </div>
-
-                    <form
-                        className="grid gap-5"
-                        onSubmit={handleProfileSubmit}
-                    >
-                        <div className="grid gap-4 sm:grid-cols-2">
-
-                            <div className="space-y-2">
-                                <label
-                                    htmlFor="artisan-skills"
-                                    className="text-xs font-semibold text-ink"
-                                >
-                                    Professional Skills
-                                </label>
-
-                                <input
-                                    id="artisan-skills"
-                                    value={skills}
-                                    onChange={(event) =>
-                                        setSkills(event.target.value)
-                                    }
-                                    placeholder="e.g. Carpentry, Plumbing"
-                                    className="min-h-12 w-full rounded-xl border border-line bg-paper px-4 text-sm text-ink outline-none transition placeholder:text-muted focus:border-copper focus:ring-2 focus:ring-copper/10"
-                                    required
-                                />
-
-                                <p className="text-[11px] text-muted">
-                                    Separate multiple skills with commas.
-                                </p>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label
-                                    htmlFor="artisan-years"
-                                    className="text-xs font-semibold text-ink"
-                                >
-                                    Years of Experience
-                                </label>
-
-                                <input
-                                    id="artisan-years"
-                                    type="number"
-                                    min="0"
-                                    max="80"
-                                    value={years}
-                                    onChange={(event) =>
-                                        setYears(event.target.value)
-                                    }
-                                    className="min-h-12 w-full rounded-xl border border-line bg-paper px-4 text-sm text-ink outline-none transition placeholder:text-muted focus:border-copper focus:ring-2 focus:ring-copper/10"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label
-                                htmlFor="artisan-bio"
-                                className="text-xs font-semibold text-ink"
-                            >
-                                Professional Summary
-                            </label>
-
-                            <textarea
-                                id="artisan-bio"
-                                value={bio}
-                                onChange={(event) =>
-                                    setBio(event.target.value)
-                                }
-                                rows={4}
-                                maxLength={1000}
-                                placeholder="Tell customers about your experience, services, and the quality of your work..."
-                                className="w-full resize-y rounded-xl border border-line bg-paper p-4 text-sm text-ink outline-none transition placeholder:text-muted focus:border-copper focus:ring-2 focus:ring-copper/10"
-                            />
-
-                            <p className="text-right text-[11px] text-muted">
-                                {bio.length}/1000
-                            </p>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-4">
+                <StatCard
+                    label="Escrow & Wallet"
+                    value={
+                        balance === null
+                            ? "—"
+                            : balanceVisible
+                                ? formatNaira(balance)
+                                : "₦ ••••••"
+                    }
+                    description="Available balance for payouts & hires"
+                    icon={Wallet}
+                    action={
+                        balance !== null && (
                             <button
-                                type="submit"
-                                disabled={profileSaving}
-                                className="inline-flex min-h-11 items-center justify-center rounded-full bg-copper px-7 text-sm font-semibold text-white transition-all hover:bg-copper-deep hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+                                type="button"
+                                onClick={() => setBalanceVisible((visible) => !visible)}
+                                aria-label={
+                                    balanceVisible ? "Hide wallet balance" : "Show wallet balance"
+                                }
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted transition-colors hover:bg-subtle hover:text-ink"
                             >
-                                {profileSaving ? "Saving..." : "Save Profile"}
+                                {balanceVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
+                        )
+                    }
+                />
 
-                            {profileNote && (
-                                <p
-                                    role="status"
-                                    className="text-sm font-medium text-copper-deep"
-                                >
-                                    {profileNote}
-                                </p>
-                            )}
-                        </div>
-                    </form>
-                </section>
-            )}
-
-            {/* Social Links */}
-            <section className="rounded-[1.75rem] border border-line bg-cream p-6 shadow-sm sm:p-8">
-
-                <div className="mb-6">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-copper">
-                        CONNECT
-                    </p>
-
-                    <h2 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">
-                        Social Links
-                    </h2>
-
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
-                        Add your professional social profiles to help
-                        customers learn more about your work.
-                    </p>
-                </div>
-
-                <SocialLinksForm />
+                <StatCard
+                    label={isArtisan ? "Profile Readiness" : "Completed Jobs"}
+                    value={
+                        isArtisan
+                            ? skills.trim()
+                                ? "Ready"
+                                : "Incomplete"
+                            : jobsLoading
+                                ? "—"
+                                : String(completedJobsCount)
+                    }
+                    description={
+                        isArtisan
+                            ? "Complete your trade bio to win more bids"
+                            : "Jobs signed off and paid out"
+                    }
+                    icon={isArtisan ? UserCheck : CheckCircle2}
+                    badge={
+                        isArtisan
+                            ? {
+                                text: skills.trim() ? "Verified" : "Action needed",
+                                tone: skills.trim() ? "success" : "warning",
+                            }
+                            : { text: "Account Active", tone: "success" }
+                    }
+                />
             </section>
 
-            {/* Recent Jobs */}
-            <section className="space-y-5">
+            {/* Primary Action Strip */}
+            <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-cream p-4 shadow-card sm:px-6">
+                <div className="flex flex-wrap items-center gap-2.5">
+                    <QuickLink to="/jobs?view=all">Browse Marketplace</QuickLink>
+                    <QuickLink to="/jobs?view=assigned">Assigned Jobs</QuickLink>
+                    <QuickLink to="/chat">Job Messages</QuickLink>
+                </div>
 
+                <Link
+                    to="/wallet"
+                    className="inline-flex min-h-10 items-center gap-2 rounded-full bg-copper px-5 text-xs font-semibold text-white no-underline transition-colors hover:bg-copper-deep"
+                >
+                    <span>Manage Wallet</span>
+                    <ArrowRight size={14} />
+                </Link>
+            </section>
+
+            {/* Priority #1: Recent / Available Jobs */}
+            <section className="space-y-5">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                     <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-copper">
-                            YOUR WORKSPACE
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-copper">
+                            Live Activity
                         </p>
-
-                        <h2 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">
+                        <h2 className="mt-1 font-display text-2xl font-semibold text-ink sm:text-3xl">
                             {isArtisan ? "Available Jobs" : "Recent Jobs"}
                         </h2>
-
-                        <p className="mt-1 text-sm text-muted">
-                            {isArtisan
-                                ? "Explore opportunities currently available on Craftad."
-                                : "Keep track of your latest projects and their progress."}
-                        </p>
                     </div>
 
                     <Link
                         to="/jobs"
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-copper no-underline transition-colors hover:text-copper-deep"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-line bg-cream px-4 py-2 text-xs font-semibold text-ink no-underline transition-colors hover:border-copper hover:text-copper"
                     >
-                        View All
+                        <span>View all jobs</span>
                         <ArrowRight size={14} />
                     </Link>
                 </div>
 
-                <div className="grid gap-3">
-
+                <div className="grid gap-3.5">
                     {jobsLoading ? (
-                        <div className="rounded-2xl border border-line bg-cream p-10 text-center">
-                            <p className="text-sm text-muted">
-                                Loading your jobs...
-                            </p>
-                        </div>
+                        Array.from({ length: 3 }).map((_, idx) => (
+                            <div
+                                key={idx}
+                                className="h-24 animate-pulse rounded-2xl border border-line bg-cream/70 p-6"
+                            />
+                        ))
                     ) : jobs.length > 0 ? (
-                        jobs.slice(0, 4).map((job) => (
+                        jobs.slice(0, 5).map((job) => (
                             <Link
                                 key={job._id}
                                 to={`/jobs/${job._id}`}
-                                className="group flex flex-col justify-between gap-4 rounded-2xl border border-line bg-cream p-5 no-underline transition-all hover:-translate-y-0.5 hover:border-copper/40 hover:shadow-md sm:flex-row sm:items-center sm:p-6"
+                                className="group flex flex-col justify-between gap-4 rounded-2xl border border-line bg-cream p-5 no-underline shadow-card transition-all hover:-translate-y-0.5 hover:border-line-strong hover:shadow-raised sm:flex-row sm:items-center sm:p-6"
                             >
                                 <div className="min-w-0 space-y-2">
-
                                     <div className="flex flex-wrap items-center gap-2.5">
-                                        <h3 className="truncate font-semibold text-ink transition-colors group-hover:text-copper">
+                                        <h3 className="truncate text-base font-semibold text-ink transition-colors group-hover:text-copper">
                                             {job.title || "Untitled Job"}
                                         </h3>
 
-                                        <span className="rounded-full border border-line bg-paper px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
-                                            {job.category || "General"}
-                                        </span>
+                                        <span className="rounded-full border border-line bg-subtle px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-muted">
+                      {job.category || "General"}
+                    </span>
                                     </div>
 
                                     <p className="flex items-center gap-1.5 text-xs text-muted">
-                                        <MapPin size={13} />
-                                        {job.location || "Location not specified"}
+                                        <MapPin size={13} className="shrink-0 text-copper/80" />
+                                        <span>{job.location || "Location not specified"}</span>
                                     </p>
                                 </div>
 
                                 <div className="flex items-center justify-between gap-4 sm:justify-end">
-
                                     <div className="sm:text-right">
                                         <p className="font-display text-lg font-semibold text-ink">
                                             {getJobAmountLabel(job)}
                                         </p>
-
-                                        <p className="mt-1 text-xs font-medium capitalize text-copper">
-                                            {formatJobStatus(job.status)}
-                                        </p>
+                                        <span
+                                            className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${getStatusBadgeStyle(
+                                                job.status
+                                            )}`}
+                                        >
+                      {(job.status || "open").replaceAll("_", " ")}
+                    </span>
                                     </div>
 
-                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-paper text-muted transition-all group-hover:border-copper group-hover:text-copper">
-                                        <ArrowUpRight size={16} />
-                                    </span>
+                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-paper text-muted transition-all group-hover:border-copper group-hover:bg-copper group-hover:text-white">
+                    <ArrowUpRight size={16} />
+                  </span>
                                 </div>
                             </Link>
                         ))
                     ) : (
-                        <div className="rounded-2xl border border-dashed border-line bg-cream px-6 py-12 text-center">
-
-                            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-paper text-muted">
-                                <BriefcaseBusiness size={21} />
+                        <div className="rounded-3xl border border-dashed border-line-strong bg-cream px-6 py-12 text-center">
+                            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-subtle text-copper">
+                                <BriefcaseBusiness size={22} />
                             </div>
 
                             <h3 className="mt-4 font-display text-xl font-semibold text-ink">
-                                {isArtisan
-                                    ? "No open opportunities yet"
-                                    : "No job activity yet"}
+                                {isArtisan ? "No open opportunities yet" : "No jobs posted yet"}
                             </h3>
 
                             <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-muted">
                                 {isArtisan
-                                    ? "New opportunities will appear here when customers post jobs."
-                                    : "Your projects will appear here once you create or receive a job."}
+                                    ? "New local jobs will appear here as soon as customers publish them."
+                                    : "Post your first job to receive quotes from vetted local artisans."}
                             </p>
 
                             <Link
                                 to={isArtisan ? "/jobs?view=all" : "/jobs/new"}
-                                className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-full bg-copper px-5 text-xs font-semibold text-white no-underline transition-colors hover:bg-copper-deep"
+                                className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-copper px-6 text-xs font-semibold text-white no-underline shadow-sm transition-colors hover:bg-copper-deep"
                             >
-                                {isArtisan ? "Explore Jobs" : "Post Your First Job"}
+                                <span>{isArtisan ? "Explore Jobs" : "Post Your First Job"}</span>
                                 <ArrowRight size={14} />
                             </Link>
                         </div>
                     )}
-
                 </div>
             </section>
+
+            {/* Secondary Settings Grid (Profile & Social Links side-by-side on desktop) */}
+            <div className={`grid gap-6 ${isArtisan ? "lg:grid-cols-12" : ""}`}>
+                {isArtisan && (
+                    <section className="rounded-3xl border border-line bg-cream p-6 shadow-card sm:p-8 lg:col-span-7">
+                        <div className="mb-6">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-copper">
+                                Professional Profile
+                            </p>
+                            <h2 className="mt-1.5 font-display text-2xl font-semibold text-ink">
+                                Your Artisan Credentials
+                            </h2>
+                            <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                                Keep your trade skills and experience up to date so customers
+                                trust your bids.
+                            </p>
+                        </div>
+
+                        <form className="grid gap-5" onSubmit={handleProfileSubmit}>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="space-y-1.5">
+                                    <label
+                                        htmlFor="artisan-skills"
+                                        className="text-xs font-semibold text-ink"
+                                    >
+                                        Trade Skills
+                                    </label>
+                                    <input
+                                        id="artisan-skills"
+                                        value={skills}
+                                        onChange={(e) => setSkills(e.target.value)}
+                                        placeholder="e.g. Carpentry, Plumbing"
+                                        className="min-h-11 w-full rounded-xl border border-line bg-paper px-3.5 text-sm text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/15"
+                                        required
+                                    />
+                                    <p className="text-[11px] text-muted">
+                                        Separate multiple skills with commas.
+                                    </p>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label
+                                        htmlFor="artisan-years"
+                                        className="text-xs font-semibold text-ink"
+                                    >
+                                        Years of Experience
+                                    </label>
+                                    <input
+                                        id="artisan-years"
+                                        type="number"
+                                        min="0"
+                                        max="80"
+                                        value={years}
+                                        onChange={(e) => setYears(e.target.value)}
+                                        className="min-h-11 w-full rounded-xl border border-line bg-paper px-3.5 text-sm text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/15"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label
+                                    htmlFor="artisan-bio"
+                                    className="text-xs font-semibold text-ink"
+                                >
+                                    Workshop & Work Summary
+                                </label>
+                                <textarea
+                                    id="artisan-bio"
+                                    value={bio}
+                                    onChange={(e) => setBio(e.target.value)}
+                                    rows={3}
+                                    maxLength={1000}
+                                    placeholder="Describe your specialty, past projects, and tools..."
+                                    className="w-full resize-y rounded-xl border border-line bg-paper p-3.5 text-sm text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/15"
+                                />
+                                <p className="text-right text-[11px] text-muted">
+                                    {bio.length}/1000
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-4">
+                                <button
+                                    type="submit"
+                                    disabled={profileSaving}
+                                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-copper px-6 text-sm font-semibold text-white transition-all hover:bg-copper-deep disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    {profileSaving ? "Saving..." : "Save Profile"}
+                                </button>
+
+                                {profileNote.text && (
+                                    <p
+                                        role="status"
+                                        className={`text-sm font-medium ${
+                                            profileNote.type === "error"
+                                                ? "text-danger"
+                                                : "text-success"
+                                        }`}
+                                    >
+                                        {profileNote.text}
+                                    </p>
+                                )}
+                            </div>
+                        </form>
+                    </section>
+                )}
+
+                <section
+                    className={`rounded-3xl border border-line bg-cream p-6 shadow-card sm:p-8 ${
+                        isArtisan ? "lg:col-span-5" : ""
+                    }`}
+                >
+                    <div className="mb-6">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-copper">
+                            Social Proof
+                        </p>
+                        <h2 className="mt-1.5 font-display text-2xl font-semibold text-ink">
+                            Portfolio & Social Links
+                        </h2>
+                        <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                            Link your Instagram, X, or WhatsApp catalog so clients can verify
+                            your past builds.
+                        </p>
+                    </div>
+
+                    <SocialLinksForm />
+                </section>
+            </div>
         </div>
     );
 }
 
-function StatCard({
-                      label,
-                      value,
-                      description,
-                      icon: Icon,
-                      status = false,
-                      action,
-                  }) {
+function StatCard({ label, value, description, icon: Icon, badge, action }) {
+    const badgeClasses =
+        badge?.tone === "warning"
+            ? "bg-warning-soft text-warning"
+            : "bg-success-soft text-success";
+
     return (
-
-        <article className="group relative overflow-hidden rounded-2xl border border-line bg-cream p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-copper/40 hover:shadow-md sm:p-6">
-
+        <article className="group relative overflow-hidden rounded-2xl border border-line bg-cream p-6 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-raised">
             <div className="flex items-start justify-between gap-4">
-
                 <div className="min-w-0">
-                    <p className="text-sm font-medium text-muted">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted">
                         {label}
                     </p>
-
-                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
                         <p className="break-words font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                             {value}
                         </p>
-
                         {action}
                     </div>
                 </div>
 
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-copper/15 bg-copper/10 text-copper transition-colors group-hover:bg-copper/15">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-copper/15 bg-copper/10 text-copper transition-colors group-hover:bg-copper/15">
                     <Icon size={20} strokeWidth={1.8} />
                 </div>
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-line/70 pt-4">
-                <p className="text-xs leading-relaxed text-muted">
-                    {description}
-                </p>
-
-                {status && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                Active
-            </span>
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-2 border-t border-line/70 pt-3.5">
+                <p className="text-xs leading-relaxed text-muted">{description}</p>
+                {badge && (
+                    <span
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${badgeClasses}`}
+                    >
+            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                        {badge.text}
+          </span>
                 )}
             </div>
         </article>
-
     );
 }
 
@@ -656,7 +671,7 @@ function QuickLink({ to, children }) {
     return (
         <Link
             to={to}
-            className="inline-flex min-h-10 items-center rounded-full border border-line bg-paper px-4 text-xs font-medium text-ink no-underline transition-all hover:border-copper hover:bg-cream hover:shadow-sm"
+            className="inline-flex min-h-10 items-center rounded-full border border-line bg-paper px-4 text-xs font-semibold text-ink no-underline transition-all hover:border-copper hover:bg-raised"
         >
             {children}
         </Link>
