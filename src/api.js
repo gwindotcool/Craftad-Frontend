@@ -78,6 +78,7 @@ export const craftad = {
     getOrCreateConversation: (token, applicationId) => request("/api/chat/conversations", {method: "POST", body: JSON.stringify({ applicationId }),}, token),
     conversationMessages: (token, conversationId) => request(`/api/chat/conversations/${conversationId}/messages?limit=100`, {}, token),
     sendConversationMessage: (token, conversationId, text) => request(`/api/chat/conversations/${conversationId}/messages`, {method: "POST", body: JSON.stringify({ text }),}, token),
+    sendConversationMedia: (token, conversationId, formData) => request(`/api/chat/conversations/${conversationId}/media`, {method: "POST", body: formData,}, token),
     priceOffers: (token, applicationId) => request(`/api/applications/${applicationId}/offers`, {}, token),
     submitPriceOffer: (token, applicationId, amount) => request(`/api/applications/${applicationId}/offers`, {method: "POST", body: JSON.stringify({ amount }),}, token),
     review: (token, jobId, body) => request(`/api/reviews/${jobId}`, { method: "POST", body: JSON.stringify(body) }, token),

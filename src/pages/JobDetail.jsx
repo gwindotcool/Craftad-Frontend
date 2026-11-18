@@ -261,6 +261,8 @@ export function JobDetail() {
                     initiallyOpen={true}
                     showLauncher={false}
                     embedded={false}
+                    onOfferUpdated={load}
+                    onAccepted={load}
                     onClose={() => setSelectedApplication(null)}
                 />
             )}

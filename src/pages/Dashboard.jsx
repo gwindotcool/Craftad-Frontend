@@ -30,15 +30,87 @@ function formatNaira(amount) {
     })}`;
 }
 
-function getJobAmountLabel(job) {
+
+function getJobPriceInfo(job, isArtisan) {
     const agreed = Number(job.agreedPrice);
-    if (Number.isFinite(agreed) && agreed > 0) return formatNaira(agreed);
-
     const budget = Number(job.budget);
-    if (Number.isFinite(budget) && budget > 0) return formatNaira(budget);
 
-    return "Open budget";
+    const validBudget = Number.isFinite(budget) && budget > 0;
+
+    // An agreed price always takes priority.
+    if (Number.isFinite(agreed) && agreed > 0) {
+        return {
+            label: "Agreed price",
+            value: formatNaira(agreed),
+            detail: "",
+            secondary: validBudget
+                ? `Original budget: ${formatNaira(budget)}`
+                : "",
+        };
+    }
+
+    let latestOffer = null;
+
+    if (isArtisan) {
+        // Artisans must only see their own application's offer.
+        const offer = job.myApplication?.currentOffer;
+
+        if (offer?.status === "pending") {
+            latestOffer = offer;
+        }
+    } else {
+        // Customers can see offers across their own applications.
+        const pendingOffers = (job.applications || [])
+            .map((application) => application.currentOffer)
+            .filter(
+                (offer) =>
+                    offer &&
+                    typeof offer === "object" &&
+                    offer.status === "pending" &&
+                    Number(offer.amount) > 0
+            );
+
+        pendingOffers.sort(
+            (a, b) =>
+                new Date(b.createdAt || 0).getTime() -
+                new Date(a.createdAt || 0).getTime()
+        );
+
+        latestOffer = pendingOffers[0] || null;
+    }
+
+    if (latestOffer && Number(latestOffer.amount) > 0) {
+        const proposerName = latestOffer.proposedBy?.fullName;
+
+        return {
+            label: isArtisan ? "Latest offer on your application" : "Latest offer",
+            value: formatNaira(latestOffer.amount),
+            detail: proposerName
+                ? `Proposed by ${proposerName}`
+                : "Pending negotiation",
+            secondary: validBudget
+                ? `Customer budget: ${formatNaira(budget)}`
+                : "",
+        };
+    }
+
+    if (validBudget) {
+        return {
+            label: "Customer budget",
+            value: formatNaira(budget),
+            detail: "",
+            secondary: "",
+        };
+    }
+
+    return {
+        label: "Budget",
+        value: "Open budget",
+        detail: "",
+        secondary: "",
+    };
 }
+
 
 function getStatusBadgeStyle(status) {
     switch (status) {
@@ -448,18 +520,37 @@ export function Dashboard() {
                                 </div>
 
                                 <div className="flex items-center justify-between gap-4 sm:justify-end">
+
                                     <div className="sm:text-right">
-                                        <p className="font-display text-lg font-semibold text-ink">
-                                            {getJobAmountLabel(job)}
+                                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">
+                                            {getJobPriceInfo(job, isArtisan).label}
                                         </p>
+
+                                        <p className="font-display text-lg font-semibold text-ink">
+                                            {getJobPriceInfo(job, isArtisan).value}
+                                        </p>
+
+                                        {getJobPriceInfo(job, isArtisan).detail && (
+                                            <p className="mt-1 text-[11px] text-muted">
+                                                {getJobPriceInfo(job, isArtisan).detail}
+                                            </p>
+                                        )}
+
+                                        {getJobPriceInfo(job, isArtisan).secondary && (
+                                            <p className="mt-1 text-[11px] text-muted">
+                                                {getJobPriceInfo(job, isArtisan).secondary}
+                                            </p>
+                                        )}
+
                                         <span
                                             className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${getStatusBadgeStyle(
                                                 job.status
                                             )}`}
                                         >
-                      {(job.status || "open").replaceAll("_", " ")}
-                    </span>
+        {(job.status || "open").replaceAll("_", " ")}
+    </span>
                                     </div>
+
 
                                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line bg-paper text-muted transition-all group-hover:border-copper group-hover:bg-copper group-hover:text-white">
                     <ArrowUpRight size={16} />

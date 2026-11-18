@@ -83,6 +83,24 @@ export function ArtisanApplicationPanel({
             description: "Open your conversation to review the latest updates.",
             button: "Open Conversation",
         };
+        const latestOffer =
+            myApplication.currentOffer &&
+            typeof myApplication.currentOffer === "object"
+                ? myApplication.currentOffer
+                : null;
+
+        const agreedPrice = myApplication.agreedPrice ?? null;
+
+        const displayPrice = agreedPrice ?? latestOffer?.amount ?? null;
+
+// Compare IDs as strings to avoid ObjectId/string comparison issues.
+        const offerProposerId = latestOffer?.proposedBy?._id?.toString();
+        const artisanId = myApplication.artisan?._id?.toString();
+
+        const offerProposer =
+            offerProposerId && offerProposerId === artisanId
+                ? "You"
+                : latestOffer?.proposedBy?.fullName || "Customer";
 
         return (
             <section className="rounded-3xl border border-line bg-cream p-6 shadow-card sm:p-8">
@@ -118,6 +136,29 @@ export function ArtisanApplicationPanel({
                         </p>
                     </div>
                 )}
+                <div className="mt-4 rounded-2xl border border-line bg-paper p-5">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
+                        {agreedPrice != null
+                            ? "Agreed Price"
+                            : latestOffer
+                                ? "Latest Offer"
+                                : "Quote Status"}
+                    </p>
+
+                    <p className="mt-2 font-display text-2xl font-semibold text-copper">
+                        {displayPrice != null
+                            ? `₦${Number(displayPrice).toLocaleString("en-NG")}`
+                            : "Awaiting quote"}
+                    </p>
+
+                    <p className="mt-1 text-xs text-muted">
+                        {agreedPrice != null
+                            ? "Price agreed"
+                            : latestOffer?.status === "pending"
+                                ? `Pending · proposed by ${offerProposer}`
+                                : "No active price offer"}
+                    </p>
+                </div>
 
                 <button
                     type="button"

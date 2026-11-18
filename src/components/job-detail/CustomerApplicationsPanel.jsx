@@ -84,12 +84,14 @@ export function CustomerApplicationsPanel({
                             app.agreedPrice ??
                             (app.status === "accepted" ? job.agreedPrice : null);
 
-                        const displayPrice =
-                            agreedPrice ?? latestOffer?.amount ?? app.proposedPrice ?? null;
+                        const displayPrice = agreedPrice ?? latestOffer?.amount ?? null;
 
                         const offerStatus = latestOffer?.status;
+                        const offerProposerId = String(latestOffer?.proposedBy?._id || "");
+                        const currentUserId = String(user?._id || "");
+
                         const offerProposer =
-                            latestOffer?.proposedBy?._id === user?._id
+                            offerProposerId && offerProposerId === currentUserId
                                 ? "You"
                                 : latestOffer?.proposedBy?.fullName || null;
 
@@ -136,15 +138,13 @@ export function CustomerApplicationsPanel({
                                                 ? "Agreed Price"
                                                 : latestOffer
                                                     ? "Latest Offer"
-                                                    : app.proposedPrice != null
-                                                        ? "Initial Proposal"
-                                                        : "Quote Status"}
+                                                    : "Quote Status"}
                                         </p>
 
                                         <p className="mt-1 font-display text-2xl font-semibold tracking-tight text-copper">
                                             {displayPrice != null
                                                 ? formatMoney(displayPrice)
-                                                : "Open quote"}
+                                                : "Awaiting quote"}
                                         </p>
 
                                         <p className="mt-0.5 text-xs text-muted">

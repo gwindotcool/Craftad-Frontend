@@ -38,25 +38,97 @@ function formatNaira(amount) {
     })}`;
 }
 
-function getEffectiveAmount(job) {
+
+function getJobPriceInfo(job, isArtisan) {
     const agreed = Number(job.agreedPrice);
-    if (Number.isFinite(agreed) && agreed > 0) return agreed;
     const budget = Number(job.budget);
-    if (Number.isFinite(budget) && budget > 0) return budget;
-    return 0;
+
+    const validBudget = Number.isFinite(budget) && budget > 0;
+
+    if (Number.isFinite(agreed) && agreed > 0) {
+        return {
+            label: "Agreed Price",
+            value: formatNaira(agreed),
+            detail: "",
+            secondary: validBudget
+                ? `Original budget: ${formatNaira(budget)}`
+                : "",
+            sortAmount: agreed,
+        };
+    }
+
+    let latestOffer = null;
+
+    if (isArtisan) {
+        const offer = job.myApplication?.currentOffer;
+
+        if (offer?.status === "pending") {
+            latestOffer = offer;
+        }
+    } else {
+        const pendingOffers = (job.applications || [])
+            .map((application) => application.currentOffer)
+            .filter(
+                (offer) =>
+                    offer &&
+                    typeof offer === "object" &&
+                    offer.status === "pending" &&
+                    Number(offer.amount) > 0
+            );
+
+        pendingOffers.sort(
+            (a, b) =>
+                new Date(b.createdAt || 0).getTime() -
+                new Date(a.createdAt || 0).getTime()
+        );
+
+        latestOffer = pendingOffers[0] || null;
+    }
+
+    if (latestOffer && Number(latestOffer.amount) > 0) {
+        const amount = Number(latestOffer.amount);
+        const proposerName = latestOffer.proposedBy?.fullName;
+
+        return {
+            label: isArtisan ? "Latest Offer on Your Application" : "Latest Offer",
+            value: formatNaira(amount),
+            detail: proposerName
+                ? `Proposed by ${proposerName}`
+                : "Pending negotiation",
+            secondary: validBudget
+                ? `Customer budget: ${formatNaira(budget)}`
+                : "",
+            sortAmount: amount,
+        };
+    }
+
+    if (validBudget) {
+        return {
+            label: "Budget",
+            value: formatNaira(budget),
+            detail: "",
+            secondary: "",
+            sortAmount: budget,
+        };
+    }
+
+    return {
+        label: "Budget",
+        value: "Open to quotes",
+        detail: "",
+        secondary: "",
+        sortAmount: 0,
+    };
 }
 
-function getJobAmountDisplay(job) {
-    const agreed = Number(job.agreedPrice);
-    if (Number.isFinite(agreed) && agreed > 0) {
-        return { label: "Agreed Price", value: formatNaira(agreed) };
-    }
-    const budget = Number(job.budget);
-    if (Number.isFinite(budget) && budget > 0) {
-        return { label: "Budget", value: formatNaira(budget) };
-    }
-    return { label: "Budget", value: "Open to quotes" };
+function getEffectiveAmount(job, isArtisan) {
+    return getJobPriceInfo(job, isArtisan).sortAmount;
 }
+
+function getJobAmountDisplay(job, isArtisan) {
+    return getJobPriceInfo(job, isArtisan);
+}
+
 
 function getStatusBadgeStyle(status) {
     switch (status) {
@@ -172,7 +244,7 @@ export function Jobs() {
             jobs.map((job) => ({
                 ...job,
                 _id: job._id || job.id,
-                _amount: getEffectiveAmount(job),
+                _amount: getEffectiveAmount(job, isArtisan),
                 _createdTs: job.createdAt ? new Date(job.createdAt).getTime() || 0 : 0,
                 _searchBlob: [job.title, job.description, job.location, job.category]
                     .filter(Boolean)
@@ -513,7 +585,7 @@ export function Jobs() {
                 <ul className="grid gap-4">
                     {shown.map((job) => {
                         const postedLabel = formatRelativeDate(job.createdAt);
-                        const amount = getJobAmountDisplay(job);
+                        const amount = getJobAmountDisplay(job, isArtisan);
                         const applicantsCount =
                             job.applicationsCount ??
                             (Array.isArray(job.applications) ? job.applications.length : null);
@@ -546,14 +618,29 @@ export function Jobs() {
                                             </h2>
                                         </div>
 
+
                                         <div className="shrink-0 text-left sm:text-right">
                                             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
                                                 {amount.label}
                                             </p>
+
                                             <p className="font-display text-xl font-semibold text-ink sm:text-2xl">
                                                 {amount.value}
                                             </p>
+
+                                            {amount.detail && (
+                                                <p className="mt-1 text-[11px] text-muted">
+                                                    {amount.detail}
+                                                </p>
+                                            )}
+
+                                            {amount.secondary && (
+                                                <p className="mt-1 text-[11px] text-muted">
+                                                    {amount.secondary}
+                                                </p>
+                                            )}
                                         </div>
+
                                     </div>
 
                                     {/* Description Excerpt */}

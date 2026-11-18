@@ -8,9 +8,21 @@ import {
     LoaderCircle,
     MessageSquare,
     Minus,
+    Paperclip,
     Send,
     X,
 } from "lucide-react";
+const MAX_MEDIA_FILES = 5;
+const MAX_MEDIA_SIZE = 50 * 1024 * 1024;
+
+const ALLOWED_MEDIA_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "video/mp4",
+    "video/quicktime",
+    "video/webm",
+];
 import { craftad, listOf } from "../api";
 
 function formatMoney(amount) {
@@ -28,18 +40,20 @@ function getErrorMessage(error) {
 }
 
 export function FloatingNegotiationChat({
-                                            token,
-                                            user,
-                                            application,
-                                            job,
-                                            onAccepted,
-                                            initialConversation = null,
-                                            initiallyOpen = true,
-                                            openSignal = 0,
-                                            showLauncher = true,
-                                            embedded = false,
-                                            onClose,
-                                        }) {
+     token,
+     user,
+     application,
+     job,
+     onAccepted,
+     onOfferUpdated,
+     initialConversation = null,
+     initiallyOpen = true,
+     openSignal = 0,
+     showLauncher = true,
+     embedded = false,
+     onClose,
+ }) {
+
     const socket = useSocket();
     const [presence, setPresence] = useState(null);
 
@@ -49,12 +63,30 @@ export function FloatingNegotiationChat({
     const [offers, setOffers] = useState([]);
     const [messageText, setMessageText] = useState("");
     const [offerAmount, setOfferAmount] = useState("");
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [mediaPreviews, setMediaPreviews] = useState([]);
+    const fileInputRef = useRef(null);
     const [loading, setLoading] = useState(false);
     const [sending, setSending] = useState(false);
     const [accepting, setAccepting] = useState(false);
     const [error, setError] = useState("");
 
     const messagesEndRef = useRef(null);
+    // Generate local previews and release browser memory when files change.
+    useEffect(() => {
+        const nextPreviews = selectedFiles.map((file) => ({
+            file,
+            url: URL.createObjectURL(file),
+        }));
+
+        setMediaPreviews(nextPreviews);
+
+        return () => {
+            nextPreviews.forEach((preview) => {
+                URL.revokeObjectURL(preview.url);
+            });
+        };
+    }, [selectedFiles]);
 
     // Open the chat when the parent sends a new open signal.
     useEffect(() => {
@@ -96,10 +128,7 @@ export function FloatingNegotiationChat({
         (isCustomer && currentUserId === customerId) ||
         (isArtisan && currentUserId === artisanId);
 
-    const isClosed =
-        ["accepted", "rejected", "withdrawn", "price_agreed"].includes(
-            applicationStatus
-        ) || (job?.status && job.status !== "open");
+    const isClosed = Boolean(conversation?.isClosed);
 
     // Offer information
     const latestOffer = useMemo(() => {
@@ -392,24 +421,96 @@ export function FloatingNegotiationChat({
             />
         );
     }
+    function handleFileSelection(event) {
+        const incomingFiles = Array.from(event.target.files || []);
+
+        // Allow selecting the same file again later.
+        event.target.value = "";
+
+        if (!incomingFiles.length) return;
+
+        setError("");
+
+        const remainingSlots = MAX_MEDIA_FILES - selectedFiles.length;
+
+        if (incomingFiles.length > remainingSlots) {
+            setError(
+                `You can attach a maximum of ${MAX_MEDIA_FILES} files per message.`
+            );
+            return;
+        }
+
+        const invalidFile = incomingFiles.find(
+            (file) => !ALLOWED_MEDIA_TYPES.includes(file.type)
+        );
+
+        if (invalidFile) {
+            setError(
+                `${invalidFile.name} has an unsupported format. Use JPEG, PNG, WebP, MP4, MOV, or WebM.`
+            );
+            return;
+        }
+
+        const oversizedFile = incomingFiles.find(
+            (file) => file.size > MAX_MEDIA_SIZE
+        );
+
+        if (oversizedFile) {
+            setError(`${oversizedFile.name} exceeds the 50 MB file limit.`);
+            return;
+        }
+
+        setSelectedFiles((previous) => [...previous, ...incomingFiles]);
+    }
+
+    function handleRemoveSelectedFile(index) {
+        setSelectedFiles((previous) =>
+            previous.filter((_, fileIndex) => fileIndex !== index)
+        );
+    }
 
     async function handleSendMessage(event) {
         event?.preventDefault();
 
         const text = messageText.trim();
-        if (!text || !conversation?._id || sending) return;
+        const hasAttachments = selectedFiles.length > 0;
+
+        if ((!text && !hasAttachments) || !conversation?._id || sending) {
+            return;
+        }
 
         setSending(true);
         setError("");
 
         try {
-            await craftad.sendConversationMessage(
-                token,
-                conversation._id,
-                text
-            );
+            if (hasAttachments) {
+                const formData = new FormData();
+
+                selectedFiles.forEach((file) => {
+                    formData.append("media", file);
+                });
+
+                if (text) {
+                    formData.append("text", text);
+                }
+
+                await craftad.sendConversationMedia(
+                    token,
+                    conversation._id,
+                    formData
+                );
+
+                setSelectedFiles([]);
+            } else {
+                await craftad.sendConversationMessage(
+                    token,
+                    conversation._id,
+                    text
+                );
+            }
 
             setMessageText("");
+
             await refresh(conversation._id);
         } catch (err) {
             setError(getErrorMessage(err));
@@ -443,6 +544,10 @@ export function FloatingNegotiationChat({
             await craftad.submitPriceOffer(token, applicationId, amount);
             setOfferAmount("");
             await refresh(conversation?._id);
+
+            if (onOfferUpdated) {
+                await onOfferUpdated();
+            }
         } catch (err) {
             setError(getErrorMessage(err));
         } finally {
@@ -662,6 +767,111 @@ export function FloatingNegotiationChat({
                             if (item.type === "price_offer") {
                                 return renderOffer(item);
                             }
+                            if (item.type === "media") {
+                                const senderId = getId(item.sender);
+                                const mine = senderId === currentUserId;
+
+                                const mediaItems = Array.isArray(item.media) ? item.media : [];
+
+                                return (
+                                    <div
+                                        key={item._id}
+                                        className={`my-3 max-w-[86%] overflow-hidden rounded-2xl border shadow-sm ${
+                                            mine
+                                                ? "ml-auto border-copper/30 bg-copper/10"
+                                                : "mr-auto border-line bg-cream"
+                                        }`}
+                                    >
+                                        <div className="px-3 pt-3">
+                                            <p className="text-[10px] font-semibold uppercase tracking-wide text-copper">
+                                                {item.sender?.fullName ||
+                                                    (mine ? user?.fullName : "Participant")}
+                                                {" · "}
+                                                {item.sender?.role ||
+                                                    (mine ? user?.role : "participant")}
+                                            </p>
+                                        </div>
+
+                                        {item.text && (
+                                            <p className="whitespace-pre-wrap break-words px-3 pt-2 text-sm text-ink">
+                                                {item.text}
+                                            </p>
+                                        )}
+
+                                        <div className="grid grid-cols-1 gap-2 p-3">
+                                            {mediaItems.map((media, index) => {
+                                                const url = media.url;
+                                                const mimeType = media.mimeType || "";
+
+                                                const isImage =
+                                                    media.resourceType === "image" ||
+                                                    mimeType.startsWith("image/");
+
+                                                const isVideo =
+                                                    media.resourceType === "video" ||
+                                                    mimeType.startsWith("video/");
+
+                                                return (
+                                                    <div
+                                                        key={media._id || media.publicId || `${item._id}-${index}`}
+                                                        className="overflow-hidden rounded-xl"
+                                                    >
+                                                        {url && isImage && (
+                                                            <a
+                                                                href={url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                            >
+                                                                <img
+                                                                    src={url}
+                                                                    alt={media.originalName || "Chat attachment"}
+                                                                    loading="lazy"
+                                                                    className="max-h-72 w-full rounded-xl object-contain"
+                                                                />
+                                                            </a>
+                                                        )}
+
+                                                        {url && isVideo && (
+                                                            <video
+                                                                controls
+                                                                playsInline
+                                                                preload="metadata"
+                                                                className="max-h-72 w-full rounded-xl bg-black"
+                                                            >
+                                                                <source src={url} type={mimeType} />
+                                                                Your browser does not support video playback.
+                                                            </video>
+                                                        )}
+
+                                                        {!url && (
+                                                            <p className="rounded-lg bg-paper p-3 text-xs text-muted">
+                                                                Attachment temporarily unavailable. Refresh the conversation to try again.
+                                                            </p>
+                                                        )}
+
+                                                        <p className="mt-1 truncate text-[10px] text-muted">
+                                                            {media.originalName || "Attachment"}
+                                                        </p>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <div className="flex items-center justify-end gap-1.5 px-3 pb-3">
+                <span className="text-[10px] text-muted">
+                    {item.createdAt
+                        ? new Date(item.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })
+                        : ""}
+                </span>
+
+                                            {renderReadReceipt(item, mine)}
+                                        </div>
+                                    </div>
+                                );
+                            }
 
                             const senderId = getId(item.sender);
                             const mine = senderId === currentUserId;
@@ -795,26 +1005,119 @@ export function FloatingNegotiationChat({
                     {/* Message Composer */}
                     <form
                         onSubmit={handleSendMessage}
-                        className="flex shrink-0 items-end gap-2.5 border-t border-line bg-cream p-3.5 sm:p-4"
+                        className="shrink-0 border-t border-line bg-cream p-3.5 sm:p-4"
                     >
-            <textarea
-                rows={1}
-                maxLength={5000}
-                value={messageText}
-                onChange={(event) => setMessageText(event.target.value)}
-                onKeyDown={handleComposerKeyDown}
-                placeholder="Write a message… (Enter to send)"
-                className="max-h-28 min-h-11 min-w-0 flex-1 resize-none rounded-2xl border border-line bg-paper px-4 py-3 text-sm leading-relaxed text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/15"
-            />
+                        {/* Selected attachment previews */}
+                        {mediaPreviews.length > 0 && (
+                            <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                {mediaPreviews.map((preview, index) => {
+                                    const isVideo = preview.file.type.startsWith("video/");
 
-                        <button
-                            type="submit"
-                            disabled={sending || !messageText.trim()}
-                            aria-label="Send message"
-                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-copper text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-copper-deep disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
-                        >
-                            <Send size={16} />
-                        </button>
+                                    return (
+                                        <div
+                                            key={`${preview.file.name}-${preview.file.lastModified}-${index}`}
+                                            className="group relative overflow-hidden rounded-xl border border-line bg-paper"
+                                        >
+                                            {isVideo ? (
+                                                <video
+                                                    src={preview.url}
+                                                    controls
+                                                    preload="metadata"
+                                                    className="h-24 w-full object-cover"
+                                                />
+                                            ) : (
+                                                <img
+                                                    src={preview.url}
+                                                    alt={preview.file.name}
+                                                    className="h-24 w-full object-cover"
+                                                />
+                                            )}
+
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveSelectedFile(index)}
+                                                disabled={sending}
+                                                aria-label={`Remove ${preview.file.name}`}
+                                                className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white hover:bg-black disabled:opacity-50"
+                                            >
+                                                <X size={14} />
+                                            </button>
+
+                                            <p className="truncate px-2 py-1.5 text-[10px] text-muted">
+                                                {preview.file.name}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        <div className="flex items-end gap-2.5">
+                            {/* Hidden attachment input */}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm"
+                                onChange={handleFileSelection}
+                                disabled={sending || isClosed}
+                                className="hidden"
+                            />
+
+                            {/* Attachment button */}
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={
+                                    sending ||
+                                    isClosed ||
+                                    selectedFiles.length >= MAX_MEDIA_FILES
+                                }
+                                aria-label="Attach photos or videos"
+                                title="Attach photos or videos"
+                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-line bg-paper text-copper transition-colors hover:bg-copper/10 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                                <Paperclip size={18} />
+                            </button>
+
+                            <textarea
+                                rows={1}
+                                maxLength={5000}
+                                value={messageText}
+                                onChange={(event) => setMessageText(event.target.value)}
+                                onKeyDown={handleComposerKeyDown}
+                                placeholder="Write a message… (Enter to send)"
+                                disabled={sending || isClosed}
+                                className="max-h-28 min-h-11 min-w-0 flex-1 resize-none rounded-2xl border border-line bg-paper px-4 py-3 text-sm leading-relaxed text-ink outline-none transition focus:border-copper focus:ring-2 focus:ring-copper/15 disabled:opacity-60"
+                            />
+
+                            <button
+                                type="submit"
+                                disabled={
+                                    sending ||
+                                    isClosed ||
+                                    (!messageText.trim() && selectedFiles.length === 0)
+                                }
+                                aria-label="Send message"
+                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-copper text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-copper-deep disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+                            >
+                                {sending ? (
+                                    <LoaderCircle size={17} className="animate-spin" />
+                                ) : (
+                                    <Send size={16} />
+                                )}
+                            </button>
+                        </div>
+
+                        <div className="mt-2 flex items-center justify-between gap-2 text-[10px] text-muted">
+        <span>
+            JPEG, PNG, WebP, MP4, MOV or WebM · Max 50 MB each
+        </span>
+
+                            <span className="shrink-0">
+            {selectedFiles.length}/{MAX_MEDIA_FILES} files
+        </span>
+                        </div>
                     </form>
                 </section>
             )}
