@@ -128,7 +128,46 @@ function getStatusBadgeStyle(status) {
             return "bg-copper/12 text-copper";
     }
 }
+function getCurrentCoordinates() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(
+                new Error(
+                    "Your browser does not support location services."
+                )
+            );
+            return;
+        }
 
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                resolve([
+                    position.coords.longitude,
+                    position.coords.latitude,
+                ]);
+            },
+            (error) => {
+                const messages = {
+                    1: "Location permission was denied. Allow location access in your browser settings and try again.",
+                    2: "Your location could not be determined. Please try again.",
+                    3: "Location request timed out. Please try again.",
+                };
+
+                reject(
+                    new Error(
+                        messages[error.code] ||
+                        "Unable to obtain your location."
+                    )
+                );
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 60000,
+            }
+        );
+    });
+}
 export function Dashboard() {
     const { token, user } = useSession();
 
@@ -143,26 +182,12 @@ export function Dashboard() {
     const [bio, setBio] = useState("");
     const [profileNote, setProfileNote] = useState({ type: "", text: "" });
     const [profileSaving, setProfileSaving] = useState(false);
+    const [profileExists, setProfileExists] = useState(false);
+    const [profileLoading, setProfileLoading] = useState(true);
+    const [profileLoadFailed, setProfileLoadFailed] = useState(false);
     const [balanceVisible, setBalanceVisible] = useState(true);
 
     const isArtisan = user?.role === "artisan";
-
-    // Hydrate artisan profile fields if already present on user/profile payload
-    useEffect(() => {
-        if (!user || user.role !== "artisan") return;
-        const profile = user.artisanProfile || user.artisan || user;
-        if (Array.isArray(profile.skills) && profile.skills.length > 0) {
-            setSkills(profile.skills.join(", "));
-        } else if (typeof profile.skills === "string" && profile.skills.trim()) {
-            setSkills(profile.skills);
-        }
-        if (profile.yearsOfExperience != null) {
-            setYears(String(profile.yearsOfExperience));
-        }
-        if (typeof profile.bio === "string" && profile.bio.trim()) {
-            setBio(profile.bio);
-        }
-    }, [user]);
 
     const loadDashboard = useCallback(
         async (isManual = false) => {
@@ -180,13 +205,13 @@ export function Dashboard() {
                     : craftad.myJobs(token);
 
             const requests = [jobsRequest, craftad.wallet(token)];
-            if (user.role === "artisan" && typeof craftad.profile === "function") {
-                requests.push(craftad.profile(token));
+            if (user.role === "artisan") {
+                setProfileLoading(true);
+                requests.push(craftad.artisanMe(token));
             }
 
             const [jobsResult, walletResult, profileResult] =
                 await Promise.allSettled(requests);
-
             if (jobsResult.status === "fulfilled") {
                 setJobs(listOf(jobsResult.value, ["jobs"]));
             } else {
@@ -203,27 +228,49 @@ export function Dashboard() {
                 setBalance(null);
             }
 
-            if (profileResult?.status === "fulfilled") {
-                const fetchedUser =
-                    profileResult.value?.user || profileResult.value?.data?.user;
-                const artisanData =
-                    profileResult.value?.artisan ||
-                    fetchedUser?.artisanProfile ||
-                    fetchedUser;
-                if (artisanData) {
-                    if (
-                        Array.isArray(artisanData.skills) &&
-                        artisanData.skills.length > 0
-                    ) {
-                        setSkills(artisanData.skills.join(", "));
+            if (user.role === "artisan") {
+                if (profileResult?.status === "fulfilled") {
+                    const artisanData = profileResult.value?.artisan;
+
+                    if (artisanData) {
+                        setProfileExists(true);
+                        setProfileLoadFailed(false);
+
+                        setSkills(
+                            Array.isArray(artisanData.skills)
+                                ? artisanData.skills.join(", ")
+                                : ""
+                        );
+
+                        setYears(
+                            artisanData.yearsOfExperience != null
+                                ? String(artisanData.yearsOfExperience)
+                                : "0"
+                        );
+
+                        setBio(artisanData.bio || "");
+                    } else {
+                        setProfileExists(false);
+                        setProfileLoadFailed(true);
                     }
-                    if (artisanData.yearsOfExperience != null) {
-                        setYears(String(artisanData.yearsOfExperience));
-                    }
-                    if (typeof artisanData.bio === "string" && artisanData.bio.trim()) {
-                        setBio(artisanData.bio);
-                    }
+                } else if (profileResult?.reason?.status === 404) {
+                    setProfileExists(false);
+                    setProfileLoadFailed(false);
+                    setSkills("");
+                    setYears("1");
+                    setBio("");
+                } else {
+                    setProfileLoadFailed(true);
+
+                    setProfileNote({
+                        type: "error",
+                        text:
+                            profileResult?.reason?.message ||
+                            "Could not load your professional profile.",
+                    });
                 }
+
+                setProfileLoading(false);
             }
 
             setJobsLoading(false);
@@ -246,42 +293,96 @@ export function Dashboard() {
 
     async function handleProfileSubmit(event) {
         event.preventDefault();
+
         setProfileNote({ type: "", text: "" });
-        setProfileSaving(true);
 
-        const parsedSkills = skills
-            .split(",")
-            .map((item) => item.trim())
-            .filter(Boolean);
-
-        if (parsedSkills.length === 0) {
+        if (profileLoading) {
             setProfileNote({
                 type: "error",
-                text: "Please enter at least one trade skill.",
+                text: "Please wait while your profile loads.",
             });
-            setProfileSaving(false);
+            return;
+        }
+        if (profileLoadFailed) {
+            setProfileNote({
+                type: "error",
+                text: "We couldn't confirm your saved profile. Refresh the dashboard and try again.",
+            });
             return;
         }
 
-        const body = {
-            skills: parsedSkills,
-            yearsOfExperience: Number(years) || 0,
-            bio: bio.trim(),
-            location: {
-                type: "Point",
-                coordinates: [3.3792, 6.5244],
-            },
-        };
+        setProfileSaving(true);
 
         try {
-            try {
-                await craftad.updateArtisan(token, body);
-            } catch {
-                await craftad.createArtisan(token, body);
+            const parsedSkills = skills
+                .split(",")
+                .map((item) => item.trim())
+                .filter(Boolean);
+
+            if (parsedSkills.length === 0) {
+                throw new Error("Please enter at least one trade skill.");
             }
+
+            const experience = Number(years);
+
+            if (
+                !Number.isInteger(experience) ||
+                experience < 0 ||
+                experience > 80
+            ) {
+                throw new Error("Enter a valid experience between 0 and 80 years.");
+            }
+
+            const body = {
+                skills: parsedSkills,
+                yearsOfExperience: experience,
+                bio: bio.trim(),
+            };
+
+            if (profileExists) {
+                // Update existing profile. Preserve its saved location.
+                await craftad.updateArtisan(token, body);
+            } else {
+                // A new profile requires the artisan's actual GPS location.
+                const coordinates = await getCurrentCoordinates();
+
+                body.location = {
+                    type: "Point",
+                    coordinates,
+                };
+
+                await craftad.createArtisan(token, body);
+                setProfileExists(true);
+            }
+
+            // Reload the persisted profile instead of trusting form state.
+            const result = await craftad.artisanMe(token);
+            const savedProfile = result?.artisan;
+
+            if (!savedProfile) {
+                throw new Error(
+                    "Profile was saved, but we could not reload it. Please refresh."
+                );
+            }
+            setProfileExists(true);
+            setProfileLoadFailed(false);
+
+            setSkills(
+                Array.isArray(savedProfile.skills)
+                    ? savedProfile.skills.join(", ")
+                    : ""
+            );
+
+            setYears(
+                savedProfile.yearsOfExperience != null
+                    ? String(savedProfile.yearsOfExperience)
+                    : "0"
+            );
+            setBio(savedProfile.bio || "");
+
             setProfileNote({
                 type: "success",
-                text: "Artisan profile saved successfully.",
+                text: "Your professional profile has been saved successfully.",
             });
         } catch (error) {
             setProfileNote({
@@ -425,9 +526,13 @@ export function Dashboard() {
                     label={isArtisan ? "Profile Readiness" : "Completed Jobs"}
                     value={
                         isArtisan
-                            ? skills.trim()
-                                ? "Ready"
-                                : "Incomplete"
+                            ? profileLoading
+                                ? "Loading..."
+                                : profileLoadFailed
+                                    ? "Unavailable"
+                                    : profileExists && skills.trim() && years !== ""
+                                        ? "Ready"
+                                        : "Incomplete"
                             : jobsLoading
                                 ? "—"
                                 : String(completedJobsCount)
@@ -440,11 +545,28 @@ export function Dashboard() {
                     icon={isArtisan ? UserCheck : CheckCircle2}
                     badge={
                         isArtisan
-                            ? {
-                                text: skills.trim() ? "Verified" : "Action needed",
-                                tone: skills.trim() ? "success" : "warning",
+                            ? profileLoading
+                                ? {
+                                    text: "Checking profile",
+                                    tone: "warning",
+                                }
+                                : profileLoadFailed
+                                    ? {
+                                        text: "Unable to verify",
+                                        tone: "warning",
+                                    }
+                                    : {
+                                        text: profileExists && skills.trim() && years !== ""
+                                            ? "Profile complete"
+                                            : "Action needed",
+                                        tone: profileExists && skills.trim() && years !== ""
+                                            ? "success"
+                                            : "warning",
+                                    }
+                            : {
+                                text: "Account Active",
+                                tone: "success",
                             }
-                            : { text: "Account Active", tone: "success" }
                     }
                 />
             </section>

@@ -32,7 +32,12 @@ async function request(path, init = {}, token) {
     }
 
     try {
-        const res = await fetch(`${BASE}${path}`, { ...init, method, headers });
+        const res = await fetch(`${BASE}${path}`, {
+            ...init,
+            method,
+            headers,
+            cache: "no-store",
+        });
         const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
